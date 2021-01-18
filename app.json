@@ -1,5 +1,5 @@
 {
-  "name": "PWA template",
-  "description": "PWA template using jsenv",
-  "repository": "https://github.com/jsenv/jsenv-pwa-template"
+  "name": "Gridix",
+  "description": "Donjon game maker",
+  "repository": "https://github.com/damiflore/gridix"
 }

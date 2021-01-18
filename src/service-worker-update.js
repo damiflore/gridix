@@ -7,6 +7,7 @@ import {
 } from "@jsenv/pwa"
 import { createDOM } from "src/dom.js"
 
+// on fera une sorte de notif
 if (canUseServiceWorker) {
   const serviceWorkerUpdateDocument = createDOM(`
 <button>Check update</button>

@@ -4,9 +4,9 @@
     "../../../main.css"
   ],
   "names": [],
-  "mappings": "AAAA,0BAAuB",
-  "file": "main-19e322aa.css",
+  "mappings": "AAAA,6BAA0B",
+  "file": "main-a0dbee41.css",
   "sourcesContent": [
-    "@import \"./src/pwa.css\";\n"
+    "@import \"./src/gridix.css\";\n"
   ]
 }
