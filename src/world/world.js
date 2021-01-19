@@ -1,5 +1,5 @@
 import { unitCollidesWithUnit } from "src/unit/unit.js"
-import { getDistanceBetweenTwoPoints } from "../physic/geometry"
+import { getDistanceBetweenTwoPoints } from "src/physic/geometry.js"
 
 export const createWorld = ({ width, height, units } = {}) => {
   const canvas = createCanvas({
@@ -41,10 +41,11 @@ export const createWorld = ({ width, height, units } = {}) => {
               velocityRelativeVector.y * collisionVectorNormalized.y
 
             if (speed >= 0) {
-              unit.vx -= speed * collisionVectorNormalized.x
-              unit.vy -= speed * collisionVectorNormalized.y
-              otherUnit.vx += speed * collisionVectorNormalized.x
-              otherUnit.vy += speed * collisionVectorNormalized.y
+              const impulse = (2 * speed) / (unit.mass + otherUnit.mass)
+              unit.vx -= impulse * otherUnit.mass * collisionVectorNormalized.x
+              unit.vy -= impulse * otherUnit.mass * collisionVectorNormalized.y
+              otherUnit.vx += impulse * unit.mass * collisionVectorNormalized.x
+              otherUnit.vy += impulse * unit.mass * collisionVectorNormalized.y
             }
           }
         }
