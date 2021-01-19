@@ -13,9 +13,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/isPoin
 
 */
 
-import { createWorld } from "src/world/world.js"
+import { createWorld, detectUnitCollision } from "src/world/world.js"
 import { CELL_SIZE } from "src/game.constant.js"
-import { unitCollidesWithUnit } from "src/unit/unit.js"
 import { createRectangle, cellToRectangleGeometry } from "src/unit/unit.rectangle.js"
 import { createCircle, cellToCircleGeometry } from "src/unit/unit.circle.js"
 
@@ -107,6 +106,7 @@ moveAvailables.forEach((direction) => {
   }
 
   const moveAvailableHint = createRectangle({
+    isSolid: false,
     x: 0,
     y: 0,
     z: 10,
@@ -121,13 +121,16 @@ moveAvailables.forEach((direction) => {
         const destinationPoint = cellToCellCenter(moveAvailableCell)
         const moveAllowed = testMoveTo(hero, destinationPoint)
         if (moveAllowed) {
-          moveAvailableHint.fillStyle = "green"
           moveAvailableHint.move(moveAvailableCell)
-          return
+          return {
+            fillStyle: "green",
+          }
         }
       }
 
-      moveAvailableHint.fillStyle = "transparent"
+      return {
+        fillStyle: "transparent",
+      }
     },
   })
   units.push(moveAvailableHint)
@@ -143,15 +146,9 @@ const cellToCellCenter = ({ x, y }) => {
 const testMoveTo = (unit, destinationPoint) => {
   const currentPosition = { x: unit.x, y: unit.y }
   unit.move(destinationPoint)
-  const collision = someOtherUnitCollides(unit)
+  const collision = Boolean(detectUnitCollision(unit, units, world))
   unit.move(currentPosition)
   return !collision
-}
-
-const someOtherUnitCollides = (unit) => {
-  return units.some((unitCandidate) => {
-    return unitCandidate !== unit && unitCollidesWithUnit(unitCandidate, unit)
-  })
 }
 
 const cellFromPoint = ({ x, y }) => {
@@ -170,9 +167,6 @@ document.body.appendChild(world.canvas)
 
 world.start()
 
-/*
-TODO: pouvoir cliquer sur une case précédemment visité, le joueur s'y téléporte
-*/
 world.canvas.addEventListener("click", (clickEvent) => {
   const clickPoint = {
     x: clickEvent.offsetX,
