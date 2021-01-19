@@ -156,12 +156,16 @@ const someRectangleSideLine = ([firstPoint, secondPoint, thirdPoint, fourthPoint
 
 export const circleCollidesWithCircle = (firstCircle, secondCircle) => {
   // Calculate the distance between the two circles
-  const squareDistance = getDistanceBetweenTwoPoints(firstCircle, secondCircle)
+  const distanceX = firstCircle.x - secondCircle.x
+  const distanceY = firstCircle.y - secondCircle.y
+  const distanceSquared = distanceX * distanceX + distanceY * distanceY
+
   const radiusSum = firstCircle.radius + secondCircle.radius
+  const radiusSquared = radiusSum * radiusSum
 
   // When the distance is smaller or equal to the sum
   // of the two radius, the circles touch or overlap
-  return squareDistance <= radiusSum * radiusSum
+  return distanceSquared <= radiusSquared
 }
 
 // point and triangle
