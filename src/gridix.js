@@ -94,8 +94,6 @@ const createGame = ({ rowCount = 3, columnCount = 3 } = {}) => {
     })
   }
 
-  const unitIsHero = (unit) => unit === hero
-
   return {
     canvas,
     render,

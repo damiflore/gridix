@@ -1,3 +1,5 @@
+import { getDistanceBetweenTwoPoints } from "./geometry.js"
+
 // https://github.com/davidfig/intersects/blob/master/lineToLine.js
 export const lineCollidesWithLine = (
   [firstLineStartPoint, firstLineEndPoint],
@@ -72,3 +74,16 @@ const someRectangleSideLine = ([firstPoint, secondPoint, thirdPoint, fourthPoint
   if (predicate(rectangleFourthLine)) return true
   return false
 }
+
+export const circleCollidesWithCircle = (firstCircle, secondCircle) => {
+  // Calculate the distance between the two circles
+  const squareDistance = getDistanceBetweenTwoPoints(firstCircle, secondCircle)
+  const radiusSum = firstCircle.radius + secondCircle.radius
+
+  // When the distance is smaller or equal to the sum
+  // of the two radius, the circles touch or overlap
+  return squareDistance <= radiusSum * radiusSum
+}
+
+// point and triangle
+// http://www.jeffreythompson.org/collision-detection/tri-point.php

@@ -1,3 +1,14 @@
+/*
+
+Pour chaque unit on pourrait mettre une hitbox
+qui est différente de la vraie forme de l'objet
+
+une hitbox serait par défaut soit rectangle soit cercle
+pour faciliter la détection de collision
+on pourrait avoir plusieurs hitbox pour un seul objet aussi
+
+*/
+
 import { CELL_SIZE } from "src/game.constant.js"
 import { createUnit, drawPathStyle } from "src/unit/unit.js"
 
