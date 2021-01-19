@@ -85,6 +85,8 @@ export const createWorld = ({ width, height, units } = {}) => {
     })
   }
 
+  window.units = units
+
   return {
     ...world,
     canvas,
@@ -99,10 +101,10 @@ export const detectUnitCollision = (unit, units, world) => {
   const worldHeight = world.height
 
   let collidesWithWorld = false
-  let xInsideWorld
-  let yInsideWorld
-  let xVelocityAfterImpact
-  let yVelocityAfterImpact
+  let xInsideWorld = unit.x
+  let yInsideWorld = unit.y
+  let xVelocityAfterImpact = unit.vx
+  let yVelocityAfterImpact = unit.vy
   const isCircle = Boolean(unit.radius)
   if (isCircle) {
     if (unit.x < unit.radius) {
@@ -111,36 +113,36 @@ export const detectUnitCollision = (unit, units, world) => {
       xVelocityAfterImpact = Math.abs(unit.vx) * worldRestitution
     } else if (unit.x > worldWidth - unit.radius) {
       collidesWithWorld = true
-      xVelocityAfterImpact = -Math.abs(unit.vx) * worldRestitution
       xInsideWorld = worldWidth - unit.radius
+      xVelocityAfterImpact = -Math.abs(unit.vx) * worldRestitution
     }
     if (unit.y < unit.radius) {
       collidesWithWorld = true
-      yVelocityAfterImpact = Math.abs(unit.vy) * worldRestitution
       yInsideWorld = unit.radius
+      yVelocityAfterImpact = Math.abs(unit.vy) * worldRestitution
     } else if (unit.y > worldHeight - unit.radius) {
       collidesWithWorld = true
-      yVelocityAfterImpact = -Math.abs(unit.vy) * worldRestitution
       yInsideWorld = worldHeight - unit.radius
+      yVelocityAfterImpact = -Math.abs(unit.vy) * worldRestitution
     }
   }
   // rectangle then
   else if (unit.x < 0) {
     collidesWithWorld = true
-    xVelocityAfterImpact = Math.abs(unit.vx) * worldRestitution
     xInsideWorld = 0
+    xVelocityAfterImpact = Math.abs(unit.vx) * worldRestitution
   } else if (unit.x + unit.width > worldWidth) {
     collidesWithWorld = true
-    xVelocityAfterImpact = -Math.abs(unit.vx) * worldRestitution
     xInsideWorld = worldWidth - unit.width
+    xVelocityAfterImpact = -Math.abs(unit.vx) * worldRestitution
   } else if (unit.y < 0) {
     collidesWithWorld = true
-    yVelocityAfterImpact = Math.abs(unit.vy) * worldRestitution
     yInsideWorld = 0
+    yVelocityAfterImpact = Math.abs(unit.vy) * worldRestitution
   } else if (unit.y + unit.height > worldHeight) {
     collidesWithWorld = true
-    yVelocityAfterImpact = -Math.abs(unit.vy) * worldRestitution
     yInsideWorld = worldHeight - unit.height
+    yVelocityAfterImpact = -Math.abs(unit.vy) * worldRestitution
   }
   if (collidesWithWorld) {
     unit.move({ x: xInsideWorld, y: yInsideWorld })
