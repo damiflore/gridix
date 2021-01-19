@@ -10,114 +10,99 @@ simplissime
 - context api: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
 https://github.com/ovalia/ovalia/blob/master/html/game.html
 
+https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/isPointInPath
+
 */
 
-const CELL_SIZE = 32
+import { CELL_SIZE } from "src/game.constant.js"
+import { createRectangle, cellToRectangleGeometry } from "src/unit/unit.rectangle.js"
+import { createCircle, cellToCircleGeometry } from "src/unit/unit.circle.js"
 
-const createUnit = ({ x, y, z = 0, solid = false, ...rest }) => {
-  return {
-    x,
-    y,
-    z,
-    solid,
-    ...rest,
-  }
-}
+window.splashscreen.remove()
 
-const createFloor = (props) => {
-  return {
+const createFloorAtCell = ({ row, column }) => {
+  return createRectangle(cellToRectangleGeometry({ row, column }), {
     solid: false,
-    width: CELL_SIZE,
-    height: CELL_SIZE,
-    color: "white",
-    draw: unitDrawAsRectangle,
-    ...props,
-  }
+    fillStyle: "white",
+  })
 }
 
-const createWall = (props) => {
-  return createUnit({
+const createWallAtCell = ({ row, column }) => {
+  return createRectangle(cellToRectangleGeometry({ row, column }), {
     solid: true,
-    width: CELL_SIZE,
-    height: CELL_SIZE,
-    color: "black",
-    draw: unitDrawAsRectangle,
-    ...props,
+    fillStyle: "grey",
   })
 }
 
-const unitDrawAsRectangle = (unit, context) => {
-  drawRectangle(context, {
-    x: unit.x,
-    y: unit.y,
-    width: unit.width,
-    height: unit.height,
-    fillStyle: unit.color,
+const createHeroAtCell = ({ row, column, radius = 12 }) => {
+  const hero = createCircle(cellToCircleGeometry({ row, column, radius }), {
+    fillStyle: "red",
   })
+  return hero
 }
 
-const drawRectangle = (context, { fillStyle = "green", x, y, width, height }) => {
-  context.save()
-  context.fillStyle = fillStyle
-  context.fillRect(x, y, width, height)
-  context.restore()
-}
+const createGame = ({ rowCount = 3, columnCount = 3 } = {}) => {
+  const hero = createHeroAtCell({ row: 0, column: 0 })
+  const units = [
+    createFloorAtCell({ row: 0, column: 0 }),
+    createWallAtCell({ row: 1, column: 0 }),
+    createWallAtCell({ row: 2, column: 0 }),
+    createFloorAtCell({ row: 0, column: 1 }),
+    createWallAtCell({ row: 1, column: 1 }),
+    createFloorAtCell({ row: 2, column: 1 }),
+    createFloorAtCell({ row: 0, column: 2 }),
+    createFloorAtCell({ row: 1, column: 2 }),
+    createFloorAtCell({ row: 2, column: 2 }),
+    hero,
+  ]
 
-const unitDrawAsCircle = (unit, context) => {
-  drawCircle(context, {
-    x: unit.x + unit.width / 2,
-    y: unit.y + unit.height / 2,
-    radius: unit.radius,
-  })
-}
-
-const drawCircle = (context, { fillStyle = "red", x, y, radius }) => {
-  context.save()
-  context.fillStyle = fillStyle
-  context.beginPath()
-  context.arc(x, y, radius, 0, 2 * Math.PI)
-  context.stroke()
-  context.fill()
-  context.closePath()
-  context.restore()
-}
-
-const hero = createUnit({
-  x: 0,
-  y: 0,
-  width: 32,
-  height: 32,
-  draw: (unit, context) => unitDrawAsCircle({ ...unit, radius: 12 }, context),
-})
-
-const units = [
-  createFloor({ x: 0, y: 0 }),
-  createWall({ x: 32, y: 0 }),
-  createWall({ x: 64, y: 0 }),
-  createFloor({ x: 0, y: 32 }),
-  createWall({ x: 32, y: 32 }),
-  createFloor({ x: 64, y: 32 }),
-  createFloor({ x: 0, y: 64 }),
-  createFloor({ x: 32, y: 64 }),
-  createFloor({ x: 64, y: 64 }),
-  hero,
-]
-
-const createMap = ({ rowCount = 3, columnCount = 3 } = {}) => {
   const canvas = createCanvas({
     width: CELL_SIZE * columnCount,
     height: CELL_SIZE * rowCount,
   })
-
-  return canvas
-}
-
-const render = (canvas) => {
   const context = canvas.getContext("2d")
 
-  units.forEach((unit) => {
-    unit.draw(unit, context)
-  })
+  const render = () => {
+    context.clearRect(0, 0, canvas.width, canvas.height)
+    units.forEach((unit) => {
+      unit.draw(context)
+    })
+  }
+
+  const startRendering = () => {
+    render()
+
+    let stopRendering = () => {}
+    const next = () => {
+      const animationFrame = requestAnimationFrame(() => {
+        render()
+        next()
+      })
+      stopRendering = () => {
+        window.cancelAnimationFrame(animationFrame)
+      }
+    }
+
+    next()
+
+    return stopRendering
+  }
+
+  const unitsFromPoint = ({ x, y }) => {
+    return units.filter((unit) => {
+      return context.isPointInPath(unit.path, x, y)
+    })
+  }
+
+  const unitIsHero = (unit) => unit === hero
+
+  return {
+    canvas,
+    render,
+    startRendering,
+    unitsFromPoint,
+    hero,
+  }
 }
 
 const createCanvas = ({ width, height }) => {
@@ -127,8 +112,25 @@ const createCanvas = ({ width, height }) => {
   return canvas
 }
 
-const canvas = createMap()
-setTimeout(() => {
-  document.body.appendChild(canvas)
-  render(canvas)
-}, 200)
+const game = createGame()
+document.body.appendChild(game.canvas)
+
+// game.render()
+game.startRendering()
+
+game.canvas.addEventListener("click", (clickEvent) => {
+  const clickPoint = {
+    x: clickEvent.offsetX,
+    y: clickEvent.offsetY,
+  }
+  const unitsUnderClick = game.unitsFromPoint(clickPoint)
+  const heroUnderClick = unitsUnderClick.some((unit) => game.hero === unit)
+  if (heroUnderClick) {
+    return
+  }
+  const wallUnderClick = unitsUnderClick.some((unit) => unit.solid)
+  if (wallUnderClick) {
+    return
+  }
+  game.hero.move(clickPoint)
+})
