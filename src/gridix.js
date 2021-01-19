@@ -13,6 +13,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/isPoin
 
 */
 
+import { createWorld } from "src/world/world.js"
 import { CELL_SIZE } from "src/game.constant.js"
 import { unitCollidesWithUnit } from "src/unit/unit.js"
 import { createRectangle, cellToRectangleGeometry } from "src/unit/unit.rectangle.js"
@@ -43,85 +44,6 @@ const createHeroAtCell = ({ row, column, radius = 12 }) => {
     fillStyle: "red",
   })
   return hero
-}
-
-const createGame = ({ rowCount = 3, columnCount = 3, units } = {}) => {
-  const canvas = createCanvas({
-    width: CELL_SIZE * columnCount,
-    height: CELL_SIZE * rowCount,
-  })
-  const context = canvas.getContext("2d")
-
-  const render = () => {
-    units.forEach((unit) => {
-      unit.tick()
-    })
-    context.clearRect(0, 0, canvas.width, canvas.height)
-    units
-      .sort((leftUnit, rightUnit) => leftUnit.z - rightUnit.z)
-      .forEach((unit) => {
-        unit.draw(context)
-      })
-  }
-
-  // const addUnit = (unit) => {
-  //   const index = getSortedIndexForValueInArray(unit, units)
-  //   units.splice(index, 0, unit)
-
-  //   return () => {
-  //     const index = units.indexOf(unit)
-  //     if (index > -1) {
-  //       units.splice(index, 1)
-  //     }
-  //   }
-  // }
-
-  const startRendering = () => {
-    render()
-
-    let stopRendering = () => {}
-    const next = () => {
-      const animationFrame = requestAnimationFrame(() => {
-        render()
-        next()
-      })
-      stopRendering = () => {
-        window.cancelAnimationFrame(animationFrame)
-      }
-    }
-
-    next()
-
-    return stopRendering
-  }
-
-  const unitsFromPoint = ({ x, y }) => {
-    return units.filter((unit) => {
-      return context.isPointInPath(unit.path, x, y)
-    })
-  }
-
-  const cellFromPoint = ({ x, y }) => {
-    return {
-      x: Math.floor(x / CELL_SIZE) * CELL_SIZE,
-      y: Math.floor(y / CELL_SIZE) * CELL_SIZE,
-    }
-  }
-
-  return {
-    canvas,
-    render,
-    startRendering,
-    unitsFromPoint,
-    cellFromPoint,
-  }
-}
-
-const createCanvas = ({ width, height }) => {
-  const canvas = document.createElement("canvas")
-  canvas.width = width
-  canvas.height = height
-  return canvas
 }
 
 const units = [
@@ -193,7 +115,7 @@ moveAvailables.forEach((direction) => {
     fillStyle: "transparent",
     opacity: 0.5,
     tick: () => {
-      const heroCell = game.cellFromPoint(hero)
+      const heroCell = cellFromPoint(hero)
       const moveAvailableCell = heroCellToMoveCell(heroCell)
       if (moveAvailableCell) {
         const destinationPoint = cellToCellCenter(moveAvailableCell)
@@ -232,21 +154,31 @@ const someOtherUnitCollides = (unit) => {
   })
 }
 
-const game = createGame({ units })
-document.body.appendChild(game.canvas)
+const cellFromPoint = ({ x, y }) => {
+  return {
+    x: Math.floor(x / CELL_SIZE) * CELL_SIZE,
+    y: Math.floor(y / CELL_SIZE) * CELL_SIZE,
+  }
+}
 
-// game.render()
-game.startRendering()
+const world = createWorld({
+  width: 3 * CELL_SIZE,
+  height: 3 * CELL_SIZE,
+  units,
+})
+document.body.appendChild(world.canvas)
+
+world.start()
 
 /*
 TODO: pouvoir cliquer sur une case précédemment visité, le joueur s'y téléporte
 */
-game.canvas.addEventListener("click", (clickEvent) => {
+world.canvas.addEventListener("click", (clickEvent) => {
   const clickPoint = {
     x: clickEvent.offsetX,
     y: clickEvent.offsetY,
   }
-  const destinationPoint = cellToCellCenter(game.cellFromPoint(clickPoint))
+  const destinationPoint = cellToCellCenter(cellFromPoint(clickPoint))
   const moveAllowed = testMoveTo(hero, destinationPoint)
   if (moveAllowed) {
     hero.move(destinationPoint)
