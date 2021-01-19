@@ -15,11 +15,12 @@ import { createUnit, drawPathStyle } from "src/unit/unit.js"
 export const createCircle = ({
   isSolid = true,
   isColliding = false,
+  isBounceEnabled = false,
   x,
   y,
   radius,
-  vx,
-  vy,
+  vx = 0,
+  vy = 0,
   fillStyle = "violet",
   opacity,
   tick = () => {},
@@ -27,6 +28,7 @@ export const createCircle = ({
   const circle = {
     isSolid,
     isColliding,
+    isBounceEnabled,
     x,
     y,
     radius,
