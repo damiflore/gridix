@@ -11,10 +11,10 @@ export const createUnit = (props) => {
 
 export const unitCollidesWithUnit = (firstUnit, secondUnit) => {
   // il faudrait aussi tester qu'ils sont sur le meme Z
-  if (!firstUnit.solid) {
+  if (!firstUnit.isSolid) {
     return false
   }
-  if (!secondUnit.solid) {
+  if (!secondUnit.isSolid) {
     return false
   }
 

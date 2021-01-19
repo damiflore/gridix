@@ -2,19 +2,25 @@ import { CELL_SIZE } from "src/game.constant.js"
 import { createUnit, drawPathStyle } from "src/unit/unit.js"
 
 export const createRectangle = ({
+  isSolid = true,
+  isColliding = false,
   x,
   y,
   width,
   height,
-  solid = false,
+  vx,
+  vy,
   fillStyle = "violet",
   opacity,
   tick = () => {},
 }) => {
   const rectangle = {
-    solid,
+    isSolid,
+    isColliding,
     x,
     y,
+    vx,
+    vy,
     width,
     height,
     fillStyle,

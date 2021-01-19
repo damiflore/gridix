@@ -24,7 +24,7 @@ window.splashscreen.remove()
 const createFloorAtCell = ({ row, column }) => {
   return createRectangle({
     ...cellToRectangleGeometry({ row, column }),
-    solid: false,
+    isSolid: false,
     fillStyle: "white",
   })
 }
@@ -32,7 +32,7 @@ const createFloorAtCell = ({ row, column }) => {
 const createWallAtCell = ({ row, column }) => {
   return createRectangle({
     ...cellToRectangleGeometry({ row, column }),
-    solid: true,
+    isSolid: true,
     fillStyle: "grey",
   })
 }
@@ -40,7 +40,7 @@ const createWallAtCell = ({ row, column }) => {
 const createHeroAtCell = ({ row, column, radius = 12 }) => {
   const hero = createCircle({
     ...cellToCircleGeometry({ row, column, radius }),
-    solid: true,
+    isSolid: true,
     fillStyle: "red",
   })
   return hero

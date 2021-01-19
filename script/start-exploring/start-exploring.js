@@ -8,6 +8,9 @@ startExploring({
     "app": {
       "./main.html": true,
     },
+    "example": {
+      "example/**/*.html": true,
+    },
     "unit tests": {
       "test/**/*.test.html": true,
     },

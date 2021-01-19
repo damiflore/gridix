@@ -1,3 +1,5 @@
+import { unitCollidesWithUnit } from "src/unit/unit.js"
+
 export const createWorld = ({ width, height, units } = {}) => {
   const canvas = createCanvas({
     width,
@@ -5,9 +7,43 @@ export const createWorld = ({ width, height, units } = {}) => {
   })
   const context = canvas.getContext("2d")
 
-  const tick = (msEllapsed) => {
+  const detectCollisions = () => {
     units.forEach((unit) => {
-      unit.tick(msEllapsed)
+      unit.isColliding = false
+    })
+
+    units.forEach((unit) => {
+      units.forEach((otherUnit) => {
+        if (otherUnit === unit) {
+          return
+        }
+        if (unitCollidesWithUnit(unit, otherUnit)) {
+          unit.isColliding = true
+          otherUnit.isColliding = true
+        }
+      })
+    })
+  }
+
+  const applyVelocity = (msEllapsed) => {
+    units.forEach((unit) => {
+      if (unit.vx || unit.vy) {
+        unit.move({
+          x: unit.x + unit.vx * (msEllapsed / 1000),
+          y: unit.y + unit.vy * (msEllapsed / 1000),
+        })
+      }
+    })
+  }
+
+  const tick = (msEllapsed) => {
+    applyVelocity(msEllapsed)
+    detectCollisions(msEllapsed)
+    units.forEach((unit) => {
+      const props = unit.tick(unit, msEllapsed)
+      if (props) {
+        Object.assign(unit, props)
+      }
     })
   }
 

@@ -13,19 +13,21 @@ import { CELL_SIZE } from "src/game.constant.js"
 import { createUnit, drawPathStyle } from "src/unit/unit.js"
 
 export const createCircle = ({
+  isSolid = true,
+  isColliding = false,
   x,
   y,
   radius,
-  solid = false,
   fillStyle = "violet",
   opacity,
   tick = () => {},
 }) => {
   const circle = {
+    isSolid,
+    isColliding,
     x,
     y,
     radius,
-    solid,
     fillStyle,
     opacity,
     tick,
