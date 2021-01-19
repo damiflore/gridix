@@ -30,6 +30,7 @@ export const createCircle = ({ x, y, radius }, { fillStyle = "violet" }) => {
     },
   }
   circle.path = createPathForCircle(circle)
+  circle.hitboxes = [circle]
   return createUnit(circle)
 }
 

@@ -9,7 +9,6 @@ simplissime
 
 - context api: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
 https://github.com/ovalia/ovalia/blob/master/html/game.html
-
 https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/isPointInPath
 
 */
@@ -116,6 +115,17 @@ document.body.appendChild(game.canvas)
 // game.render()
 game.startRendering()
 
+/*
+next step:
+ne pas pouvoir se rendre sur une case si un élement est entre le joueur et sa destination (collision)
+en imaginant que le joueur veut se déplacer en ligne droite vers cette destination
+
+ne pouvoir click que autour du joueur (1 case)
+et mettre en évidence ces cases.
+
+pour voir cliquer sur une case précédemment visité, le joueur s'y téléporte
+
+*/
 game.canvas.addEventListener("click", (clickEvent) => {
   const clickPoint = {
     x: clickEvent.offsetX,
@@ -130,5 +140,17 @@ game.canvas.addEventListener("click", (clickEvent) => {
   if (wallUnderClick) {
     return
   }
-  game.hero.move(clickPoint)
+  // on le bouge au centre de la cellule la plus proche!
+  const cellAtClick = cellFromPoint(clickPoint)
+  game.hero.move({
+    x: cellAtClick.x + CELL_SIZE / 2,
+    y: cellAtClick.y + CELL_SIZE / 2,
+  })
 })
+
+const cellFromPoint = ({ x, y }) => {
+  return {
+    x: Math.floor(x / CELL_SIZE) * CELL_SIZE,
+    y: Math.floor(y / CELL_SIZE) * CELL_SIZE,
+  }
+}

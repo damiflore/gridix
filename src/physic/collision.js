@@ -41,6 +41,62 @@ export const lineCollidesWithLine = (
   return isIntersecting
 }
 
+// https://codepen.io/JChehe/pen/dWmYjO?editors=1010
+
+export const rectangleCollidesWithRectangle = (firstRectangle, secondRectangle) => {
+  const firstRectangleRight = firstRectangle[1].x
+  const secondRectangleLeft = secondRectangle[0].x
+  // first left of second
+  if (firstRectangleRight <= secondRectangleLeft) {
+    return false
+  }
+
+  const firstRectangleLeft = firstRectangle[0].x
+  const secondRectangleRight = secondRectangle[1].x
+  // first right of second
+  if (firstRectangleLeft >= secondRectangleRight) {
+    return false
+  }
+
+  const firstRectangleBottom = firstRectangle[2].y
+  const secondRectangleTop = secondRectangle[0].y
+  // first above second
+  if (firstRectangleBottom <= secondRectangleTop) {
+    return false
+  }
+
+  const firstRectangleTop = firstRectangle[0].y
+  const secondRectangleBottom = secondRectangle[2].y
+  // first below second
+  if (firstRectangleTop >= secondRectangleBottom) {
+    return false
+  }
+
+  return true
+}
+
+export const circleCollidesWithRectangle = (circle, rectangle) => {
+  let closestRectanglePointX
+  let closestRectanglePointY
+
+  const rectangleTopLeftPoint = rectangle[0]
+  const rectangleTopRightPoint = rectangle[1]
+  const rectangleBottomRightPoint = rectangle[2]
+
+  if (circle.x < rectangleTopLeftPoint.x) {
+    closestRectanglePointX = rectangleTopLeftPoint.x
+  } else if (circle.x > rectangleTopRightPoint.x) {
+    closestRectanglePointX = rectangleTopRightPoint.x
+  }
+  if (circle.y < rectangleTopLeftPoint.y) {
+    closestRectanglePointY = rectangleTopLeftPoint.y
+  } else if (circle.y > rectangleBottomRightPoint.y) {
+    closestRectanglePointY = rectangleBottomRightPoint.y
+  }
+
+  return pointCollidesWithCircle({ x: closestRectanglePointX, y: closestRectanglePointY }, circle)
+}
+
 export const rotatedRectangleCollidesWithRotatedRectangle = (
   firstRotatedRectangle,
   secondRotatedRectangle,
@@ -65,13 +121,25 @@ export const lineCollidesWithRectangle = (line, rectangle) => {
 
 const someRectangleSideLine = ([firstPoint, secondPoint, thirdPoint, fourthPoint], predicate) => {
   const rectangleFirstLine = [firstPoint, secondPoint]
-  if (predicate(rectangleFirstLine)) return true
+  if (predicate(rectangleFirstLine)) {
+    return true
+  }
+
   const rectangleSecondLine = [secondPoint, thirdPoint]
-  if (predicate(rectangleSecondLine)) return true
+  if (predicate(rectangleSecondLine)) {
+    return true
+  }
+
   const rectangleThirdLine = [thirdPoint, fourthPoint]
-  if (predicate(rectangleThirdLine)) return true
+  if (predicate(rectangleThirdLine)) {
+    return true
+  }
+
   const rectangleFourthLine = [fourthPoint, firstPoint]
-  if (predicate(rectangleFourthLine)) return true
+  if (predicate(rectangleFourthLine)) {
+    return true
+  }
+
   return false
 }
 
@@ -87,3 +155,32 @@ export const circleCollidesWithCircle = (firstCircle, secondCircle) => {
 
 // point and triangle
 // http://www.jeffreythompson.org/collision-detection/tri-point.php
+
+export const lineCollidesWithCircle = () => {
+  // TODO
+}
+
+export const pointCollidesWithCircle = (point, circle) => {
+  const distanceBetweenPointAndCircleCenter = getDistanceBetweenTwoPoints(point, circle)
+  if (distanceBetweenPointAndCircleCenter <= circle.radius) {
+    return true
+  }
+  return false
+}
+
+export const pointCollidesWithLine = (point, line) => {
+  const distanceWithLineStart = getDistanceBetweenTwoPoints(point, line[0])
+  const distanceWithLineEnd = getDistanceBetweenTwoPoints(point, line[1])
+
+  const lineLength = getDistanceBetweenTwoPoints(line[0], line[1])
+
+  // if the two distances are equal to the line length, point is one the line
+  if (
+    distanceWithLineStart + distanceWithLineEnd >= lineLength - 0.1 &&
+    distanceWithLineStart + distanceWithLineEnd <= lineLength + 0.1
+  ) {
+    return true
+  }
+
+  return false
+}

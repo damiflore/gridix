@@ -30,6 +30,7 @@ export const createRectangle = (
     },
   }
   rectangle.path = createPathForPolygon(rectangleToPoints(rectangle))
+  rectangle.hitboxes = [rectangle]
 
   return createUnit(rectangle)
 }
