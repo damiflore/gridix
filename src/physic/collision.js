@@ -76,25 +76,36 @@ export const rectangleCollidesWithRectangle = (firstRectangle, secondRectangle) 
 }
 
 export const circleCollidesWithRectangle = (circle, rectangle) => {
-  let closestRectanglePointX
-  let closestRectanglePointY
+  let closestPointX
+  let closestPointY
 
-  const rectangleTopLeftPoint = rectangle[0]
-  const rectangleTopRightPoint = rectangle[1]
-  const rectangleBottomRightPoint = rectangle[2]
+  const circleX = circle.x
+  const circleY = circle.y
+  const rectangleLeft = rectangle[0].x
+  const rectangleTop = rectangle[0].y
+  const rectangleRight = rectangle[1].x
+  const rectangleBottom = rectangle[2].y
 
-  if (circle.x < rectangleTopLeftPoint.x) {
-    closestRectanglePointX = rectangleTopLeftPoint.x
-  } else if (circle.x > rectangleTopRightPoint.x) {
-    closestRectanglePointX = rectangleTopRightPoint.x
+  if (circleX < rectangleLeft) {
+    closestPointX = rectangleLeft
+  } else if (circleX > rectangleRight) {
+    closestPointX = rectangleRight
+  } else {
+    closestPointX = circleX
   }
-  if (circle.y < rectangleTopLeftPoint.y) {
-    closestRectanglePointY = rectangleTopLeftPoint.y
-  } else if (circle.y > rectangleBottomRightPoint.y) {
-    closestRectanglePointY = rectangleBottomRightPoint.y
+  if (circleY < rectangleTop) {
+    closestPointY = rectangleTop
+  } else if (circleY > rectangleBottom) {
+    closestPointY = rectangleBottom
+  } else {
+    closestPointY = circleY
   }
 
-  return pointCollidesWithCircle({ x: closestRectanglePointX, y: closestRectanglePointY }, circle)
+  const distanceX = circleX - closestPointX
+  const distanceY = circleY - closestPointY
+  const distanceSquared = distanceX * distanceX + distanceY * distanceY
+  const radiusSquared = circle.radius * circle.radius
+  return distanceSquared < radiusSquared
 }
 
 export const rotatedRectangleCollidesWithRotatedRectangle = (

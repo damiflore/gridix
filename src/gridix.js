@@ -14,47 +14,38 @@ https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/isPoin
 */
 
 import { CELL_SIZE } from "src/game.constant.js"
+import { unitCollidesWithUnit } from "src/unit/unit.js"
 import { createRectangle, cellToRectangleGeometry } from "src/unit/unit.rectangle.js"
 import { createCircle, cellToCircleGeometry } from "src/unit/unit.circle.js"
 
 window.splashscreen.remove()
 
 const createFloorAtCell = ({ row, column }) => {
-  return createRectangle(cellToRectangleGeometry({ row, column }), {
+  return createRectangle({
+    ...cellToRectangleGeometry({ row, column }),
     solid: false,
     fillStyle: "white",
   })
 }
 
 const createWallAtCell = ({ row, column }) => {
-  return createRectangle(cellToRectangleGeometry({ row, column }), {
+  return createRectangle({
+    ...cellToRectangleGeometry({ row, column }),
     solid: true,
     fillStyle: "grey",
   })
 }
 
 const createHeroAtCell = ({ row, column, radius = 12 }) => {
-  const hero = createCircle(cellToCircleGeometry({ row, column, radius }), {
+  const hero = createCircle({
+    ...cellToCircleGeometry({ row, column, radius }),
+    solid: true,
     fillStyle: "red",
   })
   return hero
 }
 
-const createGame = ({ rowCount = 3, columnCount = 3 } = {}) => {
-  const hero = createHeroAtCell({ row: 0, column: 0 })
-  const units = [
-    createFloorAtCell({ row: 0, column: 0 }),
-    createWallAtCell({ row: 1, column: 0 }),
-    createWallAtCell({ row: 2, column: 0 }),
-    createFloorAtCell({ row: 0, column: 1 }),
-    createWallAtCell({ row: 1, column: 1 }),
-    createFloorAtCell({ row: 2, column: 1 }),
-    createFloorAtCell({ row: 0, column: 2 }),
-    createFloorAtCell({ row: 1, column: 2 }),
-    createFloorAtCell({ row: 2, column: 2 }),
-    hero,
-  ]
-
+const createGame = ({ rowCount = 3, columnCount = 3, units } = {}) => {
   const canvas = createCanvas({
     width: CELL_SIZE * columnCount,
     height: CELL_SIZE * rowCount,
@@ -62,11 +53,28 @@ const createGame = ({ rowCount = 3, columnCount = 3 } = {}) => {
   const context = canvas.getContext("2d")
 
   const render = () => {
-    context.clearRect(0, 0, canvas.width, canvas.height)
     units.forEach((unit) => {
-      unit.draw(context)
+      unit.tick()
     })
+    context.clearRect(0, 0, canvas.width, canvas.height)
+    units
+      .sort((leftUnit, rightUnit) => leftUnit.z - rightUnit.z)
+      .forEach((unit) => {
+        unit.draw(context)
+      })
   }
+
+  // const addUnit = (unit) => {
+  //   const index = getSortedIndexForValueInArray(unit, units)
+  //   units.splice(index, 0, unit)
+
+  //   return () => {
+  //     const index = units.indexOf(unit)
+  //     if (index > -1) {
+  //       units.splice(index, 1)
+  //     }
+  //   }
+  // }
 
   const startRendering = () => {
     render()
@@ -93,12 +101,19 @@ const createGame = ({ rowCount = 3, columnCount = 3 } = {}) => {
     })
   }
 
+  const cellFromPoint = ({ x, y }) => {
+    return {
+      x: Math.floor(x / CELL_SIZE) * CELL_SIZE,
+      y: Math.floor(y / CELL_SIZE) * CELL_SIZE,
+    }
+  }
+
   return {
     canvas,
     render,
     startRendering,
     unitsFromPoint,
-    hero,
+    cellFromPoint,
   }
 }
 
@@ -109,48 +124,131 @@ const createCanvas = ({ width, height }) => {
   return canvas
 }
 
-const game = createGame()
+const units = [
+  createFloorAtCell({ row: 0, column: 0 }),
+  createWallAtCell({ row: 1, column: 0 }),
+  createWallAtCell({ row: 2, column: 0 }),
+  createFloorAtCell({ row: 0, column: 1 }),
+  createWallAtCell({ row: 1, column: 1 }),
+  createFloorAtCell({ row: 2, column: 1 }),
+  createFloorAtCell({ row: 0, column: 2 }),
+  createFloorAtCell({ row: 1, column: 2 }),
+  createFloorAtCell({ row: 2, column: 2 }),
+]
+
+const hero = createHeroAtCell({ row: 0, column: 0 })
+units.push(hero)
+
+const moveAvailables = [
+  // directions
+  "left",
+  "right",
+  "top",
+  "bottom",
+]
+moveAvailables.forEach((direction) => {
+  const heroCellToMoveCell = (heroCell) => {
+    if (direction === "left") {
+      if (heroCell.x === 0) {
+        return null
+      }
+      return {
+        x: heroCell.x - CELL_SIZE,
+        y: heroCell.y,
+      }
+    }
+    if (direction === "right") {
+      if (heroCell.x === 2 * CELL_SIZE) {
+        return null
+      }
+      return {
+        x: heroCell.x + CELL_SIZE,
+        y: heroCell.y,
+      }
+    }
+    if (direction === "top") {
+      if (heroCell.y === 0) {
+        return null
+      }
+      return {
+        x: heroCell.x,
+        y: heroCell.y - CELL_SIZE,
+      }
+    }
+    if (heroCell.y === 2 * CELL_SIZE) {
+      return null
+    }
+    return {
+      x: heroCell.x,
+      y: heroCell.y + CELL_SIZE,
+    }
+  }
+
+  const moveAvailableHint = createRectangle({
+    x: 0,
+    y: 0,
+    z: 10,
+    width: CELL_SIZE,
+    height: CELL_SIZE,
+    fillStyle: "transparent",
+    opacity: 0.5,
+    tick: () => {
+      const heroCell = game.cellFromPoint(hero)
+      const moveAvailableCell = heroCellToMoveCell(heroCell)
+      if (moveAvailableCell) {
+        const destinationPoint = cellToCellCenter(moveAvailableCell)
+        const moveAllowed = testMoveTo(hero, destinationPoint)
+        if (moveAllowed) {
+          moveAvailableHint.fillStyle = "green"
+          moveAvailableHint.move(moveAvailableCell)
+          return
+        }
+      }
+
+      moveAvailableHint.fillStyle = "transparent"
+    },
+  })
+  units.push(moveAvailableHint)
+})
+
+const cellToCellCenter = ({ x, y }) => {
+  return {
+    x: x + CELL_SIZE / 2,
+    y: y + CELL_SIZE / 2,
+  }
+}
+
+const testMoveTo = (unit, destinationPoint) => {
+  const currentPosition = { x: unit.x, y: unit.y }
+  unit.move(destinationPoint)
+  const collision = someOtherUnitCollides(unit)
+  unit.move(currentPosition)
+  return !collision
+}
+
+const someOtherUnitCollides = (unit) => {
+  return units.some((unitCandidate) => {
+    return unitCandidate !== unit && unitCollidesWithUnit(unitCandidate, unit)
+  })
+}
+
+const game = createGame({ units })
 document.body.appendChild(game.canvas)
 
 // game.render()
 game.startRendering()
 
 /*
-next step:
-ne pas pouvoir se rendre sur une case si un élement est entre le joueur et sa destination (collision)
-en imaginant que le joueur veut se déplacer en ligne droite vers cette destination
-
-ne pouvoir click que autour du joueur (1 case)
-et mettre en évidence ces cases.
-
-pour voir cliquer sur une case précédemment visité, le joueur s'y téléporte
-
+TODO: pouvoir cliquer sur une case précédemment visité, le joueur s'y téléporte
 */
 game.canvas.addEventListener("click", (clickEvent) => {
   const clickPoint = {
     x: clickEvent.offsetX,
     y: clickEvent.offsetY,
   }
-  const unitsUnderClick = game.unitsFromPoint(clickPoint)
-  const heroUnderClick = unitsUnderClick.some((unit) => game.hero === unit)
-  if (heroUnderClick) {
-    return
+  const destinationPoint = cellToCellCenter(game.cellFromPoint(clickPoint))
+  const moveAllowed = testMoveTo(hero, destinationPoint)
+  if (moveAllowed) {
+    hero.move(destinationPoint)
   }
-  const wallUnderClick = unitsUnderClick.some((unit) => unit.solid)
-  if (wallUnderClick) {
-    return
-  }
-  // on le bouge au centre de la cellule la plus proche!
-  const cellAtClick = cellFromPoint(clickPoint)
-  game.hero.move({
-    x: cellAtClick.x + CELL_SIZE / 2,
-    y: cellAtClick.y + CELL_SIZE / 2,
-  })
 })
-
-const cellFromPoint = ({ x, y }) => {
-  return {
-    x: Math.floor(x / CELL_SIZE) * CELL_SIZE,
-    y: Math.floor(y / CELL_SIZE) * CELL_SIZE,
-  }
-}

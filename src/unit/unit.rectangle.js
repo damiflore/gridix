@@ -1,10 +1,16 @@
 import { CELL_SIZE } from "src/game.constant.js"
 import { createUnit, drawPathStyle } from "src/unit/unit.js"
 
-export const createRectangle = (
-  { x, y, width, height },
-  { solid = false, fillStyle = "violet" },
-) => {
+export const createRectangle = ({
+  x,
+  y,
+  width,
+  height,
+  solid = false,
+  fillStyle = "violet",
+  opacity,
+  tick = () => {},
+}) => {
   const rectangle = {
     solid,
     x,
@@ -12,6 +18,8 @@ export const createRectangle = (
     width,
     height,
     fillStyle,
+    opacity,
+    tick,
 
     move: ({ x = rectangle.x, y = rectangle.y }) => {
       rectangle.x = x
@@ -26,7 +34,7 @@ export const createRectangle = (
     },
 
     draw: (context) => {
-      drawPathStyle(context, rectangle.path, rectangle)
+      drawPathStyle(context, rectangle)
     },
   }
   rectangle.path = createPathForPolygon(rectangleToPoints(rectangle))
@@ -55,7 +63,7 @@ export const cellToRectangleGeometry = ({ row, column, width = CELL_SIZE, height
   }
 }
 
-const rectangleToPoints = ({ x, y, width, height }) => {
+export const rectangleToPoints = ({ x, y, width, height }) => {
   return [
     { x, y },
     { x: x + width, y },

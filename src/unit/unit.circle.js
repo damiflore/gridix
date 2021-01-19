@@ -12,12 +12,23 @@ on pourrait avoir plusieurs hitbox pour un seul objet aussi
 import { CELL_SIZE } from "src/game.constant.js"
 import { createUnit, drawPathStyle } from "src/unit/unit.js"
 
-export const createCircle = ({ x, y, radius }, { fillStyle = "violet" }) => {
+export const createCircle = ({
+  x,
+  y,
+  radius,
+  solid = false,
+  fillStyle = "violet",
+  opacity,
+  tick = () => {},
+}) => {
   const circle = {
     x,
     y,
     radius,
+    solid,
     fillStyle,
+    opacity,
+    tick,
 
     move: ({ x = circle.x, y = circle.y }) => {
       circle.x = x
@@ -26,11 +37,12 @@ export const createCircle = ({ x, y, radius }, { fillStyle = "violet" }) => {
     },
 
     draw: (context) => {
-      drawPathStyle(context, circle.path, circle)
+      drawPathStyle(context, circle)
     },
   }
   circle.path = createPathForCircle(circle)
   circle.hitboxes = [circle]
+
   return createUnit(circle)
 }
 
