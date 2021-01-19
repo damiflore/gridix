@@ -16,6 +16,7 @@ export const createRectangle = ({
   fillStyle = "violet",
   opacity,
   tick = () => {},
+  onCollision,
 }) => {
   const rectangle = {
     isSolid,
@@ -32,6 +33,7 @@ export const createRectangle = ({
     fillStyle,
     opacity,
     tick,
+    onCollision,
 
     move: ({ x = rectangle.x, y = rectangle.y }) => {
       rectangle.x = x

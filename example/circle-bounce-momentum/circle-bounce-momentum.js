@@ -3,6 +3,20 @@ import { createCircle } from "src/unit/unit.circle.js"
 import { createRectangle } from "src/unit/unit.rectangle.js"
 
 const units = [
+  createRectangle({
+    isBounceEnabled: true,
+    x: 10,
+    y: 10,
+    width: 90,
+    height: 250,
+    vx: 40,
+    vy: 5,
+    tick: ({ isColliding }) => {
+      return {
+        fillStyle: isColliding ? "red" : "green",
+      }
+    },
+  }),
   createCircle({
     isBounceEnabled: true,
     x: 250,
@@ -84,8 +98,8 @@ const units = [
   }),
   createCircle({
     isBounceEnabled: true,
-    x: 50,
-    y: 50,
+    x: 90,
+    y: 250,
     radius: 50,
     mass: 4,
     vx: 50,

@@ -1,5 +1,6 @@
 import { unitCollidesWithUnit } from "src/unit/unit.js"
-import { getDistanceBetweenTwoPoints } from "src/physic/geometry.js"
+import { getDistanceBetweenTwoPoints, getRectangleCenterPoint } from "src/physic/geometry.js"
+import { rectangleToPoints } from "src/unit/unit.rectangle.js"
 
 export const createWorld = ({ width, height, units } = {}) => {
   const canvas = createCanvas({
@@ -15,8 +16,8 @@ export const createWorld = ({ width, height, units } = {}) => {
       unit.isColliding = false
     })
 
-    units.forEach((unit, index) => {
-      const performCollision = detectUnitCollision(unit, units.slice(index + 1), world)
+    units.forEach((unit) => {
+      const performCollision = detectUnitCollision(unit, units, world)
       if (performCollision) {
         performCollision()
       }
@@ -54,14 +55,24 @@ export const createWorld = ({ width, height, units } = {}) => {
       })
   }
 
+  let animationFrame
+  let stopped = false
+
+  const stop = () => {
+    stopped = true
+    window.cancelAnimationFrame(animationFrame)
+  }
+
   const start = () => {
     tick(0)
     draw()
     let msPrevious = performance.now()
 
-    let stop = () => {}
     const next = () => {
-      const animationFrame = requestAnimationFrame(() => {
+      if (stopped) {
+        return
+      }
+      animationFrame = window.requestAnimationFrame(() => {
         const msNow = performance.now()
         const msEllapsed = msNow - msPrevious
         msPrevious = msNow
@@ -69,14 +80,9 @@ export const createWorld = ({ width, height, units } = {}) => {
         draw()
         next()
       })
-      stop = () => {
-        window.cancelAnimationFrame(animationFrame)
-      }
     }
 
     next()
-
-    return stop
   }
 
   const unitsFromPoint = ({ x, y }) => {
@@ -91,6 +97,7 @@ export const createWorld = ({ width, height, units } = {}) => {
     ...world,
     canvas,
     start,
+    stop,
     unitsFromPoint,
   }
 }
@@ -165,12 +172,22 @@ export const detectUnitCollision = (unit, units, world) => {
     unit.isColliding = true
     otherUnit.isColliding = true
 
+    if (unit.onCollision) {
+      unit.onCollision(otherUnit, unit)
+    }
+    if (otherUnit.onCollision) {
+      otherUnit.onCollision(unit, otherUnit)
+    }
+
     if (unit.isBounceEnabled || otherUnit.isBounceEnabled) {
+      const otherUnitCenter = unitToCenterPoint(otherUnit)
+      const unitCenter = unitToCenterPoint(unit)
+
       const collisionVector = {
-        x: otherUnit.x - unit.x,
-        y: otherUnit.y - unit.y,
+        x: otherUnitCenter.x - unitCenter.x,
+        y: otherUnitCenter.y - unitCenter.y,
       }
-      const distanceBetweenUnits = getDistanceBetweenTwoPoints(otherUnit, unit)
+      const distanceBetweenUnits = getDistanceBetweenTwoPoints(otherUnitCenter, unitCenter)
       const collisionVectorNormalized = {
         x: collisionVector.x / distanceBetweenUnits,
         y: collisionVector.y / distanceBetweenUnits,
@@ -204,6 +221,14 @@ const createCanvas = ({ width, height }) => {
   canvas.width = width
   canvas.height = height
   return canvas
+}
+
+const unitToCenterPoint = (unit) => {
+  const isCircle = Boolean(unit.radius)
+  if (isCircle) {
+    return { x: unit.x, y: unit.y }
+  }
+  return getRectangleCenterPoint(rectangleToPoints(unit))
 }
 
 // const addUnit = (unit) => {

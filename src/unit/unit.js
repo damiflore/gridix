@@ -3,7 +3,6 @@ import {
   rectangleCollidesWithRectangle,
   circleCollidesWithRectangle,
 } from "src/physic/collision.js"
-import { rectangleToPoints } from "./unit.rectangle.js"
 
 export const createUnit = (props) => {
   return props
@@ -34,17 +33,14 @@ const hitboxCollidesHitbox = (firstHitbox, secondHitbox) => {
   }
 
   if (firstIsCircle) {
-    return circleCollidesWithRectangle(firstHitbox, rectangleToPoints(secondHitbox))
+    return circleCollidesWithRectangle(firstHitbox, secondHitbox)
   }
 
   if (secondIsCircle) {
-    return circleCollidesWithRectangle(secondHitbox, rectangleToPoints(firstHitbox))
+    return circleCollidesWithRectangle(secondHitbox, firstHitbox)
   }
 
-  return rectangleCollidesWithRectangle(
-    rectangleToPoints(firstHitbox),
-    rectangleToPoints(secondHitbox),
-  )
+  return rectangleCollidesWithRectangle(firstHitbox, secondHitbox)
 }
 
 export const drawPathStyle = (context, { path, fillStyle, strokeStyle, opacity = 1 } = {}) => {

@@ -44,29 +44,29 @@ export const lineCollidesWithLine = (
 // https://codepen.io/JChehe/pen/dWmYjO?editors=1010
 
 export const rectangleCollidesWithRectangle = (firstRectangle, secondRectangle) => {
-  const firstRectangleRight = firstRectangle[1].x
-  const secondRectangleLeft = secondRectangle[0].x
+  const firstRectangleLeft = firstRectangle.x
+  const firstRectangleRight = firstRectangleLeft + firstRectangle.width
+  const secondRectangleLeft = secondRectangle.x
   // first left of second
   if (firstRectangleRight <= secondRectangleLeft) {
     return false
   }
 
-  const firstRectangleLeft = firstRectangle[0].x
-  const secondRectangleRight = secondRectangle[1].x
+  const secondRectangleRight = secondRectangleLeft + secondRectangle.width
   // first right of second
   if (firstRectangleLeft >= secondRectangleRight) {
     return false
   }
 
-  const firstRectangleBottom = firstRectangle[2].y
-  const secondRectangleTop = secondRectangle[0].y
+  const firstRectangleTop = firstRectangle.y
+  const firstRectangleBottom = firstRectangleTop + firstRectangle.height
+  const secondRectangleTop = secondRectangle.y
   // first above second
   if (firstRectangleBottom <= secondRectangleTop) {
     return false
   }
 
-  const firstRectangleTop = firstRectangle[0].y
-  const secondRectangleBottom = secondRectangle[2].y
+  const secondRectangleBottom = secondRectangleTop + secondRectangle.height
   // first below second
   if (firstRectangleTop >= secondRectangleBottom) {
     return false
@@ -81,10 +81,10 @@ export const circleCollidesWithRectangle = (circle, rectangle) => {
 
   const circleX = circle.x
   const circleY = circle.y
-  const rectangleLeft = rectangle[0].x
-  const rectangleTop = rectangle[0].y
-  const rectangleRight = rectangle[1].x
-  const rectangleBottom = rectangle[2].y
+  const rectangleLeft = rectangle.x
+  const rectangleTop = rectangle.y
+  const rectangleRight = rectangleLeft + rectangle.width
+  const rectangleBottom = rectangleTop + rectangle.height
 
   if (circleX < rectangleLeft) {
     closestPointX = rectangleLeft
