@@ -13,16 +13,13 @@ export const createWorld = ({ width, height, units } = {}) => {
       unit.isColliding = false
     })
 
-    units.forEach((unit) => {
-      units.forEach((otherUnit) => {
-        if (otherUnit === unit) {
-          return
-        }
+    units.forEach((unit, index) => {
+      units.slice(index + 1).forEach((otherUnit) => {
         if (unitCollidesWithUnit(unit, otherUnit)) {
           unit.isColliding = true
           otherUnit.isColliding = true
 
-          if (unit.isBounceEnabled && otherUnit.isBounceEnabled) {
+          if (unit.isBounceEnabled || otherUnit.isBounceEnabled) {
             const collisionVector = {
               x: otherUnit.x - unit.x,
               y: otherUnit.y - unit.y,
@@ -36,20 +33,62 @@ export const createWorld = ({ width, height, units } = {}) => {
               x: unit.vx - otherUnit.vx,
               y: unit.vy - otherUnit.vy,
             }
-            const speed =
+            let speed =
               velocityRelativeVector.x * collisionVectorNormalized.x +
               velocityRelativeVector.y * collisionVectorNormalized.y
+            speed *= Math.min(unit.restitution, otherUnit.restitution)
 
             if (speed >= 0) {
               const impulse = (2 * speed) / (unit.mass + otherUnit.mass)
-              unit.vx -= impulse * otherUnit.mass * collisionVectorNormalized.x
-              unit.vy -= impulse * otherUnit.mass * collisionVectorNormalized.y
-              otherUnit.vx += impulse * unit.mass * collisionVectorNormalized.x
-              otherUnit.vy += impulse * unit.mass * collisionVectorNormalized.y
+              if (unit.isBounceEnabled) {
+                unit.vx -= impulse * otherUnit.mass * collisionVectorNormalized.x
+                unit.vy -= impulse * otherUnit.mass * collisionVectorNormalized.y
+              }
+              if (otherUnit.isBounceEnabled) {
+                otherUnit.vx += impulse * unit.mass * collisionVectorNormalized.x
+                otherUnit.vy += impulse * unit.mass * collisionVectorNormalized.y
+              }
             }
           }
         }
       })
+    })
+  }
+
+  const worldRestitution = 0.9
+  const detectWoldEdgeCollision = () => {
+    units.forEach((unit) => {
+      const isCircle = Boolean(unit.radius)
+      if (isCircle) {
+        if (unit.x < unit.radius) {
+          unit.vx = Math.abs(unit.vx) * worldRestitution
+          unit.move({ x: unit.radius })
+        } else if (unit.x > width - unit.radius) {
+          unit.vx = -Math.abs(unit.vx) * worldRestitution
+          unit.move({ x: width - unit.radius })
+        }
+        if (unit.y < unit.radius) {
+          unit.vy = Math.abs(unit.vy) * worldRestitution
+          unit.move({ y: unit.radius })
+        } else if (unit.y > height - unit.radius) {
+          unit.vy = -Math.abs(unit.vy) * worldRestitution
+          unit.move({ y: height - unit.radius })
+        }
+      }
+      // rectangle then
+      else if (unit.x < 0) {
+        unit.vx = Math.abs(unit.vx) * worldRestitution
+        unit.move({ x: 0 })
+      } else if (unit.x + unit.width > width) {
+        unit.vx = -Math.abs(unit.vx) * worldRestitution
+        unit.move({ x: width - unit.width })
+      } else if (unit.y < 0) {
+        unit.vy = Math.abs(unit.vy) * worldRestitution
+        unit.move({ y: 0 })
+      } else if (unit.y + unit.height > height) {
+        unit.vy = -Math.abs(unit.vy) * worldRestitution
+        unit.move({ y: height - unit.height })
+      }
     })
   }
 
@@ -67,6 +106,7 @@ export const createWorld = ({ width, height, units } = {}) => {
   const tick = (msEllapsed) => {
     applyVelocity(msEllapsed)
     detectCollisions(msEllapsed)
+    detectWoldEdgeCollision()
     units.forEach((unit) => {
       const props = unit.tick(unit, msEllapsed)
       if (props) {

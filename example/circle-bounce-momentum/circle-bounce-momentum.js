@@ -1,5 +1,6 @@
 import { createWorld } from "src/world/world.js"
 import { createCircle } from "src/unit/unit.circle.js"
+import { createRectangle } from "src/unit/unit.rectangle.js"
 
 const units = [
   createCircle({
@@ -8,7 +9,21 @@ const units = [
     y: 50,
     radius: 25,
     vx: 0,
-    vy: 50,
+    vy: -50,
+    tick: ({ isColliding }) => {
+      return {
+        fillStyle: isColliding ? "red" : "green",
+      }
+    },
+  }),
+  createRectangle({
+    isBounceEnabled: true,
+    x: 250,
+    y: 300,
+    width: 30,
+    height: 60,
+    vx: 100,
+    vy: -50,
     tick: ({ isColliding }) => {
       return {
         fillStyle: isColliding ? "red" : "green",
@@ -67,7 +82,6 @@ const units = [
       }
     },
   }),
-
   createCircle({
     isBounceEnabled: true,
     x: 50,

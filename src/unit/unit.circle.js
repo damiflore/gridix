@@ -17,6 +17,9 @@ export const createCircle = ({
   isColliding = false,
   isBounceEnabled = false,
   mass = 1,
+  // describes how much energy is left after each collision.
+  // It has an effect on the bounciness of objects
+  restitution = 0.9,
   vx = 0,
   vy = 0,
   x,
@@ -31,6 +34,7 @@ export const createCircle = ({
     isColliding,
     isBounceEnabled,
     mass,
+    restitution,
     vx,
     vy,
     x,
