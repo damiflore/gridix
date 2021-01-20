@@ -15,7 +15,7 @@ export const rotatePoint = (origin, point, degrees) => {
   }
 }
 
-export const rotateRectangle = (points, degree, origin = getRectangleCenterPoint(points)) => {
+export const rotateRectangle = (points, degree, origin = rectangleToCenterPoint(points)) => {
   return points.map((point) => rotatePoint(origin, point, degree))
 }
 
@@ -25,9 +25,9 @@ export const getDistanceBetweenTwoPoints = (firstPoint, secondPoint) => {
   return Math.sqrt(horizontalDiff * horizontalDiff + verticalDiff * verticalDiff)
 }
 
-export const getRectangleCenterPoint = ([topLeft, topRight, bottomRight, bottomLeft]) => {
+export const rectangleToCenterPoint = ({ left, top, right, bottom }) => {
   return {
-    x: (topLeft.x + topRight.x + bottomRight.x + bottomLeft.x) / 4,
-    y: (topLeft.y + topRight.y + bottomRight.y + bottomLeft.y) / 4,
+    x: right - left / 2,
+    y: bottom - top / 2,
   }
 }

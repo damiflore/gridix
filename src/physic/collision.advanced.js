@@ -1,4 +1,4 @@
-import { getDistanceBetweenTwoPoints } from "./geometry.js"
+import { getDistanceBetweenTwoPoints } from "./geometry.advanced.js"
 
 // https://github.com/davidfig/intersects/blob/master/lineToLine.js
 export const lineCollidesWithLine = (

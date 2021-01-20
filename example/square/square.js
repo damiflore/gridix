@@ -1,79 +1,67 @@
-import { createWorld } from "src/world/world.js"
-import { createRectangle } from "src/unit/unit.rectangle.js"
+import { createGame } from "src/game/game.js"
+import { Bloc } from "src/game/bloc.js"
 
-const units = [
-  createRectangle({
-    x: 250,
-    y: 50,
+const createSquare = (props) => {
+  return {
+    ...Bloc,
+    canCollide: true,
     width: 50,
     height: 50,
-    vx: 0,
-    vy: 50,
-    tick: ({ isColliding }) => {
-      return {
-        fillStyle: isColliding ? "red" : "green",
-      }
+    ...props,
+    fillStyle: "green",
+    effects: {
+      ...Bloc.effects,
+      "collision-color": ({ blocCollidingArray }) => {
+        return {
+          fillStyle: blocCollidingArray.length === 0 ? "green" : "red",
+        }
+      },
     },
+  }
+}
+
+const blocs = [
+  createSquare({
+    positionX: 250,
+    positionY: 50,
+    velocityX: 0,
+    velocityY: 50,
   }),
-  createRectangle({
-    x: 250,
-    y: 300,
-    width: 50,
-    height: 50,
-    vx: 0,
-    vy: -50,
-    tick: ({ isColliding }) => {
-      return {
-        fillStyle: isColliding ? "red" : "green",
-      }
-    },
+  createSquare({
+    positionX: 240,
+    positionY: 300,
+    velocityX: 0,
+    velocityY: -50,
   }),
-  createRectangle({
-    x: 150,
-    y: 0,
-    width: 50,
-    height: 50,
-    vx: 50,
-    vy: 50,
-    tick: ({ isColliding }) => {
-      return {
-        fillStyle: isColliding ? "red" : "green",
-      }
-    },
+  createSquare({
+    positionX: 150,
+    positionY: 0,
+    velocityX: 50,
+    velocityY: 50,
   }),
-  createRectangle({
-    x: 350,
-    y: 75,
-    width: 50,
-    height: 50,
-    vx: -50,
-    vy: 50,
-    tick: ({ isColliding }) => {
-      return {
-        fillStyle: isColliding ? "red" : "green",
-      }
-    },
+  createSquare({
+    positionX: 350,
+    positionY: 75,
+    velocityX: -50,
+    velocityY: 50,
   }),
-  createRectangle({
-    x: 300,
-    y: 300,
-    width: 50,
-    height: 50,
-    vx: 50,
-    vy: -50,
-    tick: ({ isColliding }) => {
-      return {
-        fillStyle: isColliding ? "red" : "green",
-      }
-    },
+  createSquare({
+    positionX: 300,
+    positionY: 300,
+    velocityX: 50,
+    velocityY: -50,
   }),
 ]
 
-const world = createWorld({
-  width: 500,
-  height: 700,
-  units,
+const game = createGame({
+  worldContainer: true,
+  worldWidth: 300,
+  worldHeight: 400,
+  blocs,
 })
 
-document.body.appendChild(world.canvas)
-world.start()
+document.body.appendChild(game.canvas)
+game.start()
+
+window.game = game
+window.blocs = blocs
