@@ -72,17 +72,17 @@ export const blocEffectBounce = {
         x: blocCollidingCenterPoint.x - blocCenterPoint.x,
         y: blocCollidingCenterPoint.y - blocCenterPoint.y,
       }
-      const distanceBetweenUnits = getDistanceBetweenTwoPoints(
+      const distanceBetweenBlocs = getDistanceBetweenTwoPoints(
         blocCollidingCenterPoint,
         blocCenterPoint,
       )
       const collisionVectorNormalized = {
-        x: collisionVector.x / distanceBetweenUnits,
-        y: collisionVector.y / distanceBetweenUnits,
+        x: collisionVector.x / distanceBetweenBlocs,
+        y: collisionVector.y / distanceBetweenBlocs,
       }
       const velocityRelativeVector = {
-        x: bloc.velocityX - blocColliding.vx,
-        y: bloc.velocityY - blocColliding.vy,
+        x: bloc.velocityX - blocColliding.velocityX,
+        y: bloc.velocityY - blocColliding.velocityY,
       }
       let speed =
         velocityRelativeVector.x * collisionVectorNormalized.x +
@@ -94,11 +94,14 @@ export const blocEffectBounce = {
       }
 
       const impulse = (2 * speed) / (bloc.mass + blocColliding.mass)
-
-      bloc.velocityX -= impulse * blocColliding.mass * collisionVectorNormalized.x
-      bloc.velocityY -= impulse * blocColliding.mass * collisionVectorNormalized.y
-      blocColliding.velocityX += impulse * bloc.mass * collisionVectorNormalized.x
-      blocColliding.velocityY += impulse * bloc.mass * collisionVectorNormalized.y
+      mutateBloc(bloc, {
+        velocityX: bloc.velocityX - impulse * blocColliding.mass * collisionVectorNormalized.x,
+        velocityY: bloc.velocityY - impulse * blocColliding.mass * collisionVectorNormalized.y,
+      })
+      mutateBloc(blocColliding, {
+        velocityX: blocColliding.velocityX + impulse * bloc.mass * collisionVectorNormalized.x,
+        velocityY: blocColliding.velocityY + impulse * bloc.mass * collisionVectorNormalized.y,
+      })
     })
   },
 }
