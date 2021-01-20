@@ -27,7 +27,12 @@ export const createGame = ({ worldContainer = false, worldWidth, worldHeight, bl
     blocs.unshift(blocForWorld)
   }
 
+  const tickCallbacks = []
   const tick = (msEllapsed) => {
+    tickCallbacks.forEach((tickCallback) => {
+      tickCallback(msEllapsed)
+    })
+
     blocs.forEach((bloc) => {
       Object.keys(bloc.updates).forEach((key) => {
         mutateBloc(bloc, bloc.updates[key](bloc, { blocs, msEllapsed }))
@@ -105,6 +110,9 @@ export const createGame = ({ worldContainer = false, worldWidth, worldHeight, bl
     start,
     stop,
     blocsFromPoint,
+    addTickCallback: (callback) => {
+      tickCallbacks.push(callback)
+    },
   }
 }
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 // https://github.com/dmail-front/autotile
 
 /*
@@ -17,6 +18,7 @@ import { createGame } from "src/game/game.js"
 import { Bloc, mutateBloc } from "src/game/bloc.js"
 import { blocCollidingArrayGetter } from "src/game/bloc.effects.js"
 import { CELL_SIZE } from "src/game.constant.js"
+import { trackKeyboardKeydown } from "src/interaction/keyboard.js"
 
 window.splashscreen.remove()
 
@@ -52,19 +54,6 @@ const createWallAtCell = ({ row, column, ...rest }) => {
   }
 }
 
-const createHeroAtCell = ({ row, column }) => {
-  const hero = {
-    ...Bloc,
-    name: "hero",
-    ...cellToRectangleGeometry({ row, column }),
-    positionZ: 1,
-    canCollide: true,
-    canMove: true,
-    fillStyle: "red",
-  }
-  return hero
-}
-
 const blocs = [
   createFloorAtCell({ row: 0, column: 0 }),
   createFloorAtCell({ row: 1, column: 0 }),
@@ -77,9 +66,6 @@ const blocs = [
   createFloorAtCell({ row: 2, column: 2 }),
 ]
 
-const hero = createHeroAtCell({ row: 0, column: 0 })
-blocs.push(hero)
-
 const cellFromPoint = ({ x, y }) => {
   return {
     x: Math.floor(x / CELL_SIZE) * CELL_SIZE,
@@ -88,7 +74,7 @@ const cellFromPoint = ({ x, y }) => {
 }
 
 const game = createGame({
-  worldContainer: true,
+  // worldContainer: true,
   worldWidth: 3 * CELL_SIZE,
   worldHeight: 3 * CELL_SIZE,
   blocs,
@@ -96,6 +82,48 @@ const game = createGame({
 document.body.appendChild(game.canvas)
 
 game.start()
+
+const downKey = trackKeyboardKeydown({
+  code: "ArrowDown",
+  node: game.canvas,
+})
+const upKey = trackKeyboardKeydown({
+  code: "ArrowUp",
+  node: game.canvas,
+})
+const leftKey = trackKeyboardKeydown({
+  code: "ArrowLeft",
+  node: game.canvas,
+})
+const rightKey = trackKeyboardKeydown({
+  code: "ArrowRight",
+  node: game.canvas,
+})
+
+const createHeroAtCell = ({ row, column }) => {
+  const hero = {
+    ...Bloc,
+    name: "hero",
+    updates: {
+      keyboardNavigation: () => {
+        return {
+          velocityX: leftKey.isDown ? -50 : rightKey.isDown ? 50 : 0,
+          velocityY: upKey.isDown ? -50 : downKey.isDown ? 50 : 0,
+        }
+      },
+      ...Bloc.updates,
+    },
+    ...cellToRectangleGeometry({ row, column }),
+    positionZ: 1,
+    canCollide: true,
+    canMove: true,
+    fillStyle: "red",
+  }
+  return hero
+}
+
+const hero = createHeroAtCell({ row: 0, column: 0 })
+blocs.push(hero)
 
 game.canvas.addEventListener("click", (clickEvent) => {
   const clickPoint = {
@@ -109,20 +137,6 @@ game.canvas.addEventListener("click", (clickEvent) => {
   })
 })
 game.canvas.setAttribute("tabindex", -1)
-game.canvas.addEventListener("keydown", (keydownEvent) => {
-  if (keydownEvent.code === "ArrowDown") {
-    hero.velocityY = 20
-  }
-  if (keydownEvent.code === "ArrowUp") {
-    hero.velocityY = -20
-  }
-  if (keydownEvent.code === "ArrowLeft") {
-    hero.velocityX = -20
-  }
-  if (keydownEvent.code === "ArrowRight") {
-    hero.velocityX = 20
-  }
-})
 
 const moveBlocIfAllowed = (bloc, { positionX = bloc.positionX, positionY = bloc.positionY }) => {
   const currentPosition = {

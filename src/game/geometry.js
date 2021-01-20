@@ -24,31 +24,35 @@ export const blocCollidesWithBloc = (firstBloc, secondBloc) => {
     return false
   }
 
-  const firstBlocLeft = firstBloc.positionX
-  const firstBlocRight = firstBlocLeft + firstBloc.width
-  const secondBlocLeft = secondBloc.positionX
+  return rectangleCollidesRectangle(firstBloc, secondBloc)
+}
+
+export const rectangleCollidesRectangle = (firstRectangle, secondRectangle) => {
+  const firstLeft = firstRectangle.positionX
+  const firstRight = firstLeft + firstRectangle.width
+  const secondLeft = secondRectangle.positionX
   // first left of second
-  if (firstBlocRight <= secondBlocLeft) {
+  if (firstRight <= secondLeft) {
     return false
   }
 
-  const secondBlocRight = secondBlocLeft + secondBloc.width
+  const secondRight = secondLeft + secondRectangle.width
   // first right of second
-  if (firstBlocLeft >= secondBlocRight) {
+  if (firstLeft >= secondRight) {
     return false
   }
 
-  const firstBlocTop = firstBloc.positionY
-  const firstBlocBottom = firstBlocTop + firstBloc.height
-  const secondBlocTop = secondBloc.positionY
+  const firstTop = firstRectangle.positionY
+  const firstBottom = firstTop + firstRectangle.height
+  const secondTop = secondRectangle.positionY
   // first above second
-  if (firstBlocBottom <= secondBlocTop) {
+  if (firstBottom <= secondTop) {
     return false
   }
 
-  const secondBlocBottom = secondBlocTop + secondBloc.height
+  const secondBottom = secondTop + secondRectangle.height
   // first below second
-  if (firstBlocTop >= secondBlocBottom) {
+  if (firstTop >= secondBottom) {
     return false
   }
 

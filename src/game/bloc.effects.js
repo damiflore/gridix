@@ -1,4 +1,10 @@
-import { getDistanceBetweenTwoPoints, blocToCenterPoint, blocCollidesWithBloc } from "./geometry.js"
+/* eslint-disable no-nested-ternary */
+import {
+  getDistanceBetweenTwoPoints,
+  blocToCenterPoint,
+  blocCollidesWithBloc,
+  rectangleCollidesRectangle,
+} from "./geometry.js"
 import { mutateBloc } from "./bloc.js"
 
 export const blocEffectCollisionDetection = {
@@ -66,8 +72,7 @@ export const blocEffectCollision = {
   collision: (bloc) => {
     const blocVelocityX = bloc.velocityX
     const blocVelocityY = bloc.velocityY
-
-    if (!blocVelocityX && !blocVelocityY) {
+    if (blocVelocityX === 0 && blocVelocityY === 0) {
       return
     }
 
@@ -75,6 +80,10 @@ export const blocEffectCollision = {
     const blocTop = bloc.positionY
     const blocRight = blocLeft + bloc.width
     const blocBottom = blocTop + bloc.height
+    const isMovingRight = blocVelocityX > 0
+    const isMovingLeft = blocVelocityX < 0
+    const isMovingTop = blocVelocityY < 0
+    const isMovingBottom = blocVelocityY > 0
 
     bloc.blocCollidingArray.forEach((blocColliding) => {
       const blocCollidingLeft = blocColliding.positionX
@@ -82,35 +91,84 @@ export const blocEffectCollision = {
       const blocCollidingTop = blocColliding.positionY
       const blocCollidingBottom = blocCollidingTop + blocColliding.height
 
-      // a block goes to the right and is colliding to the right
-      // move it back to the left to prevent collision
-      if (blocVelocityX > 0 && blocRight > blocCollidingLeft && blocRight < blocCollidingRight) {
-        mutateBloc(bloc, {
-          positionX: blocCollidingLeft - bloc.width,
-          velocityX: 0,
-        })
+      const leftCollisionLength =
+        blocLeft < blocCollidingRight && blocLeft > blocCollidingLeft
+          ? blocLeft - blocCollidingRight
+          : 0
+      const rightCollisionLength =
+        blocRight > blocCollidingLeft && blocRight < blocCollidingRight
+          ? blocRight - blocCollidingLeft
+          : 0
+      const topCollisionLength =
+        blocTop < blocCollidingBottom && blocTop > blocCollidingTop
+          ? blocTop - blocCollidingBottom
+          : 0
+      const bottomCollidisionLength =
+        blocBottom > blocCollidingTop && blocBottom < blocCollidingBottom
+          ? blocBottom - blocCollidingTop
+          : 0
+
+      const positionXCandidate =
+        isMovingRight && rightCollisionLength
+          ? blocCollidingLeft - bloc.width
+          : isMovingLeft && leftCollisionLength
+          ? blocCollidingRight
+          : undefined
+      const positionYCandidate =
+        isMovingTop && topCollisionLength
+          ? blocCollidingTop + bloc.height
+          : isMovingBottom && bottomCollidisionLength
+          ? blocCollidingBottom
+          : undefined
+
+      if (positionXCandidate !== undefined && positionYCandidate !== undefined) {
+        // try to move the smallest distance first
+        // and see if this is enough to prevent the collision
+        const positionXDistance = Math.abs(positionXCandidate - bloc.positionX)
+        const positionYDistance = Math.abs(positionYCandidate - bloc.positionY)
+        if (positionXDistance > positionYDistance) {
+          // try to alter only Y and see if this is enough
+          const yAloneIsCollisionFree = !rectangleCollidesRectangle(
+            {
+              positionX: bloc.positionX,
+              positionY: positionYCandidate,
+              width: bloc.width,
+              height: bloc.height,
+            },
+            blocColliding,
+          )
+          if (yAloneIsCollisionFree) {
+            mutateBloc(bloc, { positionY: positionYCandidate })
+            return
+          }
+        }
+        // try to alter only X and see if this is enought
+        const xAloneIsCollisionFree = !rectangleCollidesRectangle(
+          {
+            positionX: positionXCandidate,
+            positionY: bloc.positionY,
+            width: bloc.width,
+            height: bloc.height,
+          },
+          blocColliding,
+        )
+        if (xAloneIsCollisionFree) {
+          mutateBloc(bloc, { positionX: positionXCandidate })
+          return
+        }
+
+        mutateBloc(bloc, { positionX: positionXCandidate, positionY: positionYCandidate })
+        return
       }
-      // a block goes to the left and is colliding to the left
-      // move it back to the right to prevent collision
-      if (blocVelocityX < 0 && blocLeft < blocCollidingRight && blocLeft > blocCollidingLeft) {
-        mutateBloc(bloc, {
-          positionX: blocCollidingRight,
-          velocityX: 0,
-        })
+
+      if (positionYCandidate !== undefined) {
+        mutateBloc(bloc, { positionY: positionYCandidate })
+        return
       }
-      // same with block moving down
-      if (blocVelocityY > 0 && blocBottom > blocCollidingTop && blocBottom < blocCollidingBottom) {
-        mutateBloc(bloc, {
-          positionY: blocCollidingTop - bloc.height,
-          velocityY: 0,
-        })
-      }
-      // same with block moving up
-      if (blocVelocityY < 0 && blocTop < blocCollidingBottom && blocTop > blocCollidingTop) {
-        mutateBloc(bloc, {
-          positionY: blocCollidingBottom,
-          velocityY: 0,
-        })
+
+      if (positionXCandidate !== undefined) {
+        mutateBloc(bloc, { positionX: positionXCandidate })
+        return
       }
     })
   },
