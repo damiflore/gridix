@@ -13,52 +13,66 @@ https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/isPoin
 
 */
 
-import { createWorld, detectUnitCollision } from "src/world/world.js"
+import { createGame } from "src/game/game.js"
+import { Bloc, mutateBloc } from "src/game/bloc.js"
+import { blocCollidingArrayGetter } from "src/game/bloc.effects.js"
 import { CELL_SIZE } from "src/game.constant.js"
-import { createRectangle, cellToRectangleGeometry } from "src/unit/unit.rectangle.js"
-import { createCircle, cellToCircleGeometry } from "src/unit/unit.circle.js"
 
 window.splashscreen.remove()
 
+const cellToRectangleGeometry = ({ row, column }) => {
+  return {
+    positionX: column * CELL_SIZE,
+    positionY: row * CELL_SIZE,
+    width: CELL_SIZE,
+    height: CELL_SIZE,
+  }
+}
+
 const createFloorAtCell = ({ row, column }) => {
-  return createRectangle({
+  return {
+    ...Bloc,
+    name: "floor",
     ...cellToRectangleGeometry({ row, column }),
-    isSolid: false,
     fillStyle: "white",
-  })
+  }
 }
 
 const createWallAtCell = ({ row, column }) => {
-  return createRectangle({
+  return {
+    ...Bloc,
+    name: "wall",
     ...cellToRectangleGeometry({ row, column }),
-    isSolid: true,
+    canCollide: true,
     fillStyle: "grey",
-  })
+  }
 }
 
-const createHeroAtCell = ({ row, column, radius = 12 }) => {
-  const hero = createCircle({
-    ...cellToCircleGeometry({ row, column, radius }),
-    isSolid: true,
+const createHeroAtCell = ({ row, column }) => {
+  const hero = {
+    ...Bloc,
+    name: "hero",
+    ...cellToRectangleGeometry({ row, column }),
+    canCollide: true,
     fillStyle: "red",
-  })
+  }
   return hero
 }
 
-const units = [
+const blocs = [
   createFloorAtCell({ row: 0, column: 0 }),
-  createWallAtCell({ row: 1, column: 0 }),
-  createWallAtCell({ row: 2, column: 0 }),
-  createFloorAtCell({ row: 0, column: 1 }),
+  createFloorAtCell({ row: 1, column: 0 }),
+  createFloorAtCell({ row: 2, column: 0 }),
+  createWallAtCell({ row: 0, column: 1 }),
   createWallAtCell({ row: 1, column: 1 }),
   createFloorAtCell({ row: 2, column: 1 }),
-  createFloorAtCell({ row: 0, column: 2 }),
+  createWallAtCell({ row: 0, column: 2 }),
   createFloorAtCell({ row: 1, column: 2 }),
   createFloorAtCell({ row: 2, column: 2 }),
 ]
 
 const hero = createHeroAtCell({ row: 0, column: 0 })
-units.push(hero)
+blocs.push(hero)
 
 const moveAvailables = [
   // directions
@@ -105,50 +119,57 @@ moveAvailables.forEach((direction) => {
     }
   }
 
-  const moveAvailableHint = createRectangle({
-    isSolid: false,
-    x: 0,
-    y: 0,
+  const moveAvailableHint = {
+    ...Bloc,
+    name: "move-hint",
+    positionX: 0,
+    positionY: 0,
     z: 10,
     width: CELL_SIZE,
     height: CELL_SIZE,
     fillStyle: "transparent",
     opacity: 0.5,
-    tick: () => {
-      const heroCell = cellFromPoint(hero)
-      const moveAvailableCell = heroCellToMoveCell(heroCell)
-      if (moveAvailableCell) {
-        const destinationPoint = cellToCellCenter(moveAvailableCell)
-        const moveAllowed = testMoveTo(hero, destinationPoint)
-        if (moveAllowed) {
-          moveAvailableHint.move(moveAvailableCell)
-          return {
-            fillStyle: "green",
+    updates: {
+      ...Bloc.updates,
+      movehint: () => {
+        const heroCell = cellFromBloc(hero)
+        const moveAvailableCell = heroCellToMoveCell(heroCell)
+        if (moveAvailableCell) {
+          const moveAllowed = testMoveTo(hero, moveAvailableCell)
+          if (moveAllowed) {
+            return {
+              positionX: moveAvailableCell.x,
+              positionY: moveAvailableCell.y,
+              fillStyle: "green",
+            }
           }
         }
-      }
 
-      return {
-        fillStyle: "transparent",
-      }
+        return {
+          fillStyle: undefined,
+        }
+      },
     },
-  })
-  units.push(moveAvailableHint)
+  }
+  blocs.push(moveAvailableHint)
 })
 
-const cellToCellCenter = ({ x, y }) => {
-  return {
-    x: x + CELL_SIZE / 2,
-    y: y + CELL_SIZE / 2,
+const testMoveTo = (bloc, { x, y }) => {
+  const currentPosition = {
+    positionX: bloc.positionX,
+    positionY: bloc.positionY,
   }
+  mutateBloc(bloc, { positionX: x, positionY: y })
+  const blocCollidingArray = blocCollidingArrayGetter(bloc, blocs)
+  mutateBloc(bloc, currentPosition)
+  return blocCollidingArray.length === 0
 }
 
-const testMoveTo = (unit, destinationPoint) => {
-  const currentPosition = { x: unit.x, y: unit.y }
-  unit.move(destinationPoint)
-  const collision = Boolean(detectUnitCollision(unit, units, world))
-  unit.move(currentPosition)
-  return !collision
+const cellFromBloc = ({ positionX, positionY }) => {
+  return cellFromPoint({
+    x: positionX,
+    y: positionY,
+  })
 }
 
 const cellFromPoint = ({ x, y }) => {
@@ -158,23 +179,29 @@ const cellFromPoint = ({ x, y }) => {
   }
 }
 
-const world = createWorld({
-  width: 3 * CELL_SIZE,
-  height: 3 * CELL_SIZE,
-  units,
+const game = createGame({
+  worldContainer: true,
+  worldWidth: 3 * CELL_SIZE,
+  worldHeight: 3 * CELL_SIZE,
+  blocs,
 })
-document.body.appendChild(world.canvas)
+document.body.appendChild(game.canvas)
 
-world.start()
+game.start()
 
-world.canvas.addEventListener("click", (clickEvent) => {
+game.canvas.addEventListener("click", (clickEvent) => {
   const clickPoint = {
     x: clickEvent.offsetX,
     y: clickEvent.offsetY,
   }
-  const destinationPoint = cellToCellCenter(cellFromPoint(clickPoint))
+  const destinationPoint = cellFromPoint(clickPoint)
   const moveAllowed = testMoveTo(hero, destinationPoint)
   if (moveAllowed) {
-    hero.move(destinationPoint)
+    mutateBloc(hero, {
+      positionX: destinationPoint.x,
+      positionY: destinationPoint.y,
+    })
   }
 })
+
+window.blocs = blocs

@@ -3,6 +3,8 @@ import { blocEffectCollision } from "./bloc.effects.js"
 import { blocDrawRectangle } from "./bloc.draw.js"
 
 export const Bloc = {
+  name: "anonymous",
+
   // position
   positionX: 0,
   positionY: 0,

@@ -10,7 +10,7 @@ export const blocEffectCollision = {
   },
 }
 
-const blocCollidingArrayGetter = (bloc, blocs) => {
+export const blocCollidingArrayGetter = (bloc, blocs) => {
   return blocs.filter((blocCandidate) => {
     if (blocCandidate === bloc) {
       return false

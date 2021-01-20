@@ -11,6 +11,7 @@ export const createGame = ({ worldContainer = false, worldWidth, worldHeight, bl
   if (worldContainer) {
     const blocForWorld = {
       ...Bloc,
+      name: "world",
       positionX: 0,
       positionY: 0,
       width: worldWidth,
