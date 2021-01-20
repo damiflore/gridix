@@ -15,7 +15,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/isPoin
 
 import { createGame } from "src/game/game.js"
 import { Bloc, mutateBloc } from "src/game/bloc.js"
-import { blocCollidingArrayGetter } from "src/game/bloc.effects.js"
+import { blocCollidingArrayGetter, blocEffectBounce } from "src/game/bloc.effects.js"
 import { CELL_SIZE } from "src/game.constant.js"
 
 window.splashscreen.remove()
@@ -38,13 +38,14 @@ const createFloorAtCell = ({ row, column }) => {
   }
 }
 
-const createWallAtCell = ({ row, column }) => {
+const createWallAtCell = ({ row, column, ...rest }) => {
   return {
     ...Bloc,
     name: "wall",
     ...cellToRectangleGeometry({ row, column }),
     canCollide: true,
     fillStyle: "grey",
+    ...rest,
   }
 }
 
@@ -66,7 +67,14 @@ const blocs = [
   createWallAtCell({ row: 0, column: 1 }),
   createWallAtCell({ row: 1, column: 1 }),
   createFloorAtCell({ row: 2, column: 1 }),
-  createWallAtCell({ row: 0, column: 2 }),
+  createWallAtCell({
+    row: 0,
+    column: 2,
+    effects: {
+      ...Bloc.effects,
+      ...blocEffectBounce,
+    },
+  }),
   createFloorAtCell({ row: 1, column: 2 }),
   createFloorAtCell({ row: 2, column: 2 }),
 ]
@@ -113,6 +121,7 @@ game.canvas.addEventListener("keydown", (keydownEvent) => {
     moveBlocIfAllowed(hero, {
       positionY: hero.positionY - 1,
     })
+    hero.velocityY = -10
   }
   if (keydownEvent.code === "ArrowLeft") {
     moveBlocIfAllowed(hero, {
