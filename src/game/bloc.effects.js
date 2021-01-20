@@ -1,8 +1,8 @@
 import { getDistanceBetweenTwoPoints, blocToCenterPoint, blocCollidesWithBloc } from "./geometry.js"
 import { mutateBloc } from "./bloc.js"
 
-export const blocEffectCollision = {
-  collision: (bloc, { blocs }) => {
+export const blocEffectCollisionDetection = {
+  "collision-detection": (bloc, { blocs }) => {
     const blocCollidingArray = blocCollidingArrayGetter(bloc, blocs)
     return {
       blocCollidingArray,
@@ -62,6 +62,66 @@ export const blocEffectContainer = {
   },
 }
 
+export const blocEffectCollision = {
+  collision: (bloc) => {
+    const blocVelocityX = bloc.velocityX
+    const blocVelocityY = bloc.velocityY
+
+    if (!blocVelocityX && !blocVelocityY) {
+      return
+    }
+
+    const blocLeft = bloc.positionX
+    const blocTop = bloc.positionY
+    const blocRight = blocLeft + bloc.width
+    const blocBottom = blocTop + bloc.height
+
+    bloc.blocCollidingArray.forEach((blocColliding) => {
+      const blocCollidingLeft = blocColliding.positionX
+      const blocCollidingRight = blocCollidingLeft + blocColliding.width
+      const blocCollidingTop = blocColliding.positionY
+      const blocCollidingBottom = blocCollidingTop + blocColliding.height
+
+      // a block goes to the right and is colliding to the right
+      // move it back to the left to prevent collision
+      if (blocVelocityX > 0 && blocRight > blocCollidingLeft && blocRight < blocCollidingRight) {
+        mutateBloc(bloc, {
+          positionX: blocCollidingLeft - bloc.width,
+          velocityX: 0,
+        })
+      }
+      // a block goes to the left and is colliding to the left
+      // move it back to the right to prevent collision
+      if (blocVelocityX < 0 && blocLeft < blocCollidingRight && blocLeft > blocCollidingLeft) {
+        mutateBloc(bloc, {
+          positionX: blocCollidingRight,
+          velocityX: 0,
+        })
+      }
+      // same with block moving down
+      if (blocVelocityY > 0 && blocBottom > blocCollidingTop && blocBottom < blocCollidingBottom) {
+        mutateBloc(bloc, {
+          positionY: blocCollidingTop - bloc.height,
+          velocityY: 0,
+        })
+      }
+      // same with block moving up
+      if (blocVelocityY < 0 && blocTop < blocCollidingBottom && blocTop > blocCollidingTop) {
+        mutateBloc(bloc, {
+          positionY: blocCollidingBottom,
+          velocityY: 0,
+        })
+      }
+    })
+  },
+}
+
+// https://github.com/liabru/matter-js/issues/5
+// http://www.stencyl.com/help/view/continuous-collision-detection
+// en gros il faudrait que, par défault
+// lorsqu'un rectangle est en collision avec un autre
+// il soit renvoyé d'ou il venait initialement
+// (on peut utiliser sa vélocité pour en déduire d'ou il venait)
 export const blocEffectBounce = {
   bounce: (bloc) => {
     bloc.blocCollidingArray.forEach((blocColliding) => {

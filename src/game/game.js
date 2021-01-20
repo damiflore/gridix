@@ -16,7 +16,7 @@ export const createGame = ({ worldContainer = false, worldWidth, worldHeight, bl
       positionY: 0,
       width: worldWidth,
       height: worldHeight,
-      restitution: 0.9,
+      restitution: 0,
       effects: {
         ...Bloc.effects,
         ...blocEffectContainer,
@@ -40,8 +40,27 @@ export const createGame = ({ worldContainer = false, worldWidth, worldHeight, bl
     })
 
     context.clearRect(0, 0, canvas.width, canvas.height)
-    // we should sort them by x/y to draw the most down and most right last
-    blocs.sort((leftBloc, rightBloc) => leftBloc.z - rightBloc.z)
+    blocs.sort((leftBloc, rightBloc) => {
+      if (leftBloc.positionZ > rightBloc.positionZ) {
+        return 1
+      }
+      if (leftBloc.positionZ < rightBloc.positionZ) {
+        return -1
+      }
+      if (leftBloc.positionY > rightBloc.positionY) {
+        return 1
+      }
+      if (leftBloc.positionY < rightBloc.positionY) {
+        return -1
+      }
+      if (leftBloc.positionX > rightBloc.positionX) {
+        return 1
+      }
+      if (leftBloc.positionX < rightBloc.positionX) {
+        return -1
+      }
+      return 0
+    })
     blocs.forEach((bloc) => {
       bloc.draw(bloc, context)
     })

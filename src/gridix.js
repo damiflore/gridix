@@ -15,7 +15,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/isPoin
 
 import { createGame } from "src/game/game.js"
 import { Bloc, mutateBloc } from "src/game/bloc.js"
-import { blocCollidingArrayGetter, blocEffectBounce } from "src/game/bloc.effects.js"
+import { blocCollidingArrayGetter } from "src/game/bloc.effects.js"
 import { CELL_SIZE } from "src/game.constant.js"
 
 window.splashscreen.remove()
@@ -33,6 +33,7 @@ const createFloorAtCell = ({ row, column }) => {
   return {
     ...Bloc,
     name: "floor",
+    positionZ: 0,
     ...cellToRectangleGeometry({ row, column }),
     fillStyle: "white",
   }
@@ -43,7 +44,9 @@ const createWallAtCell = ({ row, column, ...rest }) => {
     ...Bloc,
     name: "wall",
     ...cellToRectangleGeometry({ row, column }),
+    positionZ: 1,
     canCollide: true,
+    restitution: 0,
     fillStyle: "grey",
     ...rest,
   }
@@ -54,7 +57,9 @@ const createHeroAtCell = ({ row, column }) => {
     ...Bloc,
     name: "hero",
     ...cellToRectangleGeometry({ row, column }),
+    positionZ: 1,
     canCollide: true,
+    canMove: true,
     fillStyle: "red",
   }
   return hero
@@ -67,14 +72,7 @@ const blocs = [
   createWallAtCell({ row: 0, column: 1 }),
   createWallAtCell({ row: 1, column: 1 }),
   createFloorAtCell({ row: 2, column: 1 }),
-  createWallAtCell({
-    row: 0,
-    column: 2,
-    effects: {
-      ...Bloc.effects,
-      ...blocEffectBounce,
-    },
-  }),
+  createWallAtCell({ row: 0, column: 2 }),
   createFloorAtCell({ row: 1, column: 2 }),
   createFloorAtCell({ row: 2, column: 2 }),
 ]
@@ -113,25 +111,16 @@ game.canvas.addEventListener("click", (clickEvent) => {
 game.canvas.setAttribute("tabindex", -1)
 game.canvas.addEventListener("keydown", (keydownEvent) => {
   if (keydownEvent.code === "ArrowDown") {
-    moveBlocIfAllowed(hero, {
-      positionY: hero.positionY + 1,
-    })
+    hero.velocityY = 20
   }
   if (keydownEvent.code === "ArrowUp") {
-    moveBlocIfAllowed(hero, {
-      positionY: hero.positionY - 1,
-    })
-    hero.velocityY = -10
+    hero.velocityY = -20
   }
   if (keydownEvent.code === "ArrowLeft") {
-    moveBlocIfAllowed(hero, {
-      positionX: hero.positionX - 1,
-    })
+    hero.velocityX = -20
   }
   if (keydownEvent.code === "ArrowRight") {
-    moveBlocIfAllowed(hero, {
-      positionX: hero.positionX + 1,
-    })
+    hero.velocityX = 20
   }
 })
 

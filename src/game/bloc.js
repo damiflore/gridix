@@ -1,5 +1,9 @@
 import { blocUpdateVelocity } from "./bloc.updates.js"
-import { blocEffectCollision } from "./bloc.effects.js"
+import {
+  blocEffectCollisionDetection,
+  blocEffectCollision,
+  blocEffectBounce,
+} from "./bloc.effects.js"
 import { blocDrawRectangle } from "./bloc.draw.js"
 
 export const Bloc = {
@@ -8,13 +12,16 @@ export const Bloc = {
   // position
   positionX: 0,
   positionY: 0,
+  positionZ: 0,
 
   // dimension
   width: 0,
   height: 0,
 
   // physic
+  blocCollidingArray: [],
   canCollide: false,
+  canMove: false,
   velocityX: 0,
   velocityY: 0,
   restitution: 1,
@@ -29,6 +36,8 @@ export const Bloc = {
     ...blocUpdateVelocity,
   },
   effects: {
+    ...blocEffectCollisionDetection,
+    ...blocEffectBounce,
     ...blocEffectCollision,
   },
   draw: blocDrawRectangle,
