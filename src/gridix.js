@@ -74,104 +74,6 @@ const blocs = [
 const hero = createHeroAtCell({ row: 0, column: 0 })
 blocs.push(hero)
 
-const moveAvailables = [
-  // directions
-  "left",
-  "right",
-  "top",
-  "bottom",
-]
-moveAvailables.forEach((direction) => {
-  const heroCellToMoveCell = (heroCell) => {
-    if (direction === "left") {
-      if (heroCell.x === 0) {
-        return null
-      }
-      return {
-        x: heroCell.x - CELL_SIZE,
-        y: heroCell.y,
-      }
-    }
-    if (direction === "right") {
-      if (heroCell.x === 2 * CELL_SIZE) {
-        return null
-      }
-      return {
-        x: heroCell.x + CELL_SIZE,
-        y: heroCell.y,
-      }
-    }
-    if (direction === "top") {
-      if (heroCell.y === 0) {
-        return null
-      }
-      return {
-        x: heroCell.x,
-        y: heroCell.y - CELL_SIZE,
-      }
-    }
-    if (heroCell.y === 2 * CELL_SIZE) {
-      return null
-    }
-    return {
-      x: heroCell.x,
-      y: heroCell.y + CELL_SIZE,
-    }
-  }
-
-  const moveAvailableHint = {
-    ...Bloc,
-    name: "move-hint",
-    positionX: 0,
-    positionY: 0,
-    z: 10,
-    width: CELL_SIZE,
-    height: CELL_SIZE,
-    fillStyle: "transparent",
-    opacity: 0.5,
-    updates: {
-      ...Bloc.updates,
-      movehint: () => {
-        const heroCell = cellFromBloc(hero)
-        const moveAvailableCell = heroCellToMoveCell(heroCell)
-        if (moveAvailableCell) {
-          const moveAllowed = testMoveTo(hero, moveAvailableCell)
-          if (moveAllowed) {
-            return {
-              positionX: moveAvailableCell.x,
-              positionY: moveAvailableCell.y,
-              fillStyle: "green",
-            }
-          }
-        }
-
-        return {
-          fillStyle: undefined,
-        }
-      },
-    },
-  }
-  blocs.push(moveAvailableHint)
-})
-
-const testMoveTo = (bloc, { x, y }) => {
-  const currentPosition = {
-    positionX: bloc.positionX,
-    positionY: bloc.positionY,
-  }
-  mutateBloc(bloc, { positionX: x, positionY: y })
-  const blocCollidingArray = blocCollidingArrayGetter(bloc, blocs)
-  mutateBloc(bloc, currentPosition)
-  return blocCollidingArray.length === 0
-}
-
-const cellFromBloc = ({ positionX, positionY }) => {
-  return cellFromPoint({
-    x: positionX,
-    y: positionY,
-  })
-}
-
 const cellFromPoint = ({ x, y }) => {
   return {
     x: Math.floor(x / CELL_SIZE) * CELL_SIZE,
@@ -195,13 +97,45 @@ game.canvas.addEventListener("click", (clickEvent) => {
     y: clickEvent.offsetY,
   }
   const destinationPoint = cellFromPoint(clickPoint)
-  const moveAllowed = testMoveTo(hero, destinationPoint)
-  if (moveAllowed) {
-    mutateBloc(hero, {
-      positionX: destinationPoint.x,
-      positionY: destinationPoint.y,
+  moveBlocIfAllowed(hero, {
+    positionX: destinationPoint.x,
+    positionY: destinationPoint.y,
+  })
+})
+game.canvas.setAttribute("tabindex", -1)
+game.canvas.addEventListener("keydown", (keydownEvent) => {
+  if (keydownEvent.code === "ArrowDown") {
+    moveBlocIfAllowed(hero, {
+      positionY: hero.positionY + 1,
+    })
+  }
+  if (keydownEvent.code === "ArrowUp") {
+    moveBlocIfAllowed(hero, {
+      positionY: hero.positionY - 1,
+    })
+  }
+  if (keydownEvent.code === "ArrowLeft") {
+    moveBlocIfAllowed(hero, {
+      positionX: hero.positionX - 1,
+    })
+  }
+  if (keydownEvent.code === "ArrowRight") {
+    moveBlocIfAllowed(hero, {
+      positionX: hero.positionX + 1,
     })
   }
 })
+
+const moveBlocIfAllowed = (bloc, { positionX = bloc.positionX, positionY = bloc.positionY }) => {
+  const currentPosition = {
+    positionX: bloc.positionX,
+    positionY: bloc.positionY,
+  }
+  mutateBloc(bloc, { positionX, positionY })
+  const blocCollidingArray = blocCollidingArrayGetter(bloc, blocs)
+  if (blocCollidingArray.length > 0) {
+    mutateBloc(bloc, currentPosition)
+  }
+}
 
 window.blocs = blocs
