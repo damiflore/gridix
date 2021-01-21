@@ -21,7 +21,7 @@ export const Bloc = {
   velocityX: 0,
   velocityY: 0,
   velocityZ: 0,
-  friction: 0,
+  friction: 0.01,
   restitution: 1,
   mass: 1,
 

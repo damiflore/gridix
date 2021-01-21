@@ -14,8 +14,7 @@ https://developers.google.com/web/updates/2018/08/offscreen-canvas
 https://developer.mozilla.org/en-US/docs/Games
 
 Prochaines choses a faire:
-
-- Le héro s'arrete de bouger a cause des forces de frottement?
+- Pouvoir pousser un objet
 - Avoir un/des objet piece qu'on peut ramasser, il s'affiche dans un inventaire
 - Pouvoir faire un tunnel avec toit semi-transparent
 - Faire un escalier montant/descendant (chaque px de l'escalier, augmente d'autant la positionZ je dirais)
@@ -25,11 +24,7 @@ Prochaines choses a faire:
 
 import { createGame } from "src/game/game.js"
 import { Bloc, mutateBloc } from "src/game/bloc.js"
-import {
-  blocUpdateAcceleration,
-  blocUpdateFriction,
-  blocUpdateVelocity,
-} from "src/game/bloc.updates.js"
+import { blocUpdateFriction, blocUpdateVelocity } from "src/game/bloc.updates.js"
 import {
   blocEffectCollisionDetection,
   blocEffectCollisionResolution,
@@ -53,11 +48,6 @@ const createFloorAtCell = ({ row, column }) => {
   return {
     ...Bloc,
     name: "floor",
-    // canCollide: true,
-    // effects: {
-    //   ...blocEffectCollisionDetection,
-    //   ...blocEffectCollisionResolution,
-    // },
     ...cellToRectangleGeometry({ row, column }),
     positionZ: -CELL_SIZE,
     fillStyle: "white",
@@ -73,7 +63,6 @@ const createWallAtCell = ({ row, column, ...rest }) => {
       ...blocEffectCollisionDetection,
       ...blocEffectCollisionResolution,
     },
-    // restitution: 0,
     ...cellToRectangleGeometry({ row, column }),
     positionZ: 0,
     fillStyle: "grey",
@@ -101,7 +90,7 @@ const cellFromPoint = ({ x, y }) => {
 }
 
 const game = createGame({
-  // worldContainer: true,
+  worldContainer: true,
   worldWidth: 3 * CELL_SIZE,
   worldHeight: 3 * CELL_SIZE,
   blocs,
@@ -132,15 +121,19 @@ const createHeroAtCell = ({ row, column }) => {
     ...Bloc,
     name: "hero",
     canCollide: true,
+    // devrait dépendre de la surface sur laquelle on se trouve
+    friction: 0.8,
     updates: {
-      keyboardNavigation: () => {
+      ...blocUpdateFriction,
+      keyboardNavigation: ({ velocityX, velocityY }) => {
+        const velocityXNew = leftKey.isDown ? -50 : rightKey.isDown ? 50 : velocityX
+        const velocityYNew = upKey.isDown ? -50 : downKey.isDown ? 50 : velocityY
+
         return {
-          velocityX: leftKey.isDown ? -50 : rightKey.isDown ? 50 : 0,
-          velocityY: upKey.isDown ? -50 : downKey.isDown ? 50 : 0,
+          velocityX: velocityXNew,
+          velocityY: velocityYNew,
         }
       },
-      ...blocUpdateAcceleration,
-      ...blocUpdateFriction,
       ...blocUpdateVelocity,
     },
     effects: {
