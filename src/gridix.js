@@ -16,10 +16,6 @@ https://developer.mozilla.org/en-US/docs/Games
 Prochaines choses a faire:
 
 - Le héro s'arrete de bouger a cause des forces de frottement?
-https://codepen.io/OliverBalfour/post/implementing-velocity-acceleration-and-friction-on-a-canvas
-https://medium.com/javascript-in-plain-english/physical-simulation-with-javascript-in-the-html5-canvas-27dc6ea121cf
-https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Advanced_animations
-
 - Avoir un/des objet piece qu'on peut ramasser, il s'affiche dans un inventaire
 - Pouvoir faire un tunnel avec toit semi-transparent
 - Faire un escalier montant/descendant (chaque px de l'escalier, augmente d'autant la positionZ je dirais)
@@ -57,11 +53,11 @@ const createFloorAtCell = ({ row, column }) => {
   return {
     ...Bloc,
     name: "floor",
-    canCollide: true,
-    effects: {
-      ...blocEffectCollisionDetection,
-      ...blocEffectCollisionResolution,
-    },
+    // canCollide: true,
+    // effects: {
+    //   ...blocEffectCollisionDetection,
+    //   ...blocEffectCollisionResolution,
+    // },
     ...cellToRectangleGeometry({ row, column }),
     positionZ: -CELL_SIZE,
     fillStyle: "white",
@@ -136,7 +132,6 @@ const createHeroAtCell = ({ row, column }) => {
     ...Bloc,
     name: "hero",
     canCollide: true,
-    // canMove: true,
     updates: {
       keyboardNavigation: () => {
         return {
@@ -147,6 +142,10 @@ const createHeroAtCell = ({ row, column }) => {
       ...blocUpdateAcceleration,
       ...blocUpdateFriction,
       ...blocUpdateVelocity,
+    },
+    effects: {
+      ...blocEffectCollisionDetection,
+      ...blocEffectCollisionResolution,
     },
     ...cellToRectangleGeometry({ row, column }),
     positionZ: 0,

@@ -15,7 +15,6 @@ export const Bloc = {
   // physic
   blocCollidingArray: [],
   canCollide: false,
-  // canMove: false,
   accelerationX: 0,
   accelerationY: 0,
   accelerationZ: 0,
