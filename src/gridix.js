@@ -80,6 +80,8 @@ const blocs = [
   createWallAtCell({ row: 0, column: 2 }),
   createFloorAtCell({ row: 1, column: 2 }),
   createFloorAtCell({ row: 2, column: 2 }),
+
+  createWallAtCell({ row: 3, column: 3 }),
 ]
 
 const cellFromPoint = ({ x, y }) => {
@@ -91,8 +93,8 @@ const cellFromPoint = ({ x, y }) => {
 
 const game = createGame({
   worldContainer: true,
-  worldWidth: 3 * CELL_SIZE,
-  worldHeight: 3 * CELL_SIZE,
+  worldWidth: 5 * CELL_SIZE,
+  worldHeight: 5 * CELL_SIZE,
   blocs,
 })
 document.body.appendChild(game.canvas)

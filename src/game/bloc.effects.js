@@ -103,7 +103,7 @@ export const blocEffectCollisionResolution = {
         blocTop < blocCollidingBottom && blocTop > blocCollidingTop
           ? blocTop - blocCollidingBottom
           : 0
-      const bottomCollidisionLength =
+      const bottomCollisionLength =
         blocBottom > blocCollidingTop && blocBottom < blocCollidingBottom
           ? blocBottom - blocCollidingTop
           : 0
@@ -115,9 +115,9 @@ export const blocEffectCollisionResolution = {
           ? blocCollidingRight
           : undefined
       const positionYCandidate =
-        isMovingTop && topCollisionLength
-          ? blocCollidingTop + bloc.height
-          : isMovingBottom && bottomCollidisionLength
+        isMovingBottom && bottomCollisionLength
+          ? blocCollidingTop - bloc.height
+          : isMovingTop && topCollisionLength
           ? blocCollidingBottom
           : undefined
 
@@ -142,7 +142,7 @@ export const blocEffectCollisionResolution = {
             return
           }
         }
-        // try to alter only X and see if this is enought
+        // try to alter only X and see if this is enough
         const xAloneIsCollisionFree = !rectangleCollidesRectangle(
           {
             positionX: positionXCandidate,
