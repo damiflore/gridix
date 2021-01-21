@@ -1,7 +1,13 @@
 import { Bloc, mutateBloc } from "./bloc.js"
 import { blocEffectContainer } from "./bloc.effects.js"
 
-export const createGame = ({ worldContainer = false, worldWidth, worldHeight, blocs } = {}) => {
+export const createGame = ({
+  worldContainer = false,
+  drawAfterUpdate = false,
+  worldWidth,
+  worldHeight,
+  blocs,
+} = {}) => {
   const canvas = createCanvas({
     width: worldWidth,
     height: worldHeight,
@@ -37,12 +43,19 @@ export const createGame = ({ worldContainer = false, worldWidth, worldHeight, bl
         mutateBloc(bloc, bloc.updates[key](bloc, { blocs, msEllapsed }))
       })
     })
+    if (drawAfterUpdate) {
+      draw()
+    }
     blocs.forEach((bloc) => {
       Object.keys(bloc.effects).forEach((key) => {
         mutateBloc(bloc, bloc.effects[key](bloc, { blocs, msEllapsed }))
       })
     })
 
+    draw()
+  }
+
+  const draw = () => {
     context.clearRect(0, 0, canvas.width, canvas.height)
     blocs.sort((leftBloc, rightBloc) => {
       if (leftBloc.positionZ > rightBloc.positionZ) {
@@ -71,19 +84,22 @@ export const createGame = ({ worldContainer = false, worldWidth, worldHeight, bl
   }
 
   let animationFrame
-  let stopped = false
+  let started = false
 
   const stop = () => {
-    stopped = true
+    started = false
     window.cancelAnimationFrame(animationFrame)
   }
 
   const start = () => {
+    if (started) return
+    started = true
+
     tick(0)
     let msPrevious = performance.now()
 
     const next = () => {
-      if (stopped) {
+      if (!started) {
         return
       }
       animationFrame = window.requestAnimationFrame(() => {
@@ -108,6 +124,7 @@ export const createGame = ({ worldContainer = false, worldWidth, worldHeight, bl
     canvas,
     start,
     stop,
+    draw,
     blocsFromPoint,
     addTickCallback: (callback) => {
       tickCallbacks.push(callback)
