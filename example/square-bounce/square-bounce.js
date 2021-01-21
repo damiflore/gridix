@@ -1,24 +1,31 @@
 import { createGame } from "src/game/game.js"
 import { Bloc } from "src/game/bloc.js"
-import { blocEffectBounce } from "src/game/bloc.effects.js"
+import { blocUpdateVelocity } from "src/game/bloc.updates.js"
+import {
+  blocEffectCollisionDetection,
+  blocEffectCollisionResolutionBounce,
+} from "src/game/bloc.effects.js"
 
 const createSquare = (props) => {
   return {
     ...Bloc,
     canCollide: true,
-    width: 50,
-    height: 50,
-    ...props,
-    fillStyle: "green",
+    updates: {
+      ...blocUpdateVelocity,
+    },
     effects: {
-      ...Bloc.effects,
-      ...blocEffectBounce,
+      ...blocEffectCollisionDetection,
+      ...blocEffectCollisionResolutionBounce,
       "collision-color": ({ blocCollidingArray }) => {
         return {
           fillStyle: blocCollidingArray.length === 0 ? "green" : "red",
         }
       },
     },
+    width: 50,
+    height: 50,
+    fillStyle: "green",
+    ...props,
   }
 }
 
