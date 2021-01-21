@@ -46,9 +46,9 @@ export const blocUpdateVelocity = {
     const secondsEllapsed = msEllapsed / 1000
 
     return {
-      positionX: positionX + velocityX * secondsEllapsed,
-      positionY: positionY + velocityY * secondsEllapsed,
-      positionZ: positionZ + velocityZ * secondsEllapsed,
+      positionX: Math.round(positionX + velocityX * secondsEllapsed),
+      positionY: Math.round(positionY + velocityY * secondsEllapsed),
+      positionZ: Math.round(positionZ + velocityZ * secondsEllapsed),
     }
   },
 }
