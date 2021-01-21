@@ -13,6 +13,12 @@ https://github.com/ovalia/ovalia/blob/master/html/game.html
 https://developers.google.com/web/updates/2018/08/offscreen-canvas
 https://developer.mozilla.org/en-US/docs/Games
 
+Bugs actuels:
+- le héro peut essayer de traverser les choses ce qui donne un flickering visuel
+- on peut pousser vers le haut un baril alors qu'on le touche de 1px
+- le héro pas par desuss le baril si celui si se trouve en haut a droite
+et qu'on se déplace en diagonale + haut
+
 Prochaines choses a faire:
 - Pouvoir pousser un objet
 - Avoir un/des objet piece qu'on peut ramasser, il s'affiche dans un inventaire
@@ -29,6 +35,8 @@ import {
   blocEffectCollisionDetection,
   blocEffectCollisionResolution,
   blocCollidingArrayGetter,
+  getCollisionLength,
+  blocToMoveDirection,
 } from "src/game/bloc.effects.js"
 import { CELL_SIZE } from "src/game.constant.js"
 import { trackKeyboardKeydown } from "src/interaction/keyboard.js"
@@ -70,6 +78,28 @@ const createWallAtCell = ({ row, column, ...rest }) => {
   }
 }
 
+const createBarilAtCell = ({ row, column, ...rest }) => {
+  return {
+    ...Bloc,
+    name: "baril",
+    mass: 100,
+    friction: 0.6,
+    canCollide: true,
+    updates: {
+      ...blocUpdateFriction,
+      ...blocUpdateVelocity,
+    },
+    effects: {
+      ...blocEffectCollisionDetection,
+      ...blocEffectCollisionResolution,
+    },
+    ...cellToRectangleGeometry({ row, column }),
+    positionZ: 32,
+    fillStyle: "brown",
+    ...rest,
+  }
+}
+
 const blocs = [
   createFloorAtCell({ row: 0, column: 0 }),
   createFloorAtCell({ row: 1, column: 0 }),
@@ -82,6 +112,9 @@ const blocs = [
   createFloorAtCell({ row: 2, column: 2 }),
 
   createWallAtCell({ row: 3, column: 3 }),
+  createWallAtCell({ row: 0, column: 5 }),
+
+  createBarilAtCell({ row: 2, column: 1 }),
 ]
 
 const cellFromPoint = ({ x, y }) => {
@@ -123,13 +156,22 @@ const createHeroAtCell = ({ row, column }) => {
     ...Bloc,
     name: "hero",
     canCollide: true,
-    // devrait dépendre de la surface sur laquelle on se trouve
     friction: 0.8,
+    mass: 10,
+    keyboardVelocity: 100,
     updates: {
       ...blocUpdateFriction,
-      keyboardNavigation: ({ velocityX, velocityY }) => {
-        const velocityXNew = leftKey.isDown ? -50 : rightKey.isDown ? 50 : velocityX
-        const velocityYNew = upKey.isDown ? -50 : downKey.isDown ? 50 : velocityY
+      keyboardNavigation: ({ velocityX, velocityY, keyboardVelocity }) => {
+        const velocityXNew = leftKey.isDown
+          ? -keyboardVelocity
+          : rightKey.isDown
+          ? keyboardVelocity
+          : velocityX
+        const velocityYNew = upKey.isDown
+          ? -keyboardVelocity
+          : downKey.isDown
+          ? keyboardVelocity
+          : velocityY
 
         return {
           velocityX: velocityXNew,
@@ -140,6 +182,43 @@ const createHeroAtCell = ({ row, column }) => {
     },
     effects: {
       ...blocEffectCollisionDetection,
+      "push-barils": (hero) => {
+        hero.blocCollidingArray.forEach((blocColliding) => {
+          if (blocColliding.name !== "baril") {
+            return
+          }
+
+          const baril = blocColliding
+          const { movingLeft, movingTop, movingRight, movingBottom } = blocToMoveDirection(hero)
+          const {
+            collisionLeftLength,
+            collisionTopLength,
+            collisionRightLength,
+            collisionBottomLength,
+          } = getCollisionLength(hero, baril)
+
+          if (movingLeft && collisionLeftLength) {
+            mutateBloc(baril, {
+              velocityX: baril.velocityX + hero.velocityX,
+            })
+          }
+          if (movingTop && collisionTopLength) {
+            mutateBloc(baril, {
+              velocityY: baril.velocityY + hero.velocityY,
+            })
+          }
+          if (movingRight && collisionRightLength) {
+            mutateBloc(baril, {
+              velocityX: baril.velocityX + hero.velocityX,
+            })
+          }
+          if (movingBottom && collisionBottomLength) {
+            mutateBloc(baril, {
+              velocityY: baril.velocityY + hero.velocityY,
+            })
+          }
+        })
+      },
       ...blocEffectCollisionResolution,
     },
     ...cellToRectangleGeometry({ row, column }),

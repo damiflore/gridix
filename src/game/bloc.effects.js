@@ -76,49 +76,27 @@ export const blocEffectCollisionResolution = {
       return
     }
 
-    const blocLeft = bloc.positionX
-    const blocTop = bloc.positionY
-    const blocRight = blocLeft + bloc.width
-    const blocBottom = blocTop + bloc.height
-    const isMovingRight = blocVelocityX > 0
-    const isMovingLeft = blocVelocityX < 0
-    const isMovingTop = blocVelocityY < 0
-    const isMovingBottom = blocVelocityY > 0
+    const { movingLeft, movingTop, movingRight, movingBottom } = blocToMoveDirection(bloc)
 
     bloc.blocCollidingArray.forEach((blocColliding) => {
-      const blocCollidingLeft = blocColliding.positionX
-      const blocCollidingRight = blocCollidingLeft + blocColliding.width
-      const blocCollidingTop = blocColliding.positionY
-      const blocCollidingBottom = blocCollidingTop + blocColliding.height
-
-      const leftCollisionLength =
-        blocLeft < blocCollidingRight && blocLeft > blocCollidingLeft
-          ? blocLeft - blocCollidingRight
-          : 0
-      const rightCollisionLength =
-        blocRight > blocCollidingLeft && blocRight < blocCollidingRight
-          ? blocRight - blocCollidingLeft
-          : 0
-      const topCollisionLength =
-        blocTop < blocCollidingBottom && blocTop > blocCollidingTop
-          ? blocTop - blocCollidingBottom
-          : 0
-      const bottomCollisionLength =
-        blocBottom > blocCollidingTop && blocBottom < blocCollidingBottom
-          ? blocBottom - blocCollidingTop
-          : 0
+      const {
+        collisionLeftLength,
+        collisionTopLength,
+        collisionRightLength,
+        collisionBottomLength,
+      } = getCollisionLength(bloc, blocColliding)
 
       const positionXCandidate =
-        isMovingRight && rightCollisionLength
-          ? blocCollidingLeft - bloc.width
-          : isMovingLeft && leftCollisionLength
-          ? blocCollidingRight
+        movingLeft && collisionLeftLength
+          ? blocColliding.positionX + blocColliding.width
+          : movingRight && collisionRightLength
+          ? blocColliding.positionX - bloc.width
           : undefined
       const positionYCandidate =
-        isMovingBottom && bottomCollisionLength
-          ? blocCollidingTop - bloc.height
-          : isMovingTop && topCollisionLength
-          ? blocCollidingBottom
+        movingTop && collisionTopLength
+          ? blocColliding.positionY + blocColliding.height
+          : movingBottom && collisionBottomLength
+          ? blocColliding.positionY - bloc.height
           : undefined
 
       if (positionXCandidate !== undefined && positionYCandidate !== undefined) {
@@ -174,44 +152,54 @@ export const blocEffectCollisionResolution = {
   },
 }
 
+export const blocToMoveDirection = ({ velocityX, velocityY }) => {
+  return {
+    movingLeft: velocityX < 0,
+    movingTop: velocityY < 0,
+    movingRight: velocityX > 0,
+    movingBottom: velocityY > 0,
+  }
+}
+
+export const getCollisionLength = (blocA, blocB) => {
+  const blocALeft = blocA.positionX
+  const blocATop = blocA.positionY
+  const blocARight = blocALeft + blocA.width
+  const blocABottom = blocATop + blocA.height
+
+  const blocBLeft = blocB.positionX
+  const blocBTop = blocB.positionY
+  const blocBRight = blocBLeft + blocB.width
+  const blocBBottom = blocBTop + blocB.height
+
+  const collisionLeftLength =
+    blocALeft < blocBRight && blocALeft > blocBLeft ? blocALeft - blocBRight : 0
+
+  const collisionTopLength =
+    blocATop < blocBBottom && blocATop > blocBTop ? blocATop - blocBBottom : 0
+
+  const collisionRightLength =
+    blocARight > blocBLeft && blocARight < blocBRight ? blocARight - blocBLeft : 0
+
+  const collisionBottomLength =
+    blocABottom > blocBTop && blocABottom < blocBBottom ? blocABottom - blocBTop : 0
+
+  return {
+    collisionTopLength,
+    collisionLeftLength,
+    collisionBottomLength,
+    collisionRightLength,
+  }
+}
+
 // https://github.com/liabru/matter-js/issues/5
 // http://www.stencyl.com/help/view/continuous-collision-detection
-// en gros il faudrait que, par défault
-// lorsqu'un rectangle est en collision avec un autre
-// il soit renvoyé d'ou il venait initialement
-// (on peut utiliser sa vélocité pour en déduire d'ou il venait)
 export const blocEffectCollisionResolutionBounce = {
   "collision-resolution-bounce": (bloc) => {
     bloc.blocCollidingArray.forEach((blocColliding) => {
-      const blocCenterPoint = blocToCenterPoint(bloc)
-      const blocCollidingCenterPoint = blocToCenterPoint(blocColliding)
+      const { collisionSpeed, collisionVectorNormalized } = getCollisionImpact(bloc, blocColliding)
 
-      const collisionVector = {
-        x: blocCollidingCenterPoint.x - blocCenterPoint.x,
-        y: blocCollidingCenterPoint.y - blocCenterPoint.y,
-      }
-      const distanceBetweenBlocs = getDistanceBetweenTwoPoints(
-        blocCollidingCenterPoint,
-        blocCenterPoint,
-      )
-      const collisionVectorNormalized = {
-        x: collisionVector.x / distanceBetweenBlocs,
-        y: collisionVector.y / distanceBetweenBlocs,
-      }
-      const velocityRelativeVector = {
-        x: bloc.velocityX - blocColliding.velocityX,
-        y: bloc.velocityY - blocColliding.velocityY,
-      }
-      let speed =
-        velocityRelativeVector.x * collisionVectorNormalized.x +
-        velocityRelativeVector.y * collisionVectorNormalized.y
-      speed *= Math.min(bloc.restitution, blocColliding.restitution)
-
-      if (speed < 0) {
-        return
-      }
-
-      const impulse = (2 * speed) / (bloc.mass + blocColliding.mass)
+      const impulse = (2 * collisionSpeed) / (bloc.mass + blocColliding.mass)
       mutateBloc(bloc, {
         velocityX: bloc.velocityX - impulse * blocColliding.mass * collisionVectorNormalized.x,
         velocityY: bloc.velocityY - impulse * blocColliding.mass * collisionVectorNormalized.y,
@@ -222,6 +210,34 @@ export const blocEffectCollisionResolutionBounce = {
       })
     })
   },
+}
+
+export const getCollisionImpact = (blocA, blocB) => {
+  const blocACenterPoint = blocToCenterPoint(blocA)
+  const blocBCenterPoint = blocToCenterPoint(blocB)
+
+  const collisionVector = {
+    x: blocBCenterPoint.x - blocACenterPoint.x,
+    y: blocBCenterPoint.y - blocACenterPoint.y,
+  }
+  const distanceBetweenBlocs = getDistanceBetweenTwoPoints(blocBCenterPoint, blocACenterPoint)
+  const collisionVectorNormalized = {
+    x: collisionVector.x / distanceBetweenBlocs,
+    y: collisionVector.y / distanceBetweenBlocs,
+  }
+  const velocityRelativeVector = {
+    x: blocA.velocityX - blocB.velocityX,
+    y: blocA.velocityY - blocB.velocityY,
+  }
+  let speed =
+    velocityRelativeVector.x * collisionVectorNormalized.x +
+    velocityRelativeVector.y * collisionVectorNormalized.y
+  speed *= Math.min(blocA.restitution, blocB.restitution)
+
+  return {
+    collisionSpeed: speed,
+    collisionVectorNormalized,
+  }
 }
 
 export const blocEffectCollisionResolutionFriction = {
