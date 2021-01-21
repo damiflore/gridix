@@ -51,7 +51,9 @@ export const blocEffectContainer = {
       } else if (blocRight > containerRight) {
         blocMutations.positionX = containerRight - blocWidth
         blocMutations.velocityX = -Math.abs(velocityX) * containerRestitution
-      } else if (blocTop < containerTop) {
+      }
+
+      if (blocTop < containerTop) {
         blocMutations.positionY = containerTop
         blocMutations.velocityY = Math.abs(velocityY) * containerRestitution
       } else if (blocBottom > containerBottom) {
@@ -70,146 +72,185 @@ export const blocEffectContainer = {
 
 export const blocEffectCollisionResolution = {
   "collision-resolution": (bloc) => {
-    const blocVelocityX = bloc.velocityX
-    const blocVelocityY = bloc.velocityY
-    if (blocVelocityX === 0 && blocVelocityY === 0) {
-      return
-    }
-
-    if (Math.abs(bloc.velocityX) < 0.1) {
-      bloc.velocityX = 0
-    }
-    if (Math.abs(bloc.velocityY) < 0.1) {
-      bloc.velocityY = 0
-    }
-
-    const { movingLeft, movingTop, movingRight, movingBottom } = blocToMoveDirection({
-      velocityX: bloc.velocityX,
-      velocityY: bloc.velocityY,
-    })
-
-    const candidates = []
-
-    const addCandidate = ({ positionX = bloc.positionX, positionY = bloc.positionY }) => {
-      candidates.push({
-        positionX,
-        positionY,
-      })
-    }
-
     bloc.blocCollidingArray.forEach((blocColliding) => {
-      const leftMoveIsColliding = movingLeft && getCollisionLeftLength(bloc, blocColliding)
-      const topMoveIsColliding = movingTop && getCollisionTopLength(bloc, blocColliding)
-      const rightMoveIsColliding = movingRight && getCollisionRightLength(bloc, blocColliding)
-      const bottomMoveIsColliding = movingBottom && getCollisionBottomLength(bloc, blocColliding)
+      if (bloc.name === "wall") return
 
-      const addBottomRightCandidate = () => {
-        addCandidate({
-          positionX: blocColliding.positionX + blocColliding.width,
-          positionY: blocColliding.positionY + blocColliding.height,
-        })
-      }
-      const addTopRightCandidate = () => {
-        addCandidate({
-          positionX: blocColliding.positionX + blocColliding.width,
-          positionY: blocColliding.positionY - bloc.height,
-        })
-      }
-      const addTopLeftCandidate = () => {
-        addCandidate({
-          positionX: blocColliding.positionX - bloc.width,
-          positionY: blocColliding.positionY - bloc.height,
-        })
-      }
-      const addBottomLeftCandidate = () => {
-        addCandidate({
-          positionX: blocColliding.positionX - bloc.width,
-          positionY: blocColliding.positionY + blocColliding.height,
-        })
-      }
-      const addLeftCandidate = () => {
-        addCandidate({
-          positionX: blocColliding.positionX - bloc.width,
-        })
-      }
-      const addRightCandidate = () => {
-        addCandidate({
-          positionX: blocColliding.positionX + blocColliding.width,
-        })
-      }
-      const addTopCandidate = () => {
-        addCandidate({
-          positionY: blocColliding.positionY - bloc.height,
-        })
-      }
-      const addBottomCandidate = () => {
-        addCandidate({
-          positionY: blocColliding.positionY + blocColliding.height,
-        })
-      }
+      // get the vectors to check against
+      var vX = bloc.positionX + bloc.width / 2 - (blocColliding.positionX + blocColliding.width / 2)
+      var vY =
+        bloc.positionY + bloc.height / 2 - (blocColliding.positionY + blocColliding.height / 2)
+      // Half widths and half heights of the objects
+      var ww2 = bloc.width / 2 + blocColliding.width / 2
+      var hh2 = bloc.height / 2 + blocColliding.height / 2
+      var colDir = ""
 
-      if (topMoveIsColliding && leftMoveIsColliding) {
-        addBottomCandidate()
-        addRightCandidate()
-        addBottomRightCandidate()
-        return
+      // if the x and y vector are less than the half width or half height,
+      // they we must be inside the object, causing a collision
+      if (Math.abs(vX) < ww2 && Math.abs(vY) < hh2) {
+        // figures out on which side we are colliding (top, bottom, left, or right)
+        var oX = ww2 - Math.abs(vX)
+        var oY = hh2 - Math.abs(vY)
+        if (oX >= oY) {
+          if (vY > 0) {
+            colDir = "TOP"
+            bloc.positionY += oY
+          } else {
+            colDir = "BOTTOM"
+            bloc.positionY -= oY
+          }
+        } else if (vX > 0) {
+          colDir = "LEFT"
+          bloc.positionX += oX
+        } else {
+          colDir = "RIGHT"
+          bloc.positionX -= oX
+        }
       }
-      if (bottomMoveIsColliding && leftMoveIsColliding) {
-        addTopCandidate()
-        addRightCandidate()
-        addTopRightCandidate()
-        return
-      }
-      if (topMoveIsColliding && rightMoveIsColliding) {
-        addBottomCandidate()
-        addLeftCandidate()
-        addBottomLeftCandidate()
-        return
-      }
-      if (bottomMoveIsColliding && rightMoveIsColliding) {
-        addTopCandidate()
-        addRightCandidate()
-        addTopLeftCandidate()
-        return
-      }
-      if (leftMoveIsColliding) {
-        addRightCandidate()
-        return
-      }
-      if (rightMoveIsColliding) {
-        addLeftCandidate()
-        return
-      }
-      if (topMoveIsColliding) {
-        addBottomCandidate()
-        return
-      }
-      if (bottomMoveIsColliding) {
-        addTopCandidate()
-        return
-      }
+      return colDir
     })
-
-    const candidatesWithoutCollision = candidates.filter((candidate) => {
-      return bloc.blocCollidingArray.every((blocColliding) => {
-        const collides = rectangleCollidesRectangle(
-          {
-            positionX: candidate.positionX,
-            positionY: candidate.positionY,
-            width: bloc.width,
-            height: bloc.height,
-          },
-          blocColliding,
-        )
-        return !collides
-      })
-    })
-    if (candidatesWithoutCollision.length === 0) {
-      // no way candidate can prevent collision
-    } else {
-      mutateBloc(bloc, candidatesWithoutCollision[0])
-    }
   },
+
+  // "collision-resolution": (bloc) => {
+  //   const blocVelocityX = bloc.velocityX
+  //   const blocVelocityY = bloc.velocityY
+  //   if (blocVelocityX === 0 && blocVelocityY === 0) {
+  //     return
+  //   }
+
+  //   if (Math.abs(bloc.velocityX) < 0.1) {
+  //     bloc.velocityX = 0
+  //   }
+  //   if (Math.abs(bloc.velocityY) < 0.1) {
+  //     bloc.velocityY = 0
+  //   }
+
+  //   const { movingLeft, movingTop, movingRight, movingBottom } = blocToMoveDirection({
+  //     velocityX: bloc.velocityX,
+  //     velocityY: bloc.velocityY,
+  //   })
+
+  //   const candidates = []
+
+  //   const addCandidate = ({ positionX = bloc.positionX, positionY = bloc.positionY }) => {
+  //     candidates.push({
+  //       positionX,
+  //       positionY,
+  //     })
+  //   }
+
+  //   bloc.blocCollidingArray.forEach((blocColliding) => {
+  //     const leftMoveIsColliding = movingLeft && getCollisionLeftLength(bloc, blocColliding)
+  //     const topMoveIsColliding = movingTop && getCollisionTopLength(bloc, blocColliding)
+  //     const rightMoveIsColliding = movingRight && getCollisionRightLength(bloc, blocColliding)
+  //     const bottomMoveIsColliding = movingBottom && getCollisionBottomLength(bloc, blocColliding)
+
+  //     const addBottomRightCandidate = () => {
+  //       addCandidate({
+  //         positionX: blocColliding.positionX + blocColliding.width,
+  //         positionY: blocColliding.positionY + blocColliding.height,
+  //       })
+  //     }
+  //     const addTopRightCandidate = () => {
+  //       addCandidate({
+  //         positionX: blocColliding.positionX + blocColliding.width,
+  //         positionY: blocColliding.positionY - bloc.height,
+  //       })
+  //     }
+  //     const addTopLeftCandidate = () => {
+  //       addCandidate({
+  //         positionX: blocColliding.positionX - bloc.width,
+  //         positionY: blocColliding.positionY - bloc.height,
+  //       })
+  //     }
+  //     const addBottomLeftCandidate = () => {
+  //       addCandidate({
+  //         positionX: blocColliding.positionX - bloc.width,
+  //         positionY: blocColliding.positionY + blocColliding.height,
+  //       })
+  //     }
+  //     const addLeftCandidate = () => {
+  //       addCandidate({
+  //         positionX: blocColliding.positionX - bloc.width,
+  //       })
+  //     }
+  //     const addRightCandidate = () => {
+  //       addCandidate({
+  //         positionX: blocColliding.positionX + blocColliding.width,
+  //       })
+  //     }
+  //     const addTopCandidate = () => {
+  //       addCandidate({
+  //         positionY: blocColliding.positionY - bloc.height,
+  //       })
+  //     }
+  //     const addBottomCandidate = () => {
+  //       addCandidate({
+  //         positionY: blocColliding.positionY + blocColliding.height,
+  //       })
+  //     }
+
+  //     if (topMoveIsColliding && leftMoveIsColliding) {
+  //       addBottomCandidate()
+  //       addRightCandidate()
+  //       addBottomRightCandidate()
+  //       return
+  //     }
+  //     if (bottomMoveIsColliding && leftMoveIsColliding) {
+  //       addTopCandidate()
+  //       addRightCandidate()
+  //       addTopRightCandidate()
+  //       return
+  //     }
+  //     if (topMoveIsColliding && rightMoveIsColliding) {
+  //       addBottomCandidate()
+  //       addLeftCandidate()
+  //       addBottomLeftCandidate()
+  //       return
+  //     }
+  //     if (bottomMoveIsColliding && rightMoveIsColliding) {
+  //       addTopCandidate()
+  //       addRightCandidate()
+  //       addTopLeftCandidate()
+  //       return
+  //     }
+  //     if (leftMoveIsColliding) {
+  //       addRightCandidate()
+  //       return
+  //     }
+  //     if (rightMoveIsColliding) {
+  //       addLeftCandidate()
+  //       return
+  //     }
+  //     if (topMoveIsColliding) {
+  //       addBottomCandidate()
+  //       return
+  //     }
+  //     if (bottomMoveIsColliding) {
+  //       addTopCandidate()
+  //       return
+  //     }
+  //   })
+
+  //   const candidatesWithoutCollision = candidates.filter((candidate) => {
+  //     return bloc.blocCollidingArray.every((blocColliding) => {
+  //       const collides = rectangleCollidesRectangle(
+  //         {
+  //           positionX: candidate.positionX,
+  //           positionY: candidate.positionY,
+  //           width: bloc.width,
+  //           height: bloc.height,
+  //         },
+  //         blocColliding,
+  //       )
+  //       return !collides
+  //     })
+  //   })
+  //   if (candidatesWithoutCollision.length === 0) {
+  //     // no way candidate can prevent collision
+  //   } else {
+  //     mutateBloc(bloc, candidatesWithoutCollision[0])
+  //   }
+  // },
 }
 
 export const blocToMoveDirection = ({ velocityX, velocityY }) => {

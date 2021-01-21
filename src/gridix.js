@@ -141,7 +141,7 @@ const cellFromPoint = ({ x, y }) => {
 }
 
 const game = createGame({
-  drawAfterUpdate: true,
+  // drawAfterUpdate: true,
   worldContainer: true,
   worldWidth: 7 * CELL_SIZE,
   worldHeight: 7 * CELL_SIZE,
@@ -204,10 +204,8 @@ const createHeroAtCell = ({ row, column }) => {
           if (blocColliding.name !== "baril") {
             return
           }
-
           const baril = blocColliding
           const { movingLeft, movingTop, movingRight, movingBottom } = blocToMoveDirection(hero)
-
           if (movingLeft && getCollisionLeftLength(hero, baril)) {
             mutateBloc(baril, {
               velocityX: baril.velocityX + hero.velocityX,
@@ -233,6 +231,8 @@ const createHeroAtCell = ({ row, column }) => {
       ...blocEffectCollisionResolution,
     },
     ...cellToRectangleGeometry({ row, column }),
+    width: 24,
+    height: 24,
     positionZ: 0,
     fillStyle: "red",
   }
