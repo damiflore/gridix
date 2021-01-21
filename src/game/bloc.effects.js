@@ -68,8 +68,8 @@ export const blocEffectContainer = {
   },
 }
 
-export const blocEffectCollision = {
-  collision: (bloc) => {
+export const blocEffectCollisionResolution = {
+  "collision-resolution": (bloc) => {
     const blocVelocityX = bloc.velocityX
     const blocVelocityY = bloc.velocityY
     if (blocVelocityX === 0 && blocVelocityY === 0) {
@@ -180,8 +180,8 @@ export const blocEffectCollision = {
 // lorsqu'un rectangle est en collision avec un autre
 // il soit renvoyé d'ou il venait initialement
 // (on peut utiliser sa vélocité pour en déduire d'ou il venait)
-export const blocEffectBounce = {
-  bounce: (bloc) => {
+export const blocEffectCollisionResolutionBounce = {
+  "collision-resolution-bounce": (bloc) => {
     bloc.blocCollidingArray.forEach((blocColliding) => {
       const blocCenterPoint = blocToCenterPoint(bloc)
       const blocCollidingCenterPoint = blocToCenterPoint(blocColliding)
@@ -222,4 +222,8 @@ export const blocEffectBounce = {
       })
     })
   },
+}
+
+export const blocEffectCollisionResolutionFriction = {
+  "collision-resolution-friction": () => {},
 }

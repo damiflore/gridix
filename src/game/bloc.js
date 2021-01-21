@@ -1,9 +1,3 @@
-import { blocUpdateVelocity } from "./bloc.updates.js"
-import {
-  blocEffectCollisionDetection,
-  blocEffectCollision,
-  blocEffectBounce,
-} from "./bloc.effects.js"
 import { blocDrawRectangle } from "./bloc.draw.js"
 
 export const Bloc = {
@@ -21,25 +15,27 @@ export const Bloc = {
   // physic
   blocCollidingArray: [],
   canCollide: false,
-  canMove: false,
+  // canMove: false,
+  accelerationX: 0,
+  accelerationY: 0,
+  accelerationZ: 0,
   velocityX: 0,
   velocityY: 0,
+  velocityZ: 0,
+  friction: 0,
   restitution: 1,
   mass: 1,
 
   // styles
   fillStyle: undefined,
   strokeStyle: undefined,
-  opacity: 1,
+  alpha: 1,
+  image: undefined,
+  imageSourceX: undefined,
+  imageSourceY: undefined,
 
-  updates: {
-    ...blocUpdateVelocity,
-  },
-  effects: {
-    ...blocEffectCollisionDetection,
-    ...blocEffectBounce,
-    ...blocEffectCollision,
-  },
+  updates: {},
+  effects: {},
   draw: blocDrawRectangle,
 }
 

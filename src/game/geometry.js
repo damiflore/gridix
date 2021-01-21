@@ -24,6 +24,13 @@ export const blocCollidesWithBloc = (firstBloc, secondBloc) => {
     return false
   }
 
+  // le bloc a une positionZ, il ne peut collisioner que avec ce qui est a le meme hauteur ?
+  // en vrai un partirais du principe qu'un bloc a une hauteur Z de CELL_SIZE
+  // et donc collisionne dans certains cas, pour le moment on ignore
+  if (firstBloc.positionZ !== secondBloc.positionZ) {
+    return false
+  }
+
   return rectangleCollidesRectangle(firstBloc, secondBloc)
 }
 

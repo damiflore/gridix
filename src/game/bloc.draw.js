@@ -9,7 +9,7 @@ export const blocDrawRectangle = (bloc, context) => {
 const applyStyle = (
   context,
   {
-    opacity,
+    alpha,
     fillStyle,
     strokeStyle,
     image,
@@ -21,7 +21,7 @@ const applyStyle = (
     height,
   },
 ) => {
-  context.globalAlpha = opacity
+  context.globalAlpha = alpha
   if (fillStyle) {
     context.fillStyle = fillStyle
     context.fill()

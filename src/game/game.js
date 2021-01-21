@@ -12,15 +12,14 @@ export const createGame = ({ worldContainer = false, worldWidth, worldHeight, bl
     const blocForWorld = {
       ...Bloc,
       name: "world",
+      effects: {
+        ...blocEffectContainer,
+      },
       positionX: 0,
       positionY: 0,
       width: worldWidth,
       height: worldHeight,
       restitution: 0,
-      effects: {
-        ...Bloc.effects,
-        ...blocEffectContainer,
-      },
     }
     // il faut le garder tout en haut pour tester la collision en tout premier
     // puisqu'elle modifie la position d'un autre gameobject

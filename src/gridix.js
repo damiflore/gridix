@@ -1,5 +1,4 @@
 /* eslint-disable no-nested-ternary */
-// https://github.com/dmail-front/autotile
 
 /*
 
@@ -8,15 +7,38 @@ Mystic quest legend (https://www.youtube.com/watch?v=Qlzd_fzUCdA)
 qui au final se jouait tres bien malgré un system de carte et déplacement
 simplissime
 
+https://github.com/dmail-front/autotile
 - context api: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
 https://github.com/ovalia/ovalia/blob/master/html/game.html
-https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/isPointInPath
+https://developers.google.com/web/updates/2018/08/offscreen-canvas
+https://developer.mozilla.org/en-US/docs/Games
+
+Prochaines choses a faire:
+
+- Le héro s'arrete de bouger a cause des forces de frottement?
+https://codepen.io/OliverBalfour/post/implementing-velocity-acceleration-and-friction-on-a-canvas
+https://medium.com/javascript-in-plain-english/physical-simulation-with-javascript-in-the-html5-canvas-27dc6ea121cf
+https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Advanced_animations
+
+- Avoir un/des objet piece qu'on peut ramasser, il s'affiche dans un inventaire
+- Pouvoir faire un tunnel avec toit semi-transparent
+- Faire un escalier montant/descendant (chaque px de l'escalier, augmente d'autant la positionZ je dirais)
+- Pouvoir faire un pont, on passe au dessus de quelque chose, mais aussi possible de passer en dessous
 
 */
 
 import { createGame } from "src/game/game.js"
 import { Bloc, mutateBloc } from "src/game/bloc.js"
-import { blocCollidingArrayGetter } from "src/game/bloc.effects.js"
+import {
+  blocUpdateAcceleration,
+  blocUpdateFriction,
+  blocUpdateVelocity,
+} from "src/game/bloc.updates.js"
+import {
+  blocEffectCollisionDetection,
+  blocEffectCollisionResolution,
+  blocCollidingArrayGetter,
+} from "src/game/bloc.effects.js"
 import { CELL_SIZE } from "src/game.constant.js"
 import { trackKeyboardKeydown } from "src/interaction/keyboard.js"
 
@@ -35,8 +57,13 @@ const createFloorAtCell = ({ row, column }) => {
   return {
     ...Bloc,
     name: "floor",
-    positionZ: 0,
+    canCollide: true,
+    effects: {
+      ...blocEffectCollisionDetection,
+      ...blocEffectCollisionResolution,
+    },
     ...cellToRectangleGeometry({ row, column }),
+    positionZ: -CELL_SIZE,
     fillStyle: "white",
   }
 }
@@ -45,10 +72,14 @@ const createWallAtCell = ({ row, column, ...rest }) => {
   return {
     ...Bloc,
     name: "wall",
-    ...cellToRectangleGeometry({ row, column }),
-    positionZ: 1,
     canCollide: true,
-    restitution: 0,
+    effects: {
+      ...blocEffectCollisionDetection,
+      ...blocEffectCollisionResolution,
+    },
+    // restitution: 0,
+    ...cellToRectangleGeometry({ row, column }),
+    positionZ: 0,
     fillStyle: "grey",
     ...rest,
   }
@@ -104,6 +135,8 @@ const createHeroAtCell = ({ row, column }) => {
   const hero = {
     ...Bloc,
     name: "hero",
+    canCollide: true,
+    // canMove: true,
     updates: {
       keyboardNavigation: () => {
         return {
@@ -111,12 +144,12 @@ const createHeroAtCell = ({ row, column }) => {
           velocityY: upKey.isDown ? -50 : downKey.isDown ? 50 : 0,
         }
       },
-      ...Bloc.updates,
+      ...blocUpdateAcceleration,
+      ...blocUpdateFriction,
+      ...blocUpdateVelocity,
     },
     ...cellToRectangleGeometry({ row, column }),
-    positionZ: 1,
-    canCollide: true,
-    canMove: true,
+    positionZ: 0,
     fillStyle: "red",
   }
   return hero
