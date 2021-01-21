@@ -19,6 +19,10 @@ Bugs actuels:
 - le héro pas par desuss le baril si celui si se trouve en haut a droite
 et qu'on se déplace en diagonale + haut
 
+je récrirais bien la fonction de résolution de collision ?
+désactiver le déplacement en diagonale ?
+désactiver le déplacement sur des demi cases ?
+
 Prochaines choses a faire:
 - Pouvoir pousser un objet
 - Avoir un/des objet piece qu'on peut ramasser, il s'affiche dans un inventaire
@@ -35,7 +39,10 @@ import {
   blocEffectCollisionDetection,
   blocEffectCollisionResolution,
   blocCollidingArrayGetter,
-  getCollisionLength,
+  getCollisionLeftLength,
+  getCollisionTopLength,
+  getCollisionRightLength,
+  getCollisionBottomLength,
   blocToMoveDirection,
 } from "src/game/bloc.effects.js"
 import { CELL_SIZE } from "src/game.constant.js"
@@ -112,9 +119,18 @@ const blocs = [
   createFloorAtCell({ row: 2, column: 2 }),
 
   createWallAtCell({ row: 3, column: 3 }),
+  createWallAtCell({ row: 3, column: 4 }),
+  createWallAtCell({ row: 3, column: 1 }),
+  createWallAtCell({ row: 4, column: 3 }),
+  createWallAtCell({ row: 4, column: 4 }),
   createWallAtCell({ row: 0, column: 5 }),
 
   createBarilAtCell({ row: 2, column: 1 }),
+  createWallAtCell({ row: 0, column: 3 }),
+
+  createWallAtCell({ row: 6, column: 1 }),
+  createWallAtCell({ row: 6, column: 2 }),
+  createWallAtCell({ row: 6, column: 3 }),
 ]
 
 const cellFromPoint = ({ x, y }) => {
@@ -125,9 +141,10 @@ const cellFromPoint = ({ x, y }) => {
 }
 
 const game = createGame({
+  drawAfterUpdate: true,
   worldContainer: true,
-  worldWidth: 5 * CELL_SIZE,
-  worldHeight: 5 * CELL_SIZE,
+  worldWidth: 7 * CELL_SIZE,
+  worldHeight: 7 * CELL_SIZE,
   blocs,
 })
 document.body.appendChild(game.canvas)
@@ -190,29 +207,23 @@ const createHeroAtCell = ({ row, column }) => {
 
           const baril = blocColliding
           const { movingLeft, movingTop, movingRight, movingBottom } = blocToMoveDirection(hero)
-          const {
-            collisionLeftLength,
-            collisionTopLength,
-            collisionRightLength,
-            collisionBottomLength,
-          } = getCollisionLength(hero, baril)
 
-          if (movingLeft && collisionLeftLength) {
+          if (movingLeft && getCollisionLeftLength(hero, baril)) {
             mutateBloc(baril, {
               velocityX: baril.velocityX + hero.velocityX,
             })
           }
-          if (movingTop && collisionTopLength) {
+          if (movingTop && getCollisionTopLength(hero, baril)) {
             mutateBloc(baril, {
               velocityY: baril.velocityY + hero.velocityY,
             })
           }
-          if (movingRight && collisionRightLength) {
+          if (movingRight && getCollisionRightLength(hero, baril)) {
             mutateBloc(baril, {
               velocityX: baril.velocityX + hero.velocityX,
             })
           }
-          if (movingBottom && collisionBottomLength) {
+          if (movingBottom && getCollisionBottomLength(hero, baril)) {
             mutateBloc(baril, {
               velocityY: baril.velocityY + hero.velocityY,
             })
@@ -256,4 +267,20 @@ const moveBlocIfAllowed = (bloc, { positionX = bloc.positionX, positionY = bloc.
   }
 }
 
+const buttonPause = document.createElement("button")
+buttonPause.innerHTML = "pause"
+buttonPause.onclick = () => {
+  game.stop()
+}
+const buttonPlay = document.createElement("button")
+buttonPlay.innerHTML = "play"
+buttonPlay.onclick = () => {
+  game.start()
+}
+
+document.body.appendChild(document.createElement("br"))
+document.body.appendChild(buttonPause)
+document.body.appendChild(buttonPlay)
+
+window.game = game
 window.blocs = blocs

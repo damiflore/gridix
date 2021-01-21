@@ -76,79 +76,139 @@ export const blocEffectCollisionResolution = {
       return
     }
 
-    const { movingLeft, movingTop, movingRight, movingBottom } = blocToMoveDirection(bloc)
+    if (Math.abs(bloc.velocityX) < 0.1) {
+      bloc.velocityX = 0
+    }
+    if (Math.abs(bloc.velocityY) < 0.1) {
+      bloc.velocityY = 0
+    }
+
+    const { movingLeft, movingTop, movingRight, movingBottom } = blocToMoveDirection({
+      velocityX: bloc.velocityX,
+      velocityY: bloc.velocityY,
+    })
+
+    const candidates = []
+
+    const addCandidate = ({ positionX = bloc.positionX, positionY = bloc.positionY }) => {
+      candidates.push({
+        positionX,
+        positionY,
+      })
+    }
 
     bloc.blocCollidingArray.forEach((blocColliding) => {
-      const {
-        collisionLeftLength,
-        collisionTopLength,
-        collisionRightLength,
-        collisionBottomLength,
-      } = getCollisionLength(bloc, blocColliding)
+      const leftMoveIsColliding = movingLeft && getCollisionLeftLength(bloc, blocColliding)
+      const topMoveIsColliding = movingTop && getCollisionTopLength(bloc, blocColliding)
+      const rightMoveIsColliding = movingRight && getCollisionRightLength(bloc, blocColliding)
+      const bottomMoveIsColliding = movingBottom && getCollisionBottomLength(bloc, blocColliding)
 
-      const positionXCandidate =
-        movingLeft && collisionLeftLength
-          ? blocColliding.positionX + blocColliding.width
-          : movingRight && collisionRightLength
-          ? blocColliding.positionX - bloc.width
-          : undefined
-      const positionYCandidate =
-        movingTop && collisionTopLength
-          ? blocColliding.positionY + blocColliding.height
-          : movingBottom && collisionBottomLength
-          ? blocColliding.positionY - bloc.height
-          : undefined
+      const addBottomRightCandidate = () => {
+        addCandidate({
+          positionX: blocColliding.positionX + blocColliding.width,
+          positionY: blocColliding.positionY + blocColliding.height,
+        })
+      }
+      const addTopRightCandidate = () => {
+        addCandidate({
+          positionX: blocColliding.positionX + blocColliding.width,
+          positionY: blocColliding.positionY - bloc.height,
+        })
+      }
+      const addTopLeftCandidate = () => {
+        addCandidate({
+          positionX: blocColliding.positionX - bloc.width,
+          positionY: blocColliding.positionY - bloc.height,
+        })
+      }
+      const addBottomLeftCandidate = () => {
+        addCandidate({
+          positionX: blocColliding.positionX - bloc.width,
+          positionY: blocColliding.positionY + blocColliding.height,
+        })
+      }
+      const addLeftCandidate = () => {
+        addCandidate({
+          positionX: blocColliding.positionX - bloc.width,
+        })
+      }
+      const addRightCandidate = () => {
+        addCandidate({
+          positionX: blocColliding.positionX + blocColliding.width,
+        })
+      }
+      const addTopCandidate = () => {
+        addCandidate({
+          positionY: blocColliding.positionY - bloc.height,
+        })
+      }
+      const addBottomCandidate = () => {
+        addCandidate({
+          positionY: blocColliding.positionY + blocColliding.height,
+        })
+      }
 
-      if (positionXCandidate !== undefined && positionYCandidate !== undefined) {
-        // try to move the smallest distance first
-        // and see if this is enough to prevent the collision
-        const positionXDistance = Math.abs(positionXCandidate - bloc.positionX)
-        const positionYDistance = Math.abs(positionYCandidate - bloc.positionY)
-        if (positionXDistance > positionYDistance) {
-          // try to alter only Y and see if this is enough
-          const yAloneIsCollisionFree = !rectangleCollidesRectangle(
-            {
-              positionX: bloc.positionX,
-              positionY: positionYCandidate,
-              width: bloc.width,
-              height: bloc.height,
-            },
-            blocColliding,
-          )
-          if (yAloneIsCollisionFree) {
-            mutateBloc(bloc, { positionY: positionYCandidate })
-            return
-          }
-        }
-        // try to alter only X and see if this is enough
-        const xAloneIsCollisionFree = !rectangleCollidesRectangle(
+      if (topMoveIsColliding && leftMoveIsColliding) {
+        addBottomCandidate()
+        addRightCandidate()
+        addBottomRightCandidate()
+        return
+      }
+      if (bottomMoveIsColliding && leftMoveIsColliding) {
+        addTopCandidate()
+        addRightCandidate()
+        addTopRightCandidate()
+        return
+      }
+      if (topMoveIsColliding && rightMoveIsColliding) {
+        addBottomCandidate()
+        addLeftCandidate()
+        addBottomLeftCandidate()
+        return
+      }
+      if (bottomMoveIsColliding && rightMoveIsColliding) {
+        addTopCandidate()
+        addRightCandidate()
+        addTopLeftCandidate()
+        return
+      }
+      if (leftMoveIsColliding) {
+        addRightCandidate()
+        return
+      }
+      if (rightMoveIsColliding) {
+        addLeftCandidate()
+        return
+      }
+      if (topMoveIsColliding) {
+        addBottomCandidate()
+        return
+      }
+      if (bottomMoveIsColliding) {
+        addTopCandidate()
+        return
+      }
+    })
+
+    const candidatesWithoutCollision = candidates.filter((candidate) => {
+      return bloc.blocCollidingArray.every((blocColliding) => {
+        const collides = rectangleCollidesRectangle(
           {
-            positionX: positionXCandidate,
-            positionY: bloc.positionY,
+            positionX: candidate.positionX,
+            positionY: candidate.positionY,
             width: bloc.width,
             height: bloc.height,
           },
           blocColliding,
         )
-        if (xAloneIsCollisionFree) {
-          mutateBloc(bloc, { positionX: positionXCandidate })
-          return
-        }
-
-        mutateBloc(bloc, { positionX: positionXCandidate, positionY: positionYCandidate })
-        return
-      }
-
-      if (positionYCandidate !== undefined) {
-        mutateBloc(bloc, { positionY: positionYCandidate })
-        return
-      }
-
-      if (positionXCandidate !== undefined) {
-        mutateBloc(bloc, { positionX: positionXCandidate })
-        return
-      }
+        return !collides
+      })
     })
+    if (candidatesWithoutCollision.length === 0) {
+      // no way candidate can prevent collision
+    } else {
+      mutateBloc(bloc, candidatesWithoutCollision[0])
+    }
   },
 }
 
@@ -161,35 +221,46 @@ export const blocToMoveDirection = ({ velocityX, velocityY }) => {
   }
 }
 
-export const getCollisionLength = (blocA, blocB) => {
+export const getCollisionLeftLength = (blocA, blocB) => {
   const blocALeft = blocA.positionX
-  const blocATop = blocA.positionY
-  const blocARight = blocALeft + blocA.width
-  const blocABottom = blocATop + blocA.height
-
   const blocBLeft = blocB.positionX
-  const blocBTop = blocB.positionY
   const blocBRight = blocBLeft + blocB.width
-  const blocBBottom = blocBTop + blocB.height
-
   const collisionLeftLength =
     blocALeft < blocBRight && blocALeft > blocBLeft ? blocALeft - blocBRight : 0
 
+  return collisionLeftLength
+}
+
+export const getCollisionTopLength = (blocA, blocB) => {
+  const blocATop = blocA.positionY
+  const blocBTop = blocB.positionY
+  const blocBBottom = blocBTop + blocB.height
   const collisionTopLength =
     blocATop < blocBBottom && blocATop > blocBTop ? blocATop - blocBBottom : 0
 
+  return collisionTopLength
+}
+
+export const getCollisionRightLength = (blocA, blocB) => {
+  const blocALeft = blocA.positionX
+  const blocARight = blocALeft + blocA.width
+  const blocBLeft = blocB.positionX
+  const blocBRight = blocBLeft + blocB.width
   const collisionRightLength =
     blocARight > blocBLeft && blocARight < blocBRight ? blocARight - blocBLeft : 0
 
+  return collisionRightLength
+}
+
+export const getCollisionBottomLength = (blocA, blocB) => {
+  const blocATop = blocA.positionY
+  const blocABottom = blocATop + blocA.height
+  const blocBTop = blocB.positionY
+  const blocBBottom = blocBTop + blocB.height
   const collisionBottomLength =
     blocABottom > blocBTop && blocABottom < blocBBottom ? blocABottom - blocBTop : 0
 
-  return {
-    collisionTopLength,
-    collisionLeftLength,
-    collisionBottomLength,
-    collisionRightLength,
-  }
+  return collisionBottomLength
 }
 
 // https://github.com/liabru/matter-js/issues/5
