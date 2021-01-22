@@ -4,33 +4,72 @@ import { blocEffectContainer } from "./bloc.effects.js"
 export const createGame = ({
   worldContainer = false,
   drawAfterUpdate = false,
-  worldWidth,
-  worldHeight,
+  rowCount,
+  columnCount,
+  cellSize = 32,
+  worldMagneticGrid = false,
   blocs,
 } = {}) => {
+  const width = rowCount * cellSize
+  const height = columnCount * cellSize
   const canvas = createCanvas({
-    width: worldWidth,
-    height: worldHeight,
+    width,
+    height,
   })
   const context = canvas.getContext("2d")
 
-  if (worldContainer) {
-    const blocForWorld = {
-      ...Bloc,
-      name: "world",
-      effects: {
-        ...blocEffectContainer,
-      },
-      positionX: 0,
-      positionY: 0,
-      width: worldWidth,
-      height: worldHeight,
-      restitution: 0,
-    }
-    // il faut le garder tout en haut pour tester la collision en tout premier
-    // puisqu'elle modifie la position d'un autre gameobject
-    blocs.unshift(blocForWorld)
+  const blocForWorld = {
+    ...Bloc,
+    name: "world",
+    updates: {
+      ...(worldMagneticGrid
+        ? {
+            "magnetic-grid": (world, { blocs }) => {
+              blocs.forEach((bloc) => {
+                if (!bloc.canMove) {
+                  return
+                }
+
+                const { velocityX, positionX } = bloc
+                const closestRowX = Math.round(positionX / cellSize) * cellSize
+                const xDiff = positionX - closestRowX
+
+                // x n'est pas sur la colonne et suffisament proche de celle ci
+                // et se déplace suffisament lentement
+                console.log(xDiff, velocityX)
+                if (xDiff && Math.abs(xDiff) < 5 && Math.abs(velocityX) < 5) {
+                  // le bloc est a gauche de la colonne la plus proche
+                  if (xDiff < 0) {
+                    console.log("attire vers la droite", {
+                      positionX,
+                      closestRowX,
+                    })
+                    bloc.velocityX = 50
+                  }
+                  // le bloc est a droite
+                  if (xDiff > 0) {
+                    console.log("attire vers la gauche", {
+                      positionX,
+                      closestRowX,
+                    })
+                    bloc.velocityX = -50
+                  }
+                }
+              })
+            },
+          }
+        : {}),
+    },
+    effects: {
+      ...(worldContainer ? blocEffectContainer : {}),
+    },
+    positionX: 0,
+    positionY: 0,
+    width,
+    height,
+    restitution: 0,
   }
+  blocs.push(blocForWorld)
 
   const tickCallbacks = []
   const tick = (msEllapsed) => {
@@ -58,10 +97,10 @@ export const createGame = ({
   const draw = () => {
     context.clearRect(0, 0, canvas.width, canvas.height)
     blocs.sort((leftBloc, rightBloc) => {
-      if (leftBloc.positionZ > rightBloc.positionZ) {
+      if (leftBloc.zIndex > rightBloc.zIndex) {
         return 1
       }
-      if (leftBloc.positionZ < rightBloc.positionZ) {
+      if (leftBloc.zIndex < rightBloc.zIndex) {
         return -1
       }
       if (leftBloc.positionY > rightBloc.positionY) {

@@ -6,7 +6,7 @@ export const Bloc = {
   // position
   positionX: 0,
   positionY: 0,
-  positionZ: 0,
+  zIndex: 0,
 
   // dimension
   width: 0,
@@ -17,10 +17,8 @@ export const Bloc = {
   canCollide: false,
   accelerationX: 0,
   accelerationY: 0,
-  accelerationZ: 0,
   velocityX: 0,
   velocityY: 0,
-  velocityZ: 0,
   friction: 0.01,
   restitution: 1,
   mass: 1,

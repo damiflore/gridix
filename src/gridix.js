@@ -13,21 +13,30 @@ https://github.com/ovalia/ovalia/blob/master/html/game.html
 https://developers.google.com/web/updates/2018/08/offscreen-canvas
 https://developer.mozilla.org/en-US/docs/Games
 
-Bugs actuels:
-- le héro peut essayer de traverser les choses ce qui donne un flickering visuel
-- on peut pousser vers le haut un baril alors qu'on le touche de 1px
-- le héro pas par desuss le baril si celui si se trouve en haut a droite
-et qu'on se déplace en diagonale + haut
-
-je récrirais bien la fonction de résolution de collision ?
-désactiver le déplacement en diagonale ?
-désactiver le déplacement sur des demi cases ?
-
 Prochaines choses a faire:
-- Pouvoir pousser un objet
-- Avoir un/des objet piece qu'on peut ramasser, il s'affiche dans un inventaire
+- Faciliter les déplacement pixel perfect dans la grille
+Lorsqu'un élement se déplace, on va faciliter le fait qu'il s'arette pixel perfect dans la grille
+genre s'il s'arette a 4px du bord d'une cellule il va continuer de glisser jusqu'a ce bord
+
+Ptet en "aimantant" les arrete de la grille
+(tout objet déplacable est attiré vers cette grille (la grill lui confere une velocité))
+
+- Avoir un menu en bas de l'écran
+Ce menu peut avoir un élement actif
+On click dessus pour l'activer/désactiver
+
+- Pouvoir passer en mode édition (un bouton dans le menu)
+dans ce mode on sélectionne le type de chose qu'on veut modifier
+on commence par sélectionner si on veut un sol/mur
+lorsqu'on clique quelque part, ce sol/mur actif remplace l'existant
+
+- Avoir un/des objet piece qu'on peut ramasser, il s'affiche dans le menu
+- Pouvoir ramasser une hache
+- Pouvoir équiper/déséquipper la hache
+- La hache permet de couper des arbres
+- Lorsqu'on clique sur le héros cela active l'action actuelle (hache)
 - Pouvoir faire un tunnel avec toit semi-transparent
-- Faire un escalier montant/descendant (chaque px de l'escalier, augmente d'autant la positionZ je dirais)
+- Faire un escalier montant/descendant
 - Pouvoir faire un pont, on passe au dessus de quelque chose, mais aussi possible de passer en dessous
 
 */
@@ -64,7 +73,6 @@ const createFloorAtCell = ({ row, column }) => {
     ...Bloc,
     name: "floor",
     ...cellToRectangleGeometry({ row, column }),
-    positionZ: -CELL_SIZE,
     fillStyle: "white",
   }
 }
@@ -73,13 +81,9 @@ const createWallAtCell = ({ row, column, ...rest }) => {
   return {
     ...Bloc,
     name: "wall",
+    zIndex: 1,
     canCollide: true,
-    effects: {
-      ...blocEffectCollisionDetection,
-      ...blocEffectCollisionResolution,
-    },
     ...cellToRectangleGeometry({ row, column }),
-    positionZ: 0,
     fillStyle: "grey",
     ...rest,
   }
@@ -92,6 +96,7 @@ const createBarilAtCell = ({ row, column, ...rest }) => {
     mass: 100,
     friction: 0.6,
     canCollide: true,
+    canMove: true,
     updates: {
       ...blocUpdateFriction,
       ...blocUpdateVelocity,
@@ -101,7 +106,7 @@ const createBarilAtCell = ({ row, column, ...rest }) => {
       ...blocEffectCollisionResolution,
     },
     ...cellToRectangleGeometry({ row, column }),
-    positionZ: 32,
+    zIndex: 1,
     fillStyle: "brown",
     ...rest,
   }
@@ -143,8 +148,9 @@ const cellFromPoint = ({ x, y }) => {
 const game = createGame({
   // drawAfterUpdate: true,
   worldContainer: true,
-  worldWidth: 7 * CELL_SIZE,
-  worldHeight: 7 * CELL_SIZE,
+  rowCount: 7,
+  columnCount: 7,
+  cellSize: 32,
   blocs,
 })
 document.body.appendChild(game.canvas)
@@ -173,7 +179,9 @@ const createHeroAtCell = ({ row, column }) => {
     ...Bloc,
     name: "hero",
     canCollide: true,
+    canMove: true,
     friction: 0.8,
+    zIndex: 1,
     mass: 10,
     keyboardVelocity: 100,
     updates: {
@@ -199,9 +207,13 @@ const createHeroAtCell = ({ row, column }) => {
     },
     effects: {
       ...blocEffectCollisionDetection,
-      "push-barils": (hero) => {
+      "push-baril": (hero) => {
         hero.blocCollidingArray.forEach((blocColliding) => {
           if (blocColliding.name !== "baril") {
+            return
+          }
+          // no dialognal move allowed
+          if (hero.velocityX && hero.velocityY) {
             return
           }
           const baril = blocColliding
@@ -233,7 +245,6 @@ const createHeroAtCell = ({ row, column }) => {
     ...cellToRectangleGeometry({ row, column }),
     width: 24,
     height: 24,
-    positionZ: 0,
     fillStyle: "red",
   }
   return hero
