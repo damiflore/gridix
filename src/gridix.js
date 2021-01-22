@@ -180,7 +180,7 @@ const createHeroAtCell = ({ row, column }) => {
     name: "hero",
     canCollide: true,
     canMove: true,
-    friction: 0.8,
+    friction: 0.5,
     zIndex: 1,
     mass: 10,
     keyboardVelocity: 100,

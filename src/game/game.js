@@ -69,6 +69,11 @@ export const createGame = ({
     height,
     restitution: 0,
   }
+  // on veut que la collision du monde se passe a la fin
+  // et on est dépendant de cela actuellement
+  // ce qui est pas fou
+  // il faudrait plutot que chaque bloc s'impose cela
+  // plutot que de compter sur ce truc
   blocs.push(blocForWorld)
 
   const tickCallbacks = []
@@ -96,7 +101,7 @@ export const createGame = ({
 
   const draw = () => {
     context.clearRect(0, 0, canvas.width, canvas.height)
-    blocs.sort((leftBloc, rightBloc) => {
+    const blocSorted = [...blocs].sort((leftBloc, rightBloc) => {
       if (leftBloc.zIndex > rightBloc.zIndex) {
         return 1
       }
@@ -117,7 +122,7 @@ export const createGame = ({
       }
       return 0
     })
-    blocs.forEach((bloc) => {
+    blocSorted.forEach((bloc) => {
       bloc.draw(bloc, context)
     })
   }
