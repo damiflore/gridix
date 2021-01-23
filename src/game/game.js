@@ -1,5 +1,4 @@
 import { Bloc, mutateBloc } from "./bloc.js"
-import { blocEffectContainer } from "./bloc.effects.js"
 
 export const createGame = ({
   worldContainer = false,
@@ -60,14 +59,20 @@ export const createGame = ({
           }
         : {}),
     },
-    effects: {
-      ...(worldContainer ? blocEffectContainer : {}),
-    },
     positionX: 0,
     positionY: 0,
     width,
     height,
     restitution: 0,
+  }
+
+  if (worldContainer) {
+    blocs.push(
+      createWorldBoundary("left", { width, height, cellSize }),
+      createWorldBoundary("right", { width, height, cellSize }),
+      createWorldBoundary("top", { width, height, cellSize }),
+      createWorldBoundary("bottom", { width, height, cellSize }),
+    )
   }
   // on veut que la collision du monde se passe a la fin
   // et on est dépendant de cela actuellement
@@ -173,6 +178,41 @@ export const createGame = ({
     addTickCallback: (callback) => {
       tickCallbacks.push(callback)
     },
+  }
+}
+
+const createWorldBoundary = (side, { width, height, cellSize }) => {
+  const sideGeometry = {
+    left: {
+      x: -cellSize,
+      width: cellSize,
+      y: 0,
+      height,
+    },
+    right: {
+      x: width,
+      width: cellSize,
+      y: 0,
+      height,
+    },
+    top: {
+      x: -cellSize,
+      width: width + cellSize * 2,
+      y: -cellSize,
+      height: cellSize,
+    },
+    bottom: {
+      x: -cellSize,
+      width: width + cellSize * 2,
+      y: height,
+      height: cellSize,
+    },
+  }[side]
+
+  return {
+    ...Bloc,
+    name: `world-${side}-boundary`,
+    ...sideGeometry,
   }
 }
 
