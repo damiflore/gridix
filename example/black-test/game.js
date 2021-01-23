@@ -57,8 +57,6 @@ export class Game extends GameObject {
   }
 
   onUpdate() {
-    if (!this.controls) return
-
     const { controls, hero } = this
     if (controls.right) {
       hero.rigidBody.forceX = 400
