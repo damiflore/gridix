@@ -24,8 +24,8 @@ const applyFrictionAmbient = (bloc) => {
   const frictionAmbientCoef = 1 - frictionAmbient
 
   mutateBloc(bloc, {
-    velocityX: Math.round(velocityX * frictionAmbientCoef),
-    velocityY: Math.round(velocityY * frictionAmbientCoef),
+    velocityX: velocityX * frictionAmbientCoef,
+    velocityY: velocityY * frictionAmbientCoef,
   })
 }
 
@@ -34,8 +34,8 @@ const applyVelocity = (bloc, { msEllapsed }) => {
   const secondsEllapsed = msEllapsed / 1000
 
   mutateBloc(bloc, {
-    positionX: Math.round(positionX + velocityX * secondsEllapsed),
-    positionY: Math.round(positionY + velocityY * secondsEllapsed),
+    positionX: positionX + velocityX * secondsEllapsed,
+    positionY: positionY + velocityY * secondsEllapsed,
   })
 }
 
