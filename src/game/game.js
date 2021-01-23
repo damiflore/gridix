@@ -109,12 +109,13 @@ export const createGame = ({
         const nowMs = Date.now()
         const ellapsedMs = nowMs - previousFrameMs
         const msPerFrame = (1 / game.fps) * 1000
+        const msToWait = msPerFrame - ellapsedMs
 
-        if (ellapsedMs < msPerFrame) {
-          requestNextFrame()
-        } else {
+        if (msToWait < 5) {
           previousFrameMs = nowMs
           step()
+          requestNextFrame()
+        } else {
           requestNextFrame()
         }
       })

@@ -240,35 +240,72 @@ const moveBlocIfAllowed = (bloc, { positionX = bloc.positionX, positionY = bloc.
   }
 }
 
-const buttonStart = document.createElement("button")
-buttonStart.innerHTML = "start"
-buttonStart.onclick = () => {
+const uiHtml = `<div>
+  <button name="start">start</button>
+  <button name="stop">stop</button>
+  <button name="step">step</button>
+  <fieldset>
+    <legend>Frame per second</legend>
+    Requested:
+    <label>
+      <input type="radio" name="fps" value="1" />
+      1
+    </label>
+    <label>
+      <input type="radio" name="fps" value="30" />
+      30
+    </label>
+    <label>
+      <input type="radio" name="fps" value="60"/>
+      60
+    </label>
+    <br />
+    Actual: <span name="fps-actual"></span>
+  </fieldset>
+</div>`
+
+const div = document.createElement("div")
+div.innerHTML = uiHtml
+document.body.appendChild(div.firstChild)
+document.querySelector(`button[name="start"]`).onclick = () => {
   game.start()
 }
-const buttonStop = document.createElement("button")
-buttonStop.innerHTML = "stop"
-buttonStop.onclick = () => {
+document.querySelector(`button[name="stop"]`).onclick = () => {
   game.stop()
 }
-const buttonStep = document.createElement("button")
-buttonStep.innerHTML = "step"
-buttonStep.onclick = () => {
+document.querySelector(`button[name="step"]`).onclick = () => {
   game.step()
 }
-const inputFps = document.createElement("input")
-inputFps.type = "number"
-inputFps.value = game.fps
-inputFps.min = 1
-inputFps.max = 60
-inputFps.oninput = () => {
-  game.fps = inputFps.value
-}
-
-document.body.appendChild(document.createElement("br"))
-document.body.appendChild(buttonStart)
-document.body.appendChild(buttonStop)
-document.body.appendChild(buttonStep)
-document.body.appendChild(inputFps)
+let updatePreviousMs
+blocs.push({
+  ...Bloc,
+  // il faudrait debounce cette fonction pour ne pas l'apelle trop souvent
+  // c'est pénible d'avoir ce truc qui flicker
+  update: () => {
+    const nowMs = Date.now()
+    if (updatePreviousMs) {
+      const diffMs = nowMs - updatePreviousMs
+      const estimatedFramePerSecond = Math.round(1000 / diffMs)
+      const requestedFps = game.fps
+      const ratio =
+        1 -
+        (estimatedFramePerSecond > requestedFps
+          ? estimatedFramePerSecond / requestedFps
+          : requestedFps / estimatedFramePerSecond)
+      document.querySelector('[name="fps-actual"]').innerHTML =
+        ratio < 0.2 ? `ok (more or less ${requestedFps} fps)` : `KO (${estimatedFramePerSecond})`
+    }
+    updatePreviousMs = nowMs
+  },
+})
+Array.from(document.querySelectorAll(`input[name="fps"]`)).forEach((input) => {
+  input.checked = game.fps === Number(input.value)
+  input.onchange = () => {
+    if (input.checked) {
+      game.fps = Number(input.value)
+    }
+  }
+})
 
 window.game = game
 window.blocs = blocs
