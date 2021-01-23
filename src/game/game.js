@@ -1,4 +1,4 @@
-import { Bloc, mutateBloc } from "./bloc.js"
+import { Bloc } from "./bloc.js"
 
 export const createGame = ({
   worldContainer = false,
@@ -44,13 +44,13 @@ export const createGame = ({
 
   const tick = (msEllapsed) => {
     blocs.forEach((bloc) => {
-      mutateBloc(bloc.update(bloc, { msEllapsed, blocs }))
+      bloc.update(bloc, { msEllapsed, blocs })
       if (drawAfterUpdate) {
         draw()
       }
     })
     blocs.forEach((bloc) => {
-      mutateBloc(bloc, bloc.effect(bloc, { blocs, msEllapsed }))
+      bloc.effect(bloc, { blocs, msEllapsed })
     })
 
     draw()
@@ -186,27 +186,27 @@ const createWorldBoundary = (
 ) => {
   const sideGeometry = {
     left: {
-      x: -worldCellSize,
+      positionX: -worldCellSize,
       width: worldCellSize,
-      y: 0,
+      positionY: 0,
       height: worldHeight,
     },
     right: {
-      x: worldWidth,
+      positionX: worldWidth,
       width: worldCellSize,
-      y: 0,
+      positionY: 0,
       height: worldHeight,
     },
     top: {
-      x: -worldCellSize,
+      positionX: -worldCellSize,
       width: worldWidth + worldCellSize * 2,
-      y: -worldCellSize,
+      positionY: -worldCellSize,
       height: worldCellSize,
     },
     bottom: {
-      x: -worldCellSize,
+      positionX: -worldCellSize,
       width: worldWidth + worldCellSize * 2,
-      y: worldHeight,
+      positionY: worldHeight,
       height: worldCellSize,
     },
   }[side]
@@ -215,6 +215,8 @@ const createWorldBoundary = (
     ...Bloc,
     name: `world-${side}-boundary`,
     ...sideGeometry,
+    canCollide: true,
+    zIndex: 3,
     restitution: worldRestitution,
   }
 }

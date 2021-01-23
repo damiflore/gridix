@@ -88,14 +88,10 @@ const createBarilAtCell = ({ row, column, ...rest }) => {
     ...Bloc,
     name: "baril",
     update: (bloc, { msEllapsed }) => {
-      return {
-        ...applyMove(bloc, { msEllapsed }),
-      }
+      applyMove(bloc, { msEllapsed })
     },
     effect: (bloc, { blocs }) => {
-      return {
-        ...detectAndResolveCollision(bloc, { blocs }),
-      }
+      detectAndResolveCollision(bloc, { blocs })
     },
     draw: blocDrawRectangle,
     mass: 100,
@@ -173,7 +169,8 @@ const rightKey = trackKeyboardKeydown({
 })
 
 const createHeroAtCell = ({ row, column }) => {
-  const moveByKeyboard = ({ velocityX, velocityY }, { keyboardVelocity }) => {
+  const moveByKeyboard = (bloc, { keyboardVelocity }) => {
+    const { velocityX, velocityY } = bloc
     const velocityXNew = leftKey.isDown
       ? -keyboardVelocity
       : rightKey.isDown
@@ -185,30 +182,26 @@ const createHeroAtCell = ({ row, column }) => {
       ? keyboardVelocity
       : velocityY
 
-    return {
+    mutateBloc(bloc, {
       velocityX: velocityXNew,
       velocityY: velocityYNew,
-    }
+    })
   }
 
   const hero = {
     ...Bloc,
     name: "hero",
     update: (bloc, { msEllapsed }) => {
-      return {
-        ...moveByKeyboard(bloc, { keyboardVelocity: 100 }),
-        ...applyMove(bloc, { msEllapsed }),
-      }
+      moveByKeyboard(bloc, { keyboardVelocity: 100 })
+      applyMove(bloc, { msEllapsed })
     },
     effect: (bloc, { blocs }) => {
-      return {
-        ...detectAndResolveCollision(bloc, { blocs }),
-      }
+      detectAndResolveCollision(bloc, { blocs })
     },
     draw: blocDrawRectangle,
     canCollide: true,
     canMove: true,
-    frictionAmbient: 0.5,
+    frictionAmbient: 0.2,
     zIndex: 1,
     mass: 10,
     ...cellToRectangleGeometry({ row, column }),

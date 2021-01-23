@@ -12,9 +12,9 @@ export const detectAndResolveCollision = (bloc, { blocs }) => {
     applyCollisioImpactOnPosition(bloc, blocColliding)
   })
 
-  return {
+  mutateBloc(bloc, {
     blocCollidingArray,
-  }
+  })
 }
 
 // https://github.com/MassiveHeights/Black/blob/e4967f19cbdfe42b3612981c810ac499ad34b154/src/physics/arcade/pairs/Pair.js#L295
