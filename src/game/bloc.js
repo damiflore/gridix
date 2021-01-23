@@ -17,9 +17,15 @@ export const Bloc = {
   canCollide: false,
   accelerationX: 0,
   accelerationY: 0,
+  // https://github.com/MassiveHeights/Black/blob/e4967f19cbdfe42b3612981c810ac499ad34b154/src/physics/arcade/Arcade.js#L587
+  // forceX,
+  // forceY,
+  // mais on dirait juste une accélération
+  // qui est reset a chaque fois qu'elle est appliquée
   velocityX: 0,
   velocityY: 0,
   friction: 0.01,
+  frictionAmbient: 0.05,
   restitution: 1,
   mass: 1,
 

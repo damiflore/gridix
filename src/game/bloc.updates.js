@@ -11,11 +11,13 @@ export const blocUpdateAcceleration = {
 
 // https://codepen.io/OliverBalfour/post/implementing-velocity-acceleration-and-friction-on-a-canvas
 export const blocUpdateFriction = {
-  friction: ({ velocityX, velocityY, friction }) => {
+  friction: ({ velocityX, velocityY, friction, frictionAmbient }) => {
     const frictionCoef = 1 - friction
+    const frictionAmbientCoef = 1 - frictionAmbient
+    const frictionTotal = frictionCoef + frictionAmbientCoef
     return {
-      velocityX: Math.round(velocityX * frictionCoef),
-      velocityY: Math.round(velocityY * frictionCoef),
+      velocityX: Math.round(velocityX * frictionTotal),
+      velocityY: Math.round(velocityY * frictionTotal),
     }
   },
 }
