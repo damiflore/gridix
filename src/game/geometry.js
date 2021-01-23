@@ -15,6 +15,15 @@ export const blocToCenterPoint = ({ positionX, positionY, width, height }) => {
   }
 }
 
+export const blocToMoveDirection = ({ velocityX, velocityY }) => {
+  return {
+    movingLeft: velocityX < 0,
+    movingTop: velocityY < 0,
+    movingRight: velocityX > 0,
+    movingBottom: velocityY > 0,
+  }
+}
+
 export const blocCollidesWithBloc = (firstBloc, secondBloc) => {
   if (!firstBloc.canCollide) {
     return false

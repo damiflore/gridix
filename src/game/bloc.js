@@ -1,7 +1,8 @@
-import { blocDrawRectangle } from "./bloc.draw.js"
-
 export const Bloc = {
   name: "anonymous",
+  update: () => {},
+  effect: () => {},
+  draw: () => {},
 
   // position
   positionX: 0,
@@ -36,12 +37,10 @@ export const Bloc = {
   image: undefined,
   imageSourceX: undefined,
   imageSourceY: undefined,
-
-  updates: {},
-  effects: {},
-  draw: blocDrawRectangle,
 }
 
 export const mutateBloc = (bloc, mutations) => {
-  Object.assign(bloc, mutations)
+  if (mutations) {
+    Object.assign(bloc, mutations)
+  }
 }

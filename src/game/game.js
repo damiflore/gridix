@@ -5,100 +5,52 @@ export const createGame = ({
   drawAfterUpdate = false,
   rowCount,
   columnCount,
-  cellSize = 32,
+  worldCellSize = 32,
   worldMagneticGrid = false,
+  worldRestitution = 0,
   blocs,
+  fps = 60,
 } = {}) => {
-  const width = rowCount * cellSize
-  const height = columnCount * cellSize
+  const game = { fps }
+
+  const worldWidth = rowCount * worldCellSize
+  const worldHeight = columnCount * worldCellSize
   const canvas = createCanvas({
-    width,
-    height,
+    width: worldWidth,
+    height: worldHeight,
   })
   const context = canvas.getContext("2d")
 
   const blocForWorld = {
     ...Bloc,
     name: "world",
-    updates: {
-      ...(worldMagneticGrid
-        ? {
-            "magnetic-grid": (world, { blocs }) => {
-              blocs.forEach((bloc) => {
-                if (!bloc.canMove) {
-                  return
-                }
-
-                const { velocityX, positionX } = bloc
-                const closestRowX = Math.round(positionX / cellSize) * cellSize
-                const xDiff = positionX - closestRowX
-
-                // x n'est pas sur la colonne et suffisament proche de celle ci
-                // et se déplace suffisament lentement
-                console.log(xDiff, velocityX)
-                if (xDiff && Math.abs(xDiff) < 5 && Math.abs(velocityX) < 5) {
-                  // le bloc est a gauche de la colonne la plus proche
-                  if (xDiff < 0) {
-                    console.log("attire vers la droite", {
-                      positionX,
-                      closestRowX,
-                    })
-                    bloc.velocityX = 50
-                  }
-                  // le bloc est a droite
-                  if (xDiff > 0) {
-                    console.log("attire vers la gauche", {
-                      positionX,
-                      closestRowX,
-                    })
-                    bloc.velocityX = -50
-                  }
-                }
-              })
-            },
-          }
-        : {}),
+    update: (world, { blocs }) => {
+      if (worldMagneticGrid) {
+        applyWorldGridMagnetism(blocs, { worldCellSize })
+      }
     },
-    positionX: 0,
-    positionY: 0,
-    width,
-    height,
-    restitution: 0,
+    width: worldWidth,
+    height: worldHeight,
   }
-
+  blocs.push(blocForWorld)
   if (worldContainer) {
     blocs.push(
-      createWorldBoundary("left", { width, height, cellSize }),
-      createWorldBoundary("right", { width, height, cellSize }),
-      createWorldBoundary("top", { width, height, cellSize }),
-      createWorldBoundary("bottom", { width, height, cellSize }),
+      createWorldBoundary("left", { worldWidth, worldHeight, worldCellSize, worldRestitution }),
+      createWorldBoundary("right", { worldWidth, worldHeight, worldCellSize, worldRestitution }),
+      createWorldBoundary("top", { worldWidth, worldHeight, worldCellSize, worldRestitution }),
+      createWorldBoundary("bottom", { worldWidth, worldHeight, worldCellSize, worldRestitution }),
     )
   }
-  // on veut que la collision du monde se passe a la fin
-  // et on est dépendant de cela actuellement
-  // ce qui est pas fou
-  // il faudrait plutot que chaque bloc s'impose cela
-  // plutot que de compter sur ce truc
-  blocs.push(blocForWorld)
 
-  const tickCallbacks = []
   const tick = (msEllapsed) => {
-    tickCallbacks.forEach((tickCallback) => {
-      tickCallback(msEllapsed)
-    })
-
     blocs.forEach((bloc) => {
-      Object.keys(bloc.updates).forEach((key) => {
-        mutateBloc(bloc, bloc.updates[key](bloc, { blocs, msEllapsed }))
-      })
+      mutateBloc(bloc.update(bloc, { msEllapsed, blocs }))
+      if (drawAfterUpdate) {
+        draw()
+      }
     })
-    if (drawAfterUpdate) {
-      draw()
-    }
     blocs.forEach((bloc) => {
-      Object.keys(bloc.effects).forEach((key) => {
-        mutateBloc(bloc, bloc.effects[key](bloc, { blocs, msEllapsed }))
-      })
+      mutateBloc(bloc, bloc.effect(bloc, { blocs, msEllapsed }))
     })
 
     draw()
@@ -134,9 +86,11 @@ export const createGame = ({
 
   let animationFrame
   let started = false
+  let msPrevious
 
   const stop = () => {
     started = false
+    msPrevious = undefined
     window.cancelAnimationFrame(animationFrame)
   }
 
@@ -144,68 +98,116 @@ export const createGame = ({
     if (started) return
     started = true
 
-    tick(0)
-    let msPrevious = performance.now()
+    step()
+    let previousFrameMs = Date.now()
 
-    const next = () => {
-      if (!started) {
-        return
-      }
+    const requestNextFrame = () => {
       animationFrame = window.requestAnimationFrame(() => {
-        const msNow = performance.now()
-        const msEllapsed = msNow - msPrevious
-        msPrevious = msNow
-        tick(msEllapsed)
-        next()
+        if (!started) {
+          return
+        }
+        const nowMs = Date.now()
+        const ellapsedMs = nowMs - previousFrameMs
+        const msPerFrame = (1 / game.fps) * 1000
+
+        if (ellapsedMs < msPerFrame) {
+          requestNextFrame()
+        } else {
+          previousFrameMs = nowMs
+          step()
+          requestNextFrame()
+        }
       })
     }
 
-    next()
+    requestNextFrame()
   }
 
-  const blocsFromPoint = ({ x, y }) => {
-    return blocs.filter((unit) => {
-      return context.isPointInPath(unit.path, x, y)
-    })
+  const step = () => {
+    if (msPrevious === undefined) {
+      msPrevious = performance.now()
+      tick(0)
+    } else {
+      const msNow = performance.now()
+      const msEllapsed = msNow - msPrevious
+      msPrevious = msNow
+      tick(msEllapsed)
+    }
   }
 
-  return {
+  Object.assign(game, {
     canvas,
     start,
     stop,
     draw,
-    blocsFromPoint,
-    addTickCallback: (callback) => {
-      tickCallbacks.push(callback)
-    },
-  }
+    step,
+  })
+
+  return game
 }
 
-const createWorldBoundary = (side, { width, height, cellSize }) => {
+const applyWorldGridMagnetism = (blocs, { worldCellSize }) => {
+  blocs.forEach((bloc) => {
+    if (!bloc.canMove) {
+      return
+    }
+
+    const { velocityX, positionX } = bloc
+    const closestRowX = Math.round(positionX / worldCellSize) * worldCellSize
+    const xDiff = positionX - closestRowX
+
+    // x n'est pas sur la colonne et suffisament proche de celle ci
+    // et se déplace suffisament lentement
+    console.log(xDiff, velocityX)
+    if (xDiff && Math.abs(xDiff) < 5 && Math.abs(velocityX) < 5) {
+      // le bloc est a gauche de la colonne la plus proche
+      if (xDiff < 0) {
+        console.log("attire vers la droite", {
+          positionX,
+          closestRowX,
+        })
+        bloc.velocityX = 50
+      }
+      // le bloc est a droite
+      if (xDiff > 0) {
+        console.log("attire vers la gauche", {
+          positionX,
+          closestRowX,
+        })
+        bloc.velocityX = -50
+      }
+    }
+  })
+}
+
+const createWorldBoundary = (
+  side,
+  { worldWidth, worldHeight, worldCellSize, worldRestitution },
+) => {
   const sideGeometry = {
     left: {
-      x: -cellSize,
-      width: cellSize,
+      x: -worldCellSize,
+      width: worldCellSize,
       y: 0,
-      height,
+      height: worldHeight,
     },
     right: {
-      x: width,
-      width: cellSize,
+      x: worldWidth,
+      width: worldCellSize,
       y: 0,
-      height,
+      height: worldHeight,
     },
     top: {
-      x: -cellSize,
-      width: width + cellSize * 2,
-      y: -cellSize,
-      height: cellSize,
+      x: -worldCellSize,
+      width: worldWidth + worldCellSize * 2,
+      y: -worldCellSize,
+      height: worldCellSize,
     },
     bottom: {
-      x: -cellSize,
-      width: width + cellSize * 2,
-      y: height,
-      height: cellSize,
+      x: -worldCellSize,
+      width: worldWidth + worldCellSize * 2,
+      y: worldHeight,
+      height: worldCellSize,
     },
   }[side]
 
@@ -213,6 +215,7 @@ const createWorldBoundary = (side, { width, height, cellSize }) => {
     ...Bloc,
     name: `world-${side}-boundary`,
     ...sideGeometry,
+    restitution: worldRestitution,
   }
 }
 

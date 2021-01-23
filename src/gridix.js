@@ -43,17 +43,9 @@ lorsqu'on clique quelque part, ce sol/mur actif remplace l'existant
 
 import { createGame } from "src/game/game.js"
 import { Bloc, mutateBloc } from "src/game/bloc.js"
-import { blocUpdateFriction, blocUpdateVelocity } from "src/game/bloc.updates.js"
-import {
-  blocEffectCollisionDetection,
-  blocEffectCollisionResolution,
-  blocCollidingArrayGetter,
-  getCollisionLeftLength,
-  getCollisionTopLength,
-  getCollisionRightLength,
-  getCollisionBottomLength,
-  blocToMoveDirection,
-} from "src/game/bloc.effects.js"
+import { applyMove } from "src/game/bloc.move.js"
+import { detectAndResolveCollision, blocCollidingArrayGetter } from "src/game/bloc.collision.js"
+import { blocDrawRectangle } from "src/game/bloc.draw.js"
 import { CELL_SIZE } from "src/game.constant.js"
 import { trackKeyboardKeydown } from "src/interaction/keyboard.js"
 
@@ -72,6 +64,7 @@ const createFloorAtCell = ({ row, column }) => {
   return {
     ...Bloc,
     name: "floor",
+    draw: blocDrawRectangle,
     ...cellToRectangleGeometry({ row, column }),
     fillStyle: "white",
   }
@@ -81,6 +74,7 @@ const createWallAtCell = ({ row, column, ...rest }) => {
   return {
     ...Bloc,
     name: "wall",
+    draw: blocDrawRectangle,
     zIndex: 1,
     canCollide: true,
     ...cellToRectangleGeometry({ row, column }),
@@ -93,18 +87,21 @@ const createBarilAtCell = ({ row, column, ...rest }) => {
   return {
     ...Bloc,
     name: "baril",
+    update: (bloc, { msEllapsed }) => {
+      return {
+        ...applyMove(bloc, { msEllapsed }),
+      }
+    },
+    effect: (bloc, { blocs }) => {
+      return {
+        ...detectAndResolveCollision(bloc, { blocs }),
+      }
+    },
+    draw: blocDrawRectangle,
     mass: 100,
     friction: 0.6,
     canCollide: true,
     canMove: true,
-    updates: {
-      ...blocUpdateFriction,
-      ...blocUpdateVelocity,
-    },
-    effects: {
-      ...blocEffectCollisionDetection,
-      ...blocEffectCollisionResolution,
-    },
     ...cellToRectangleGeometry({ row, column }),
     zIndex: 1,
     fillStyle: "brown",
@@ -152,6 +149,7 @@ const game = createGame({
   columnCount: 7,
   cellSize: 32,
   blocs,
+  fps: 1,
 })
 document.body.appendChild(game.canvas)
 
@@ -175,73 +173,44 @@ const rightKey = trackKeyboardKeydown({
 })
 
 const createHeroAtCell = ({ row, column }) => {
+  const moveByKeyboard = ({ velocityX, velocityY }, { keyboardVelocity }) => {
+    const velocityXNew = leftKey.isDown
+      ? -keyboardVelocity
+      : rightKey.isDown
+      ? keyboardVelocity
+      : velocityX
+    const velocityYNew = upKey.isDown
+      ? -keyboardVelocity
+      : downKey.isDown
+      ? keyboardVelocity
+      : velocityY
+
+    return {
+      velocityX: velocityXNew,
+      velocityY: velocityYNew,
+    }
+  }
+
   const hero = {
     ...Bloc,
     name: "hero",
+    update: (bloc, { msEllapsed }) => {
+      return {
+        ...moveByKeyboard(bloc, { keyboardVelocity: 100 }),
+        ...applyMove(bloc, { msEllapsed }),
+      }
+    },
+    effect: (bloc, { blocs }) => {
+      return {
+        ...detectAndResolveCollision(bloc, { blocs }),
+      }
+    },
+    draw: blocDrawRectangle,
     canCollide: true,
     canMove: true,
-    friction: 0.5,
+    frictionAmbient: 0.5,
     zIndex: 1,
     mass: 10,
-    keyboardVelocity: 100,
-    updates: {
-      ...blocUpdateFriction,
-      keyboardNavigation: ({ velocityX, velocityY, keyboardVelocity }) => {
-        const velocityXNew = leftKey.isDown
-          ? -keyboardVelocity
-          : rightKey.isDown
-          ? keyboardVelocity
-          : velocityX
-        const velocityYNew = upKey.isDown
-          ? -keyboardVelocity
-          : downKey.isDown
-          ? keyboardVelocity
-          : velocityY
-
-        return {
-          velocityX: velocityXNew,
-          velocityY: velocityYNew,
-        }
-      },
-      ...blocUpdateVelocity,
-    },
-    effects: {
-      ...blocEffectCollisionDetection,
-      "push-baril": (hero) => {
-        hero.blocCollidingArray.forEach((blocColliding) => {
-          if (blocColliding.name !== "baril") {
-            return
-          }
-          // no dialognal move allowed
-          if (hero.velocityX && hero.velocityY) {
-            return
-          }
-          const baril = blocColliding
-          const { movingLeft, movingTop, movingRight, movingBottom } = blocToMoveDirection(hero)
-          if (movingLeft && getCollisionLeftLength(hero, baril)) {
-            mutateBloc(baril, {
-              velocityX: baril.velocityX + hero.velocityX,
-            })
-          }
-          if (movingTop && getCollisionTopLength(hero, baril)) {
-            mutateBloc(baril, {
-              velocityY: baril.velocityY + hero.velocityY,
-            })
-          }
-          if (movingRight && getCollisionRightLength(hero, baril)) {
-            mutateBloc(baril, {
-              velocityX: baril.velocityX + hero.velocityX,
-            })
-          }
-          if (movingBottom && getCollisionBottomLength(hero, baril)) {
-            mutateBloc(baril, {
-              velocityY: baril.velocityY + hero.velocityY,
-            })
-          }
-        })
-      },
-      ...blocEffectCollisionResolution,
-    },
     ...cellToRectangleGeometry({ row, column }),
     width: 24,
     height: 24,
@@ -278,20 +247,35 @@ const moveBlocIfAllowed = (bloc, { positionX = bloc.positionX, positionY = bloc.
   }
 }
 
-const buttonPause = document.createElement("button")
-buttonPause.innerHTML = "pause"
-buttonPause.onclick = () => {
+const buttonStart = document.createElement("button")
+buttonStart.innerHTML = "start"
+buttonStart.onclick = () => {
+  game.start()
+}
+const buttonStop = document.createElement("button")
+buttonStop.innerHTML = "stop"
+buttonStop.onclick = () => {
   game.stop()
 }
-const buttonPlay = document.createElement("button")
-buttonPlay.innerHTML = "play"
-buttonPlay.onclick = () => {
-  game.start()
+const buttonStep = document.createElement("button")
+buttonStep.innerHTML = "step"
+buttonStep.onclick = () => {
+  game.step()
+}
+const inputFps = document.createElement("input")
+inputFps.type = "number"
+inputFps.value = game.fps
+inputFps.min = 1
+inputFps.max = 60
+inputFps.oninput = () => {
+  game.fps = inputFps.value
 }
 
 document.body.appendChild(document.createElement("br"))
-document.body.appendChild(buttonPause)
-document.body.appendChild(buttonPlay)
+document.body.appendChild(buttonStart)
+document.body.appendChild(buttonStop)
+document.body.appendChild(buttonStep)
+document.body.appendChild(inputFps)
 
 window.game = game
 window.blocs = blocs
