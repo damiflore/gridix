@@ -252,6 +252,10 @@ const uiHtml = `<div>
       1
     </label>
     <label>
+      <input type="radio" name="fps" value="15" />
+      15
+    </label>
+    <label>
       <input type="radio" name="fps" value="30" />
       30
     </label>

@@ -17,6 +17,11 @@ export const detectAndResolveCollision = (bloc, { blocs }) => {
   })
 }
 
+// Check this to fix moving rectangle collision:
+// https://gamedev.stackexchange.com/questions/15836/collision-resolution-in-case-of-collision-with-multiple-objects
+// check both for previous and current position?
+// https://www.reddit.com/r/mathematics/comments/egs7n8/moving_rectangles_collisions/fcapn2z/?utm_source=reddit&utm_medium=web2x&context=3
+
 // https://github.com/MassiveHeights/Black/blob/e4967f19cbdfe42b3612981c810ac499ad34b154/src/physics/arcade/pairs/Pair.js#L295
 // ne pas faire si l'objet est statique
 const applyCollisioImpactOnPosition = (firstBloc, secondBloc) => {

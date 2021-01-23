@@ -1,5 +1,10 @@
 import { Bloc } from "./bloc.js"
 
+// TODO: decorellate frame per second from the physic engine
+// the physic engine must run at a constant rate (to be defined, certainly 60 step per second
+// and the rendering engine is allowed to run a a different pace like 30 render per second
+// https://gafferongames.com/post/fix_your_timestep/
+
 export const createGame = ({
   worldContainer = false,
   drawAfterUpdate = false,

@@ -1,3 +1,5 @@
+// Needs to be updated to latest behaviour
+/* eslint-disable import/no-unresolved */
 import { createGame } from "src/game/game.js"
 import { Bloc } from "src/game/bloc.js"
 import { blocUpdateVelocity } from "src/game/bloc.updates.js"
