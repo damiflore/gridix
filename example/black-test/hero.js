@@ -10,16 +10,18 @@ export const createHero = ({ x = 0, y = 0 } = {}) => {
 
   gameObject.onUpdate = () => {
     gameObject.beginPath()
-    gameObject.rect(gameObject.x, (gameObject.y = y), width, height)
+    gameObject.rect(0, 0, width, height)
     gameObject.closePath()
     gameObject.fillStyle(redHex)
     gameObject.fill()
   }
 
-  const body = new RigidBody()
+  const rigidBody = new RigidBody()
+  gameObject.addComponent(rigidBody)
   const boxCollider = new BoxCollider(0, 0, width, height)
-  gameObject.addComponent(body)
   gameObject.addComponent(boxCollider)
+
+  gameObject.rigidBody = rigidBody
 
   return gameObject
 }
