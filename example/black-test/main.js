@@ -13,8 +13,7 @@ engine.pauseOnHide = false
 // Wroom, wroom!
 engine.start()
 
-// Set default stage size
-engine.stage.setSize(900, 500)
+engine.stage.setSize(100, 200)
 
 // Makes stage always centered
-engine.stage.scaleMode = StageScaleMode.LETTERBOX
+engine.stage.scaleMode = StageScaleMode.FIXED

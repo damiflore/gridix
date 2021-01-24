@@ -1,5 +1,5 @@
 import { AssetManager, Arcade, Black, GameObject, Key } from "black-engine"
-import { createHero } from "./hero.js"
+import { createHero, createBaril } from "./hero.js"
 
 export class Game extends GameObject {
   constructor() {
@@ -22,6 +22,8 @@ export class Game extends GameObject {
     const arcade = Black.engine.getSystem(Arcade)
     arcade.gravityX = 0
     arcade.gravityY = 0
+    arcade.boundsEnabled = true
+    arcade.iterations = 1
 
     this.stage.on("resize", this.onResize, this)
 
@@ -30,8 +32,7 @@ export class Game extends GameObject {
     Black.input.on("keyPress", (msg, keyInfo) => this.onKeyEvent(keyInfo.keyCode, true))
     Black.input.on("keyUp", (msg, keyInfo) => this.onKeyEvent(keyInfo.keyCode, false))
 
-    this.hero = createHero()
-    this.add(this.hero)
+    setupForHeroMovingOneBarilBlockedByWorld(this)
   }
 
   onKeyEvent(code, enable) {
@@ -57,6 +58,8 @@ export class Game extends GameObject {
   }
 
   onUpdate() {
+    if (!this.controls) return
+
     const { controls, hero } = this
     if (controls.right) {
       hero.rigidBody.forceX = 400
@@ -72,3 +75,36 @@ export class Game extends GameObject {
 
   onResize() {}
 }
+
+const setupForHeroMovingOneBarilBlockedByWorld = (game) => {
+  const hero = createHero({
+    x: 0,
+    y: 0,
+    width: 50,
+    height: 50,
+  })
+  game.add(hero)
+
+  const baril = createBaril({
+    x: 50,
+    y: 0,
+    width: 50,
+    height: 50,
+  })
+  game.add(baril)
+
+  game.hero = hero
+}
+
+// const setupForHeroMovingTwoBarilBlockedByWorld = (game) => {
+//   const hero = createHero()
+//   game.add(hero)
+
+//   const baril = createBaril({ x: 50, y: 0 })
+//   game.add(baril)
+
+//   const baril2 = createBaril({ x: 100, y: 0 })
+//   game.add(baril2)
+
+//   game.hero = hero
+// }

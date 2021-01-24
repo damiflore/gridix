@@ -15,6 +15,11 @@ const generateFile = async (
         projectDirectoryUrl,
         packageIncludedPredicate,
         projectPackageDevDependenciesIncluded: includeDevDependencies,
+        packagesManualOverrides: {
+          "black-engine": {
+            module: "src/index.js",
+          },
+        },
       }),
       getImportMapFromFile(new URL("./project.importmap", projectDirectoryUrl)),
     ],
