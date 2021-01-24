@@ -158,7 +158,7 @@ const updateDraw = () => {
   })
 }
 
-const previousMs = Date.now()
+let previousMs = Date.now()
 const framePerSecond = 60
 const msPerFrame = 1000 / framePerSecond
 let lagMs = 0
@@ -169,6 +169,7 @@ const runGameLoop = () => {
   })
   const currentMs = Date.now()
   const ellapsedMs = currentMs - previousMs
+  previousMs = currentMs
   lagMs += ellapsedMs
 
   // update state approriate number of times until

@@ -25,3 +25,5 @@
 # We can still do mistakes in those files.
 # -> Tell ESLint we need it on ".eslintrc.cjs" directory.
 !.eslintrc.cjs
+
+/example/book/source/
