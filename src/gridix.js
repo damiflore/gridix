@@ -73,9 +73,10 @@ const createWallAtCell = ({ row, column, ...rest }) => {
   return {
     ...Bloc,
     name: "wall",
+    canCollide: true,
+    mass: Infinity,
     draw: blocDrawRectangle,
     zIndex: 1,
-    canCollide: true,
     ...cellToRectangleGeometry({ row, column }),
     fillStyle: "grey",
     ...rest,
@@ -134,11 +135,11 @@ const cellFromPoint = ({ x, y }) => {
 const game = createGame({
   // drawAfterUpdate: true,
   worldContainer: true,
+  debugPhysic: true,
   rowCount: 7,
   columnCount: 7,
   cellSize: 32,
   blocs,
-  fps: 1,
 })
 document.body.appendChild(game.canvas)
 
@@ -162,22 +163,14 @@ const rightKey = trackKeyboardKeydown({
 })
 
 const createHeroAtCell = ({ row, column }) => {
-  const moveByKeyboard = (bloc, { keyboardVelocity }) => {
-    const { velocityX, velocityY } = bloc
-    const velocityXNew = leftKey.isDown
-      ? -keyboardVelocity
-      : rightKey.isDown
-      ? keyboardVelocity
-      : velocityX
-    const velocityYNew = upKey.isDown
-      ? -keyboardVelocity
-      : downKey.isDown
-      ? keyboardVelocity
-      : velocityY
+  const moveByKeyboard = (bloc, { keyboardForce }) => {
+    const { forceX, forceY } = bloc
+    const forceXNew = leftKey.isDown ? -keyboardForce : rightKey.isDown ? keyboardForce : forceX
+    const forceYNew = upKey.isDown ? -keyboardForce : downKey.isDown ? keyboardForce : forceY
 
     mutateBloc(bloc, {
-      velocityX: velocityXNew,
-      velocityY: velocityYNew,
+      forceX: forceXNew,
+      forceY: forceYNew,
     })
   }
 
@@ -185,14 +178,15 @@ const createHeroAtCell = ({ row, column }) => {
     ...Bloc,
     name: "hero",
     update: (bloc) => {
-      moveByKeyboard(bloc, { keyboardVelocity: 100 })
+      moveByKeyboard(bloc, { keyboardForce: 100 })
     },
     draw: blocDrawRectangle,
     canCollide: true,
     canMove: true,
     frictionAmbient: 0.2,
     zIndex: 1,
-    mass: 10,
+    mass: 50,
+    forceX: 200,
     ...cellToRectangleGeometry({ row, column }),
     width: 24,
     height: 24,

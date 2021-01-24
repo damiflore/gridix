@@ -1,3 +1,4 @@
+/* eslint-disable no-debugger */
 /* eslint-disable operator-assignment */
 import { mutateBloc } from "./bloc.js"
 import { blocToCenterPoint, blocCollidesWithBloc, getDistanceBetweenTwoPoints } from "./geometry.js"
@@ -7,6 +8,7 @@ export const updatePhysicForArcadeGame = (
   {
     // msEllapsed since last physic update
     msEllapsed,
+    beforeCollisionResolution = () => {},
   },
 ) => {
   const collisionPairs = detectCollisionPairs(blocs)
@@ -24,6 +26,7 @@ export const updatePhysicForArcadeGame = (
   blocs.forEach((bloc) => {
     applyVelocityOnPosition(bloc, { msEllapsed })
   })
+  beforeCollisionResolution()
   // solve position of colliding pairs
   collisionPairs.forEach((collisionPair) => {
     const [blocA, blocB] = collisionPair
@@ -59,22 +62,26 @@ export const findPairs = (array, pairPredicate) => {
 
 const applyForcesOnVelocity = (bloc, { msEllapsed }) => {
   const secondsEllapsed = msEllapsed / 1000
-  let velocityXDelta = 0
-  let velocityYDelta = 0
+
+  // apply forces
+  const { forceX, forceY, mass } = bloc
+  const massInverted = mass === 0 ? 0 : 1 / mass
+  const velocityXDelta = forceX * massInverted * secondsEllapsed
+  const velocityYDelta = forceY * massInverted * secondsEllapsed
 
   // apply acceleration on velocity
   // https://codepen.io/OliverBalfour/post/implementing-velocity-acceleration-and-friction-on-a-canvas
   // https://github.com/MassiveHeights/Black/blob/e4967f19cbdfe42b3612981c810ac499ad34b154/src/physics/arcade/Arcade.js#L587
-  const { accelerationX, accelerationY } = bloc
-  velocityXDelta = accelerationX * secondsEllapsed
-  velocityYDelta = accelerationY * secondsEllapsed
+  // const { accelerationX, accelerationY } = bloc
+  // velocityXDelta = velocityXDelta + accelerationX * secondsEllapsed
+  // velocityYDelta = velocityYDelta + accelerationY * secondsEllapsed
 
   // apply ambient friction (air, water) on the desired velocity update
   // https://codepen.io/OliverBalfour/post/implementing-velocity-acceleration-and-friction-on-a-canvas
-  const { frictionAmbient } = bloc
+  const { velocityX, velocityY, frictionAmbient } = bloc
   const frictionAmbientCoef = 1 - frictionAmbient
-  velocityXDelta = velocityXDelta * frictionAmbientCoef
-  velocityYDelta = velocityYDelta * frictionAmbientCoef
+  const velocityXAfterUpdate = (velocityX + velocityXDelta) * frictionAmbientCoef
+  const velocityYAfterUpdate = (velocityY + velocityYDelta) * frictionAmbientCoef
   // const speed = Math.sqrt(velocityX * velocityX + velocityY * velocityY)
   //     const angle = Math.atan2(velocityY, velocityX)
   //     if (speed > friction) {
@@ -87,11 +94,9 @@ const applyForcesOnVelocity = (bloc, { msEllapsed }) => {
   //       velocityY: Math.sin(angle) * speed,
   //     }
 
-  const { velocityX, velocityY } = bloc
-  const velocityXAfterUpdate = velocityX + velocityXDelta
-  const velocityYAfterUpdate = velocityY + velocityYDelta
-
-  mutateBloc({
+  mutateBloc(bloc, {
+    forceX: 0,
+    forceY: 0,
     velocityX: velocityXAfterUpdate,
     velocityY: velocityYAfterUpdate,
   })
@@ -103,6 +108,9 @@ const applyVelocityOnPosition = (bloc, { msEllapsed }) => {
   const { velocityX, velocityY, positionX, positionY } = bloc
   const positionXAfterUpdate = positionX + velocityX * secondsEllapsed
   const positionYAfterUpdate = positionY + velocityY * secondsEllapsed
+  if (isNaN(positionXAfterUpdate)) {
+    debugger
+  }
   mutateBloc(bloc, {
     positionX: positionXAfterUpdate,
     positionY: positionYAfterUpdate,
@@ -110,20 +118,65 @@ const applyVelocityOnPosition = (bloc, { msEllapsed }) => {
 }
 
 const applyCollisionImpactOnVelocity = (blocA, blocB) => {
-  const { collisionSpeed, collisionVectorNormalized } = getCollisionImpact(blocA, blocB)
+  const { collisionSpeed, collisionVectorNormalized } = getCollisionInfo(blocA, blocB)
+  if (collisionSpeed <= 0) {
+    return
+  }
 
-  const impulse = (2 * collisionSpeed) / (blocA.mass + blocB.mass)
+  const massSum = blocA.mass + blocB.mass
+  const impulse = (2 * collisionSpeed) / massSum
+  const blocAVelocityXImpact = blocA.velocityX - impulse * blocB.mass * collisionVectorNormalized.x
+  const blocAVelocityYImpact = blocA.velocityY - impulse * blocB.mass * collisionVectorNormalized.y
+  if (import.meta.dev && isNaN(blocAVelocityXImpact)) {
+    debugger
+  }
   mutateBloc(blocA, {
-    velocityX: blocA.velocityX - impulse * blocB.mass * collisionVectorNormalized.x,
-    velocityY: blocA.velocityY - impulse * blocB.mass * collisionVectorNormalized.y,
+    velocityX: blocAVelocityXImpact,
+    velocityY: blocAVelocityYImpact,
   })
-  mutateBloc(blocA, {
-    velocityX: blocB.velocityX + impulse * blocA.mass * collisionVectorNormalized.x,
-    velocityY: blocB.velocityY + impulse * blocA.mass * collisionVectorNormalized.y,
+  const blocBVelocityXImpact = blocB.velocityX + impulse * blocA.mass * collisionVectorNormalized.x
+  const blocBVelocityYImpact = blocB.velocityY + impulse * blocA.mass * collisionVectorNormalized.y
+  if (import.meta.dev && isNaN(blocBVelocityXImpact)) {
+    debugger
+  }
+  mutateBloc(blocB, {
+    velocityX: blocBVelocityXImpact,
+    velocityY: blocBVelocityYImpact,
   })
 }
 
-const getCollisionImpact = (blocA, blocB) => {
+// https://brm.io/matter-js/docs/files/src_collision_Resolver.js.html
+// https://github.com/MartinHeinz/physics-visual/blob/master/index.js
+const applyCollisionImpactOnPosition = (blocA, blocB) => {
+  const { collisionSpeed, collisionVectorNormalized } = getCollisionInfo(blocA, blocB)
+  if (collisionSpeed <= 0) {
+    return
+  }
+
+  const massSum = blocA.mass + blocB.mass
+  const impulse = (2 * collisionSpeed) / massSum
+  const blocAPositionXImpact = blocA.positionX - impulse * blocB.mass * collisionVectorNormalized.x
+  const blocAPositionYImpact = blocA.positionY - impulse * blocB.mass * collisionVectorNormalized.y
+  if (import.meta.dev && isNaN(blocAPositionXImpact)) {
+    debugger
+  }
+  mutateBloc(blocA, {
+    positionX: blocAPositionXImpact,
+    positionY: blocAPositionYImpact,
+  })
+
+  const blocBPositionXImpact = blocB.positionX + impulse * blocA.mass * collisionVectorNormalized.x
+  const blocBPositionYImpact = blocB.positionY + impulse * blocA.mass * collisionVectorNormalized.y
+  if (import.meta.dev && isNaN(blocBPositionXImpact)) {
+    debugger
+  }
+  mutateBloc(blocB, {
+    positionX: blocBPositionXImpact,
+    positionY: blocBPositionYImpact,
+  })
+}
+
+const getCollisionInfo = (blocA, blocB) => {
   const blocACenterPoint = blocToCenterPoint(blocA)
   const blocBCenterPoint = blocToCenterPoint(blocB)
 
@@ -144,6 +197,9 @@ const getCollisionImpact = (blocA, blocB) => {
     velocityRelativeVector.x * collisionVectorNormalized.x +
     velocityRelativeVector.y * collisionVectorNormalized.y
   speed *= Math.min(blocA.restitution, blocB.restitution)
+  if (import.meta.dev && isNaN(speed)) {
+    debugger
+  }
 
   return {
     collisionSpeed: speed,
@@ -151,54 +207,50 @@ const getCollisionImpact = (blocA, blocB) => {
   }
 }
 
-// How many pixels colliders can overlap each other without resolve
-const SLOP = 1
-// Position correction koefficient. Lower is softer and with less twitches.
-const BAUMGARTE = 0.2
+// // How many pixels colliders can overlap each other without resolve
+// const SLOP = 1
+// // Position correction koefficient. Lower is softer and with less twitches.
+// const BAUMGARTE = 0.2
 
-const applyCollisionImpactOnPosition = (blocA, blocB) => {
-  const { collisionVectorNormalized } = getCollisionImpact(blocA, blocB)
+// const normalX = collisionVectorNormalized.x
+// const normalY = collisionVectorNormalized.y
+// const blocAMassInverted = 1 / blocA.mass
+// const blocBMassInverted = 1 / blocB.mass
+// const massSumInverted = 1 / (blocAMassInverted + blocBMassInverted)
 
-  const normalX = collisionVectorNormalized.x
-  const normalY = collisionVectorNormalized.y
-  const blocAMassInverted = 1 / blocA.mass
-  const blocBMassInverted = 1 / blocB.mass
-  const massSumInverted = 1 / (blocAMassInverted + blocBMassInverted)
+// const invMassA = blocAMassInverted
+// const invMassB = blocBMassInverted
+// const positionA = {
+//   x: blocA.positionX,
+//   y: blocA.positionY,
+// }
+// const positionB = {
+//   x: blocB.positionX,
+//   y: blocB.positionY,
+// }
+// const offset = {
+//   x: positionB.x - positionA.x,
+//   y: positionB.y - positionA.y,
+// }
 
-  const invMassA = blocAMassInverted
-  const invMassB = blocBMassInverted
-  const positionA = {
-    x: blocA.positionX,
-    y: blocA.positionY,
-  }
-  const positionB = {
-    x: blocB.positionX,
-    y: blocB.positionY,
-  }
-  const offset = {
-    x: positionB.x - positionA.x,
-    y: positionB.y - positionA.y,
-  }
+// const dx = offset.x - positionB.x + positionA.x
+// const dy = offset.y - positionB.y + positionA.y
 
-  const dx = offset.x - positionB.x + positionA.x
-  const dy = offset.y - positionB.y + positionA.y
+// const overlap = this.mOverlap + (dx * normalX + dy * normalY)
+// const correction = (overlap - SLOP) * BAUMGARTE
 
-  const overlap = this.mOverlap + (dx * normalX + dy * normalY)
-  const correction = (overlap - SLOP) * BAUMGARTE
+// if (correction <= 0) return
 
-  if (correction <= 0) return
+// const normalImpulse = correction * massSumInverted
 
-  const normalImpulse = correction * massSumInverted
+// const impulseX = normalImpulse * normalX
+// const impulseY = normalImpulse * normalY
 
-  const impulseX = normalImpulse * normalX
-  const impulseY = normalImpulse * normalY
+// positionA.x -= impulseX * invMassA
+// positionA.y -= impulseY * invMassA
 
-  positionA.x -= impulseX * invMassA
-  positionA.y -= impulseY * invMassA
-
-  positionB.x += impulseX * invMassB
-  positionB.y += impulseY * invMassB
-}
+// positionB.x += impulseX * invMassB
+// positionB.y += impulseY * invMassB
 
 // Check this to fix moving rectangle collision:
 // https://gamedev.stackexchange.com/questions/15836/collision-resolution-in-case-of-collision-with-multiple-objects

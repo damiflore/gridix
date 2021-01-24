@@ -8,14 +8,14 @@ import { updatePhysicForArcadeGame } from "./physic.js"
 
 export const createGame = ({
   worldContainer = false,
-  drawAfterUpdate = false,
+  debugPhysic = false,
   rowCount,
   columnCount,
   worldCellSize = 32,
   worldMagneticGrid = false,
   worldRestitution = 0,
   blocs,
-  fps = 60,
+  fps = debugPhysic ? 1 : 60,
 } = {}) => {
   const game = { fps }
 
@@ -30,6 +30,7 @@ export const createGame = ({
   const blocForWorld = {
     ...Bloc,
     name: "world",
+    mass: Infinity,
     update: (world, { blocs }) => {
       if (worldMagneticGrid) {
         applyWorldGridMagnetism(blocs, { worldCellSize })
@@ -51,11 +52,15 @@ export const createGame = ({
   const tick = (msEllapsed) => {
     blocs.forEach((bloc) => {
       bloc.update(bloc, { msEllapsed, blocs })
-      if (drawAfterUpdate) {
-        draw()
-      }
     })
-    updatePhysicForArcadeGame(blocs, { msEllapsed })
+    updatePhysicForArcadeGame(blocs, {
+      msEllapsed,
+      beforeCollisionResolution: () => {
+        if (debugPhysic) {
+          draw()
+        }
+      },
+    })
     draw()
   }
 
