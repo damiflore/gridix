@@ -32,6 +32,7 @@ document.addEventListener("keydown", (keydownEvent) => {
       centerY: gameObjectSelected ? gameObjectSelected.centerY : Math.random() * height * 0.8,
       width: Math.random() * 30 + 10,
       height: Math.random() * 30 + 10,
+      canMove: true,
     })
     gameObjects.push(rectangle)
   }
@@ -41,6 +42,7 @@ document.addEventListener("keydown", (keydownEvent) => {
       centerX: gameObjectSelected ? gameObjectSelected.centerX : Math.random() * width * 0.8,
       centerY: gameObjectSelected ? gameObjectSelected.centerY : Math.random() * height * 0.8,
       radius: Math.random() * 10 + 20,
+      canMove: true,
     })
     gameObjects.push(circle)
   }
