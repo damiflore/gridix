@@ -3,7 +3,7 @@ import { createRectangle, drawRectangle } from "./rectangle.js"
 import { createCircle, drawCircle } from "./circle.js"
 import { gameInit } from "./gameInit.js"
 
-const width = 500
+const width = 400
 const height = 250
 const canvas = document.createElement("canvas")
 canvas.height = height

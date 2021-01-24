@@ -35,16 +35,15 @@ export const getVectorialProduct = (vectorA, vectorB) => {
 
 export const rotateVector = (vector, { centerX, centerY, angle }) => {
   // rotate in counterclockwise
-  let x = vector.x - centerX
-  let y = vector.y - centerY
+  const xDiff = vector.x - centerX
+  const yDiff = vector.y - centerY
+  const x = xDiff * Math.cos(angle) - yDiff * Math.sin(angle)
+  const y = xDiff * Math.sin(angle) + yDiff * Math.cos(angle)
 
-  x = x * Math.cos(angle) - y * Math.sin(angle)
-  y = x * Math.sin(angle) + y * Math.cos(angle)
-
-  x = x + centerX
-  y = y + centerY
-
-  return { x, y }
+  return {
+    x: x + centerX,
+    y: y + centerY,
+  }
 }
 
 export const normalizeVector = (vector) => {

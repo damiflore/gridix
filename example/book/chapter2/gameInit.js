@@ -7,6 +7,7 @@ export const gameInit = ({ gameObjects, width, height }) => {
     width: 30,
     height: 30,
     canMove: false,
+    angle: 10,
   })
   gameObjects.push(initialObject)
 

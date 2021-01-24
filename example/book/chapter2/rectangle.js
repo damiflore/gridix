@@ -42,7 +42,6 @@ export const drawRectangle = ({ centerX, centerY, width, height, angle }, contex
     height,
     angle,
   })
-
   context.save()
   context.translate(topLeftCorner.x, topLeftCorner.y)
   context.rotate(angle)
