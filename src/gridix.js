@@ -43,8 +43,7 @@ lorsqu'on clique quelque part, ce sol/mur actif remplace l'existant
 
 import { createGame } from "src/game/game.js"
 import { Bloc, mutateBloc } from "src/game/bloc.js"
-import { applyMove } from "src/game/bloc.move.js"
-import { detectAndResolveCollision, blocCollidingArrayGetter } from "src/game/bloc.collision.js"
+import { blocCollidingArrayGetter } from "src/game/bloc.collision.js"
 import { blocDrawRectangle } from "src/game/bloc.draw.js"
 import { CELL_SIZE } from "src/game.constant.js"
 import { trackKeyboardKeydown } from "src/interaction/keyboard.js"
@@ -87,12 +86,6 @@ const createBarilAtCell = ({ row, column, ...rest }) => {
   return {
     ...Bloc,
     name: "baril",
-    update: (bloc, { msEllapsed }) => {
-      applyMove(bloc, { msEllapsed })
-    },
-    effect: (bloc, { blocs }) => {
-      detectAndResolveCollision(bloc, { blocs })
-    },
     draw: blocDrawRectangle,
     mass: 100,
     friction: 0.6,
@@ -191,12 +184,8 @@ const createHeroAtCell = ({ row, column }) => {
   const hero = {
     ...Bloc,
     name: "hero",
-    update: (bloc, { msEllapsed }) => {
+    update: (bloc) => {
       moveByKeyboard(bloc, { keyboardVelocity: 100 })
-      applyMove(bloc, { msEllapsed })
-    },
-    effect: (bloc, { blocs }) => {
-      detectAndResolveCollision(bloc, { blocs })
     },
     draw: blocDrawRectangle,
     canCollide: true,

@@ -1,7 +1,6 @@
 export const Bloc = {
   name: "anonymous",
   update: () => {},
-  effect: () => {},
   draw: () => {},
 
   // position

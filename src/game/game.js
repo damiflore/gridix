@@ -1,4 +1,5 @@
 import { Bloc } from "./bloc.js"
+import { updatePhysicForArcadeGame } from "./physic.js"
 
 // TODO: decorellate frame per second from the physic engine
 // the physic engine must run at a constant rate (to be defined, certainly 60 step per second
@@ -54,16 +55,19 @@ export const createGame = ({
         draw()
       }
     })
-    blocs.forEach((bloc) => {
-      bloc.effect(bloc, { blocs, msEllapsed })
-    })
-
+    updatePhysicForArcadeGame(blocs, { msEllapsed })
     draw()
   }
 
   const draw = () => {
     context.clearRect(0, 0, canvas.width, canvas.height)
     const blocSorted = [...blocs].sort((leftBloc, rightBloc) => {
+      // TODO: c'est pas position x/y qui prime
+      // mais positionX+width et positionY+height
+      // le plus en bas -> dessine en dernier
+      // le plus a droite -> dessine en dernier
+      // si égalité, le plus en haut ou le plus a gauche en premier
+      // sinon c'est qu'ils sont l'un sur l'autre et on ne peut pas y fair egrand chose
       if (leftBloc.zIndex > rightBloc.zIndex) {
         return 1
       }
