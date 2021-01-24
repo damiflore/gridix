@@ -26,3 +26,5 @@
 # package-lock.json is generate by npm during npm install
 # -> no need for prettier on files generated dynamically.
 /package-lock.json
+
+/example/book/source/

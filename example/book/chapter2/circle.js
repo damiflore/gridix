@@ -1,23 +1,36 @@
-export const createCircle = ({ center, radius }) => {
-  return { center, radius }
-}
+import { GameObject } from "./gameObject.js"
+import { rotateVector } from "./vector.js"
 
-export const circleToStartPoint = ({ center, radius }) => {
+export const createCircle = ({ centerX, centerY, radius, ...props }) => {
   return {
-    x: center.x,
-    y: center.y - radius,
+    ...GameObject,
+    name: "circle",
+    centerX,
+    centerY,
+    radius,
+    ...props,
   }
 }
 
-export const drawCircle = ({ center, radius }, context) => {
-  const startPoint = circleToStartPoint({ center, radius })
+export const circleToStartPoint = ({ centerX, centerY, radius, angle }) => {
+  return rotateVector(
+    {
+      x: centerX,
+      y: centerY - radius,
+    },
+    { centerX, centerY, angle },
+  )
+}
+
+export const drawCircle = ({ centerX, centerY, radius, angle }, context) => {
+  const startPoint = circleToStartPoint({ centerX, centerY, radius, angle })
 
   context.beginPath()
   // draw a circle
-  context.arc(center.x, center.y, radius, 0, Math.PI * 2, true)
+  context.arc(centerX, centerY, radius, 0, Math.PI * 2, true)
   // draw a line from start point toward center
   context.moveTo(startPoint.x, startPoint.y)
-  context.lineTo(center.x, center.y)
+  context.lineTo(centerX, centerY)
   context.closePath()
   context.stroke()
 }
