@@ -1,4 +1,4 @@
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -34,9 +34,9 @@ Rectangle.prototype.findSupportPoint = function (dir, ptOnEdge) {
     for (var i = 0; i < this.mVertex.length; i++) {
         vToEdge = this.mVertex[i].subtract(ptOnEdge);
         projection = vToEdge.dot(dir);
-        
+
         //find the longest distance with certain edge
-        //dir is -n direction, so the distance should be positive       
+        //dir is -n direction, so the distance should be positive
         if ((projection > 0) && (projection > tmpSupport.mSupportPointDist)) {
             tmpSupport.mSupportPoint = this.mVertex[i];
             tmpSupport.mSupportPointDist = projection;
@@ -71,10 +71,10 @@ Rectangle.prototype.findAxisLeastPenetration = function (otherRect, collisionInf
         var dir = n.scale(-1);
         var ptOnEdge = this.mVertex[i];
         // find the support on B
-        // the point has longest distance with edge i 
+        // the point has longest distance with edge i
         otherRect.findSupportPoint(dir, ptOnEdge);
         hasSupport = (tmpSupport.mSupportPoint !== null);
-        
+
         //get the shortest support point depth
         if ((hasSupport) && (tmpSupport.mSupportPointDist < bestDistance)) {
             bestDistance = tmpSupport.mSupportPointDist;
@@ -97,7 +97,7 @@ Rectangle.prototype.findAxisLeastPenetration = function (otherRect, collisionInf
  * @param {CollisionInfo} collisionInfo Collision info of collision
  * @returns {Boolean} true if collision occurs
  * @memberOf Rectangle
- */    
+ */
 var collisionInfoR1 = new CollisionInfo();
 var collisionInfoR2 = new CollisionInfo();
 Rectangle.prototype.collidedRectRect = function (r1, r2, collisionInfo) {
@@ -111,14 +111,14 @@ Rectangle.prototype.collidedRectRect = function (r1, r2, collisionInfo) {
     if (status1) {
         status2 = r2.findAxisLeastPenetration(r1, collisionInfoR2);
         if (status2) {
-            //if both of rectangles are overlapping, choose the shorter normal as the normal       
+            //if both of rectangles are overlapping, choose the shorter normal as the normal
             if (collisionInfoR1.getDepth() < collisionInfoR2.getDepth()) {
                 var depthVec = collisionInfoR1.getNormal().scale(collisionInfoR1.getDepth());
                 collisionInfo.setInfo(collisionInfoR1.getDepth(), collisionInfoR1.getNormal(), collisionInfoR1.mStart.subtract(depthVec));
             } else {
                 collisionInfo.setInfo(collisionInfoR2.getDepth(), collisionInfoR2.getNormal().scale(-1), collisionInfoR2.mStart);
             }
-        } 
+        }
     }
     return status1 && status2;
 };
@@ -138,7 +138,7 @@ Rectangle.prototype.collidedRectCirc = function (otherCir, collisionInfo) {
     var i, v;
     var circ2Pos, projection;
     for (i = 0; i < 4; i++) {
-        //find the nearest face for center of circle        
+        //find the nearest face for center of circle
         circ2Pos = otherCir.mCenter;
         v = circ2Pos.subtract(this.mVertex[i]);
         projection = v.dot(this.mFaceNormal[i]);
@@ -158,7 +158,7 @@ Rectangle.prototype.collidedRectCirc = function (otherCir, collisionInfo) {
     if (!inside) {
         //the center of circle is outside of rectangle
 
-        //v1 is from left vertex of face to center of circle 
+        //v1 is from left vertex of face to center of circle
         //v2 is from left vertex of face to right vertex of face
         var v1 = circ2Pos.subtract(this.mVertex[nearestEdge]);
         var v2 = this.mVertex[(nearestEdge + 1) % 4].subtract(this.mVertex[nearestEdge]);
@@ -179,11 +179,11 @@ Rectangle.prototype.collidedRectCirc = function (otherCir, collisionInfo) {
         } else {
             //the center of circle is in corner region of mVertex[nearestEdge+1]
 
-            //v1 is from right vertex of face to center of circle 
+            //v1 is from right vertex of face to center of circle
             //v2 is from right vertex of face to left vertex of face
             v1 = circ2Pos.subtract(this.mVertex[(nearestEdge + 1) % 4]);
             v2 = v2.scale(-1);
-            dot = v1.dot(v2); 
+            dot = v1.dot(v2);
             if (dot < 0) {
                 dis = v1.length();
                 //compare the distance with radium to decide collision

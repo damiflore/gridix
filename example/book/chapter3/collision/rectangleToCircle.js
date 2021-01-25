@@ -12,38 +12,37 @@ export const getCollisionInfoForRectangleToCircle = (rectangle, circle) => {
   const circleCenterY = circle.centerY
   const circleRadius = circle.radius
 
-  let i = 4
+  let i = 0
   let inside = true
   let bestDistance = -Infinity
-  let nearestCorner
-  let nearestNormal
+  let nearestIndex
   // find the nearest face for center of circle
-  while (i--) {
+  while (i < 4) {
     const corner = corners[cornerKeys[i]]
+    const normal = normals[normalKeys[i]]
     const circleAndCornerDiff = {
       x: circleCenterX - corner.x,
       y: circleCenterY - corner.y,
     }
-    const normal = normals[normalKeys[i]]
     const projection = getScalarProduct(circleAndCornerDiff, normal)
     if (projection > 0) {
       // if the center of circle is outside of rectangle
       bestDistance = projection
-      nearestCorner = corner
-      nearestNormal = normal
+      nearestIndex = i
       inside = false
       break
     }
 
     if (projection > bestDistance) {
       bestDistance = projection
-      nearestCorner = corner
-      nearestNormal = normal
+      nearestIndex = i
     }
+    i++
   }
+  const nearestNormal = normals[normalKeys[nearestIndex]]
 
-  // the center of circle is inside of rectangle
   if (inside) {
+    // the center of circle is inside of rectangle
     const radiusVector = scaleVector(nearestNormal, circleRadius)
     return createCollisionInfo({
       depth: circleRadius - bestDistance,
@@ -55,11 +54,13 @@ export const getCollisionInfoForRectangleToCircle = (rectangle, circle) => {
   }
 
   // the center of circle is outside of rectangle
+  const nearestCorner = corners[cornerKeys[nearestIndex]]
+  const nextCornerIndex = (nearestIndex + 1) % 4
+  const nextCorner = corners[cornerKeys[nextCornerIndex]]
   const circleAndNearestCornerDiff = {
     x: circleCenterX - nearestCorner.x,
     y: circleCenterY - nearestCorner.y,
   }
-  const nextCorner = corners[(corners.indexOf(nearestCorner) + 1) % 4]
   const cornersDiff = {
     x: nextCorner.x - nearestCorner.x,
     y: nextCorner.y - nearestCorner.y,

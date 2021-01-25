@@ -6,6 +6,8 @@ export const gameInit = ({ gameObjects, width, height }) => {
   addTwoCollidingCircleCenterLeft({ gameObjects })
   addTwoCollidingRectangleTopRight({ gameObjects })
 
+  addCircleAndRectangleCollidingBottomRight({ gameObjects })
+
   const up = createRectangle({
     name: "world-boundary-up",
     centerX: width / 2,
@@ -88,14 +90,31 @@ const addTwoCollidingRectangleTopRight = ({ gameObjects }) => {
     centerX: 270,
     centerY: 40,
     width: 40,
-    height: 60,
+    height: 40,
   })
   gameObjects.push(rectangleA)
   const rectangleB = createRectangle({
     centerX: 290,
     centerY: 60,
     width: 60,
-    height: 40,
+    height: 60,
   })
   gameObjects.push(rectangleB)
+}
+
+const addCircleAndRectangleCollidingBottomRight = ({ gameObjects }) => {
+  const circle = createCircle({
+    centerX: 150,
+    centerY: 150,
+    radius: 20,
+  })
+  gameObjects.push(circle)
+  const rectangle = createRectangle({
+    centerX: 170,
+    centerY: 160,
+    width: 40,
+    height: 30,
+    angle: 10,
+  })
+  gameObjects.push(rectangle)
 }

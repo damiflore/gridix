@@ -48,10 +48,11 @@ const findShortestAxisPenetration = (rectangle, otherRectangle) => {
   let bestDistance = Infinity
   let bestSupportPoint
   let bestNormal
-  let i = 4
-  while (i--) {
+  let i = 0
+  while (i < 4) {
     const normal = normals[normalKeys[i]]
     const corner = corners[cornerKeys[i]]
+    i++
     const normalOpposite = scaleVector(normal, -1)
     const supportPoint = findFarthestSupportPoint(otherCorners, normalOpposite, corner)
     if (!supportPoint) {
@@ -81,9 +82,10 @@ const findFarthestSupportPoint = (corners, dir, pointOnEdge) => {
   let supportPointX = null
   let supportPointY = null
   const cornerKeys = Object.keys(corners)
-  let i = 4
-  while (i--) {
+  let i = 0
+  while (i< 4) {
     const corner = corners[cornerKeys[i]]
+    i++
     const cornerAndPointDiff = substractVector(corner, pointOnEdge)
     const projection = getScalarProduct(cornerAndPointDiff, dir)
     if (projection > 0 && projection > supportPointDistance) {
