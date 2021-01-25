@@ -4,6 +4,7 @@ export const GameObject = {
   centerY: 0,
   angle: 0,
   boundRadius: 0,
+  collisionInfo: null,
   updateState: () => {},
 }
 

@@ -106,16 +106,13 @@ const updateState = () => {
   gameObjects.forEach((gameObject) => {
     gameObject.updateState(gameObject)
   })
-  updatePhysicForArcadeGame(gameObjects)
+  updatePhysicForArcadeGame({ gameObjects, context })
 }
 
 const updateDraw = () => {
   context.clearRect(0, 0, width, height)
   gameObjects.forEach((gameObject, index) => {
     context.strokeStyle = "blue"
-    if (gameObject.isColliding) {
-      context.strokeStyle = "green"
-    }
     if (index === gameObjectSelectedIndex) {
       context.strokeStyle = "red"
     }
@@ -141,6 +138,10 @@ const runGameLoop = () => {
   previousMs = currentMs
   lagMs += ellapsedMs
 
+  // for the rest of the book draw comes before update
+  // but this is for convenience and should be moved back after update in real circumstances
+  updateDraw()
+
   // update state approriate number of times until
   // it is updated enough times
   while (lagMs >= msPerFrame) {
@@ -156,7 +157,6 @@ const runGameLoop = () => {
       gameObjectSelectedIndex = 4
     },
   })
-  updateDraw()
 }
 runGameLoop()
 

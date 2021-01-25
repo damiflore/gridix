@@ -1,15 +1,50 @@
-import { getVectorLength } from "../chapter2/vector.js"
-import { substractVector } from "./vector.js"
+import { substractVector, getScalarProduct, getVectorLength } from "./vector.js"
+import { getGameObjectCollisionInfo, getOppositeCollisionInfo } from "./collisionInfo.js"
 
-export const updatePhysicForArcadeGame = (gameObjects) => {
+export const updatePhysicForArcadeGame = ({ gameObjects, context, drawCollision = true }) => {
   const collidingPairs = detectCollidingPairs(gameObjects)
   gameObjects.forEach((gameObject) => {
-    gameObject.isColliding = false
+    gameObject.collisionInfo = null
   })
   collidingPairs.forEach((collidingPair) => {
     const [a, b] = collidingPair
-    a.isColliding = true
-    b.isColliding = true
+    let collisionInfo = getGameObjectCollisionInfo(a, b)
+    if (!collisionInfo) {
+      return
+    }
+
+    const collisionNormal = {
+      x: collisionInfo.normalX,
+      y: collisionInfo.normalY,
+    }
+    const centerDiff = {
+      x: b.centerX - a.centerX,
+      y: b.centerY - a.centerY,
+    }
+    if (getScalarProduct(collisionNormal, centerDiff) < 0) {
+      collisionInfo = getOppositeCollisionInfo(collisionInfo)
+    }
+
+    a.collisionInfo = collisionInfo
+    b.collisionInfo = collisionInfo
+    if (drawCollision) {
+      drawCollisionInfo(collisionInfo, context)
+    }
+  })
+}
+
+const drawCollisionInfo = (collisionInfo, context) => {
+  context.beginPath()
+  context.moveTo(collisionInfo.startX, collisionInfo.startY)
+  context.lineTo(collisionInfo.endX, collisionInfo.endY)
+  context.closePath()
+  context.strokeStyle = "orange"
+  context.stroke()
+}
+
+const detectCollidingPairs = (blocs) => {
+  return findPairs(blocs, (blocA, blocB) => {
+    return testGameObjectBound(blocA, blocB)
   })
 }
 
@@ -30,12 +65,6 @@ const testCircleBound = (circleA, circleB) => {
   }
 
   return true
-}
-
-const detectCollidingPairs = (blocs) => {
-  return findPairs(blocs, (blocA, blocB) => {
-    return testGameObjectBound(blocA, blocB)
-  })
 }
 
 const findPairs = (array, pairPredicate) => {
