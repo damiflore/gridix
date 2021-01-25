@@ -14,7 +14,7 @@ document.querySelector("#container").appendChild(canvas)
 
 const context = canvas.getContext("2d")
 const gameObjects = []
-let gameObjectSelectedIndex = 4
+let gameObjectSelectedIndex = 0
 
 gameInit({
   width,

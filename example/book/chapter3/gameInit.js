@@ -2,31 +2,9 @@ import { createRectangle } from "./rectangle.js"
 import { createCircle } from "./circle.js"
 
 export const gameInit = ({ gameObjects, width, height }) => {
-  const circleA = createCircle({
-    centerX: 50,
-    centerY: 50,
-    radius: 20,
-  })
-  gameObjects.push(circleA)
-  const circleB = createCircle({
-    centerX: 60,
-    centerY: 60,
-    radius: 20,
-  })
-  gameObjects.push(circleB)
-
-  const circleC = createCircle({
-    centerX: 110,
-    centerY: 110,
-    radius: 25,
-  })
-  gameObjects.push(circleC)
-  const circleD = createCircle({
-    centerX: 100,
-    centerY: 100,
-    radius: 20,
-  })
-  gameObjects.push(circleD)
+  addTwoCollidingCircleTopLeft({ gameObjects })
+  addTwoCollidingCircleCenterLeft({ gameObjects })
+  addTwoCollidingRectangleTopRight({ gameObjects })
 
   const up = createRectangle({
     name: "world-boundary-up",
@@ -65,12 +43,59 @@ export const gameInit = ({ gameObjects, width, height }) => {
   })
   gameObjects.push(right)
 
-  const initialObject = createRectangle({
-    centerX: width / 2,
-    centerY: height / 2,
-    width: 30,
-    height: 30,
-    angle: 10,
+  // const initialObject = createRectangle({
+  //   centerX: width / 2,
+  //   centerY: height / 2,
+  //   width: 30,
+  //   height: 30,
+  //   angle: 10,
+  // })
+  // gameObjects.push(initialObject)
+}
+
+const addTwoCollidingCircleTopLeft = ({ gameObjects }) => {
+  const circleA = createCircle({
+    centerX: 50,
+    centerY: 50,
+    radius: 20,
   })
-  gameObjects.push(initialObject)
+  gameObjects.push(circleA)
+  const circleB = createCircle({
+    centerX: 60,
+    centerY: 60,
+    radius: 20,
+  })
+  gameObjects.push(circleB)
+}
+
+const addTwoCollidingCircleCenterLeft = ({ gameObjects }) => {
+  const circleC = createCircle({
+    centerX: 110,
+    centerY: 110,
+    radius: 25,
+  })
+  gameObjects.push(circleC)
+  const circleD = createCircle({
+    centerX: 100,
+    centerY: 100,
+    radius: 20,
+  })
+  gameObjects.push(circleD)
+}
+
+const addTwoCollidingRectangleTopRight = ({ gameObjects }) => {
+  const rectangleA = createRectangle({
+    centerX: 270,
+    centerY: 40,
+    width: 40,
+    height: 60,
+  })
+  gameObjects.push(rectangleA)
+  const rectangleB = createRectangle({
+    centerX: 290,
+    centerY: 60,
+    width: 60,
+    height: 40,
+  })
+  gameObjects.push(rectangleB)
 }

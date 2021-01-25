@@ -53,7 +53,7 @@ const findShortestAxisPenetration = (rectangle, otherRectangle) => {
     const normal = normals[normalKeys[i]]
     const corner = corners[cornerKeys[i]]
     const normalOpposite = scaleVector(normal, -1)
-    const supportPoint = findRectangleSupportPoint(otherCorners, normalOpposite, corner)
+    const supportPoint = findFarthestSupportPoint(otherCorners, normalOpposite, corner)
     if (!supportPoint) {
       return null
     }
@@ -76,28 +76,30 @@ const findShortestAxisPenetration = (rectangle, otherRectangle) => {
   })
 }
 
-const findRectangleSupportPoint = (corners, dir, pointOnEdge) => {
-  let found = false
+const findFarthestSupportPoint = (corners, dir, pointOnEdge) => {
   let supportPointDistance = -Infinity
   let supportPointX = null
   let supportPointY = null
-  Object.keys(corners).forEach((corner) => {
-    const cornerPointDiff = substractVector(corner, pointOnEdge)
-    const projection = getScalarProduct(cornerPointDiff, dir)
+  const cornerKeys = Object.keys(corners)
+  let i = 4
+  while (i--) {
+    const corner = corners[cornerKeys[i]]
+    const cornerAndPointDiff = substractVector(corner, pointOnEdge)
+    const projection = getScalarProduct(cornerAndPointDiff, dir)
     if (projection > 0 && projection > supportPointDistance) {
-      found = true
       supportPointDistance = projection
       supportPointX = corner.x
       supportPointY = corner.y
     }
-  })
-
-  if (found) {
-    return {
-      supportPointX,
-      supportPointY,
-      supportPointDistance,
-    }
   }
-  return null
+
+  if (supportPointX === null) {
+    return null
+  }
+
+  return {
+    supportPointX,
+    supportPointY,
+    supportPointDistance,
+  }
 }
