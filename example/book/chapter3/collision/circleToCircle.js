@@ -1,34 +1,7 @@
-import { scaleVector } from "../chapter2/vector.js"
-import { substractVector, getVectorLength, normalizeVector } from "./vector.js"
+import { substractVector, getVectorLength, normalizeVector, scaleVector } from "../vector.js"
+import { createCollisionInfo } from "./collisionInfo.js"
 
-export const getGameObjectCollisionInfo = (gameObject, otherGameObject) => {
-  if (gameObject.shape === "circle" && otherGameObject.shape === "circle") {
-    return getCollisionInfoForCircleToCircle(gameObject, otherGameObject)
-  }
-  return null
-}
-
-export const getOppositeCollisionInfo = ({
-  depth,
-  normalX,
-  normalY,
-  startX,
-  startY,
-  endX,
-  endY,
-}) => {
-  return {
-    depth,
-    normalX: normalX * -1,
-    normalY: normalY * -1,
-    startX: endX,
-    startY: endY,
-    endX: startX,
-    endY: startY,
-  }
-}
-
-const getCollisionInfoForCircleToCircle = (circleA, circleB) => {
+export const getCollisionInfoForCircleToCircle = (circleA, circleB) => {
   const centerDiff = substractVector(
     { x: circleB.centerX, y: circleB.centerY },
     { x: circleA.centerX, y: circleA.centerY },
@@ -37,7 +10,7 @@ const getCollisionInfoForCircleToCircle = (circleA, circleB) => {
   const radiusSum = circleA.radius + circleB.radius
 
   if (centerDistance > radiusSum) {
-    return false
+    return null
   }
 
   // center at the same position
@@ -72,24 +45,4 @@ const getCollisionInfoForCircleToCircle = (circleA, circleB) => {
     startX: circleB.centerX + centerDiffRadius.x,
     startY: circleB.centerY + centerDiffRadius.y,
   })
-}
-
-const createCollisionInfo = ({
-  depth = 0,
-  normalX = 0,
-  normalY = 0,
-  startX = 0,
-  startY = 0,
-  endX = startX + normalX * depth,
-  endY = startY + normalY * depth,
-}) => {
-  return {
-    depth,
-    startX,
-    startY,
-    endX,
-    endY,
-    normalX,
-    normalY,
-  }
 }

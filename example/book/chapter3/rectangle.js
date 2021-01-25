@@ -34,21 +34,12 @@ export const rectangleToCorners = ({ centerX, centerY, width, height, angle }) =
     ),
   }
 }
-
-export const drawRectangle = ({ centerX, centerY, width, height, angle }, context) => {
-  const { topLeftCorner } = rectangleToCorners({
-    centerX,
-    centerY,
-    width,
-    height,
-    angle,
-  })
-  context.save()
-  context.translate(topLeftCorner.x, topLeftCorner.y)
-  context.rotate(angle)
-  context.strokeRect(0, 0, width, height)
-  context.restore()
-}
+export const RECTANGLE_CORNER_KEYS = [
+  "topLeftCorner",
+  "topRightCorner",
+  "bottomRightCorner",
+  "bottomLeftCorner",
+]
 
 export const rectangleToNormals = ({ centerX, centerY, width, height, angle }) => {
   const { topLeftCorner, topRightCorner, bottomRightCorner, bottomLeftCorner } = rectangleToCorners(
@@ -67,4 +58,20 @@ export const rectangleToNormals = ({ centerX, centerY, width, height, angle }) =
     bottomNormal: normalizeVector(substractVector(bottomLeftCorner, topLeftCorner)),
     leftNormal: normalizeVector(substractVector(topLeftCorner, topRightCorner)),
   }
+}
+export const RECTANGLE_NORMAL_KEYS = ["topNormal", "rightNormal", "bottomNormal", "leftNormal"]
+
+export const drawRectangle = ({ centerX, centerY, width, height, angle }, context) => {
+  const { topLeftCorner } = rectangleToCorners({
+    centerX,
+    centerY,
+    width,
+    height,
+    angle,
+  })
+  context.save()
+  context.translate(topLeftCorner.x, topLeftCorner.y)
+  context.rotate(angle)
+  context.strokeRect(0, 0, width, height)
+  context.restore()
 }

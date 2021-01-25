@@ -1,5 +1,5 @@
 import { substractVector, getScalarProduct, getVectorLength } from "./vector.js"
-import { getGameObjectCollisionInfo, getOppositeCollisionInfo } from "./collisionInfo.js"
+import { getGameObjectCollisionInfo, getOppositeCollisionInfo } from "./collision/collisionInfo.js"
 
 export const updatePhysicForArcadeGame = ({ gameObjects, context, drawCollision = true }) => {
   const collidingPairs = detectCollidingPairs(gameObjects)
