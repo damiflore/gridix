@@ -1,6 +1,33 @@
 import { createRectangle } from "./rectangle.js"
+import { createCircle } from "./circle.js"
 
 export const gameInit = ({ gameObjects, width, height }) => {
+  const circleA = createCircle({
+    centerX: 50,
+    centerY: 50,
+    radius: 20,
+  })
+  gameObjects.push(circleA)
+  const circleB = createCircle({
+    centerX: 60,
+    centerY: 60,
+    radius: 20,
+  })
+  gameObjects.push(circleB)
+
+  const circleC = createCircle({
+    centerX: 110,
+    centerY: 110,
+    radius: 25,
+  })
+  gameObjects.push(circleC)
+  const circleD = createCircle({
+    centerX: 100,
+    centerY: 100,
+    radius: 20,
+  })
+  gameObjects.push(circleD)
+
   const up = createRectangle({
     name: "world-boundary-up",
     centerX: width / 2,

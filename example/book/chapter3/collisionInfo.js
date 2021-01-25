@@ -1,9 +1,9 @@
 import { scaleVector } from "../chapter2/vector.js"
 import { substractVector, getVectorLength, normalizeVector } from "./vector.js"
 
-export const getGameObjectCollisionInfo = (shape, otherShape) => {
-  if (shape.type === "circle" && otherShape.type === "circle") {
-    return getCollisionInfoForCircleToCircle(shape, otherShape)
+export const getGameObjectCollisionInfo = (gameObject, otherGameObject) => {
+  if (gameObject.shape === "circle" && otherGameObject.shape === "circle") {
+    return getCollisionInfoForCircleToCircle(gameObject, otherGameObject)
   }
   return null
 }
@@ -30,8 +30,8 @@ export const getOppositeCollisionInfo = ({
 
 const getCollisionInfoForCircleToCircle = (circleA, circleB) => {
   const centerDiff = substractVector(
-    { x: circleA.centerX, y: circleA.centerY },
     { x: circleB.centerX, y: circleB.centerY },
+    { x: circleA.centerX, y: circleA.centerY },
   )
   const centerDistance = getVectorLength(centerDiff)
   const radiusSum = circleA.radius + circleB.radius
