@@ -5,20 +5,20 @@ To change this template file, choose Tools | Templates
 and open the template in the editor.
 -->
 <html>
-    <head>   
+    <head>
         <title>PhysicsEngine</title>
         <link rel ="icon" type ="image/x-icon" href="./favicon.jpg">
     </head>
-    <body onkeydown="return userControl(event);" 
+    <body onkeydown="return userControl(event);"
           onload="
             var game = new MyGame();
             gEngine.Core.initializeEngineCore()">
-        
+
         <table style="padding: 2px">
             <tr>
-                <td> 
+                <td>
                     <div>
-                        <canvas id="canvas"></canvas>    
+                        <canvas id="canvas"></canvas>
                     </div>
                 </td>
                 <td>
@@ -26,24 +26,24 @@ and open the template in the editor.
                 </td>
             </tr>
         </table>
-        
-        
-        
-        
-        <script type="text/javascript" src="Lib/Vec2.js"></script>
-        <script type="text/javascript" src="Lib/CollisionInfo.js"></script>
 
-        <script type="text/javascript" src="RigidBody/RigidShape.js"></script>  
-        <script type="text/javascript" src="RigidBody/Circle.js"></script>  
-        <script type="text/javascript" src="RigidBody/Rectangle.js"></script>     
-        <script type="text/javascript" src="RigidBody/Circle_collision.js"></script>  
-        <script type="text/javascript" src="RigidBody/Rectangle_collision.js"></script>    
-        
-        <script type="text/javascript" src="EngineCore/Physics.js"></script>
-        <script type="text/javascript" src="EngineCore/Core.js"></script>
 
-        <script type="text/javascript" src="MyGame.js"></script>
-        <script type="text/javascript" src="UserControl.js"></script>
+
+
+        <script type="text/javascript" src="./Lib/Vec2.js"></script>
+        <script type="text/javascript" src="./Lib/CollisionInfo.js"></script>
+
+        <script type="text/javascript" src="./RigidBody/RigidShape.js"></script>
+        <script type="text/javascript" src="./RigidBody/Circle.js"></script>
+        <script type="text/javascript" src="./RigidBody/Rectangle.js"></script>
+        <script type="text/javascript" src="./RigidBody/Circle_collision.js"></script>
+        <script type="text/javascript" src="./RigidBody/Rectangle_collision.js"></script>
+
+        <script type="text/javascript" src="./EngineCore/Physics.js"></script>
+        <script type="text/javascript" src="./EngineCore/Core.js"></script>
+
+        <script type="text/javascript" src="./MyGame.js"></script>
+        <script type="text/javascript" src="./UserControl.js"></script>
 
     </body>
 </html>
