@@ -3,7 +3,7 @@ export const GameObject = {
   centerX: 0,
   centerY: 0,
   angle: 0,
-  canMove: false,
+  isColliding: false,
   updateState: () => {},
 }
 

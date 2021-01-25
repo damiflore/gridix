@@ -3,6 +3,7 @@ import { createRectangle, drawRectangle } from "./rectangle.js"
 import { createCircle, drawCircle } from "./circle.js"
 import { gameInit } from "./gameInit.js"
 import { updateDevtool } from "./devtool.js"
+import { updatePhysicForArcadeGame } from "./physic.js"
 
 const width = 400
 const height = 250
@@ -13,7 +14,7 @@ document.querySelector("#container").appendChild(canvas)
 
 const context = canvas.getContext("2d")
 const gameObjects = []
-let gameObjectSelectedIndex = 0
+let gameObjectSelectedIndex = 4
 
 gameInit({
   width,
@@ -104,17 +105,17 @@ document.addEventListener("keydown", (keydownEvent) => {
 const updateState = () => {
   gameObjects.forEach((gameObject) => {
     gameObject.updateState(gameObject)
-
-    if (gameObject.canMove && gameObject.centerY < height) {
-      moveGameObject(gameObject, { y: gameObject.centerY + 1 })
-    }
   })
+  updatePhysicForArcadeGame(gameObjects)
 }
 
 const updateDraw = () => {
   context.clearRect(0, 0, width, height)
   gameObjects.forEach((gameObject, index) => {
     context.strokeStyle = "blue"
+    if (gameObject.isColliding) {
+      context.strokeStyle = "green"
+    }
     if (index === gameObjectSelectedIndex) {
       context.strokeStyle = "red"
     }
@@ -150,6 +151,10 @@ const runGameLoop = () => {
   updateDevtool({
     gameObjects,
     gameObjectSelectedIndex,
+    onReset: () => {
+      gameObjects.splice(5, gameObjects.length)
+      gameObjectSelectedIndex = 4
+    },
   })
   updateDraw()
 }

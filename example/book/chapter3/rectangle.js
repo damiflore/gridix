@@ -9,6 +9,7 @@ export const createRectangle = ({ centerX, centerY, width, height, ...props }) =
     centerY,
     width,
     height,
+    boundRadius: Math.sqrt(width * width + height * height) / 2,
     ...props,
   }
 }

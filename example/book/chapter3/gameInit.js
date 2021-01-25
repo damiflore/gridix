@@ -1,23 +1,13 @@
 import { createRectangle } from "./rectangle.js"
 
 export const gameInit = ({ gameObjects, width, height }) => {
-  const initialObject = createRectangle({
-    centerX: width / 2,
-    centerY: height / 2,
-    width: 30,
-    height: 30,
-    canMove: false,
-    angle: 10,
-  })
-  gameObjects.push(initialObject)
-
   const up = createRectangle({
     name: "world-boundary-up",
     centerX: width / 2,
     centerY: 0,
     width,
     height: 3,
-    canMove: false,
+    boundRadius: 0,
   })
   gameObjects.push(up)
   const down = createRectangle({
@@ -26,7 +16,7 @@ export const gameInit = ({ gameObjects, width, height }) => {
     centerY: height,
     width,
     height: 3,
-    canMove: false,
+    boundRadius: 0,
   })
   gameObjects.push(down)
   const left = createRectangle({
@@ -35,7 +25,7 @@ export const gameInit = ({ gameObjects, width, height }) => {
     centerY: height / 2,
     width: 3,
     height,
-    canMove: false,
+    boundRadius: 0,
   })
   gameObjects.push(left)
   const right = createRectangle({
@@ -44,7 +34,16 @@ export const gameInit = ({ gameObjects, width, height }) => {
     centerY: height / 2,
     width: 3,
     height,
-    canMove: false,
+    boundRadius: 0,
   })
   gameObjects.push(right)
+
+  const initialObject = createRectangle({
+    centerX: width / 2,
+    centerY: height / 2,
+    width: 30,
+    height: 30,
+    angle: 10,
+  })
+  gameObjects.push(initialObject)
 }

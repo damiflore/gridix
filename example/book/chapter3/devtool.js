@@ -1,6 +1,6 @@
 const devtool = document.querySelector("#devtool")
 
-export const updateDevtool = ({ gameObjects, gameObjectSelectedIndex }) => {
+export const updateDevtool = ({ gameObjects, gameObjectSelectedIndex, onReset }) => {
   const gameObjectSelected =
     gameObjectSelectedIndex === -1 ? null : gameObjects[gameObjectSelectedIndex]
 
@@ -22,7 +22,6 @@ export const updateDevtool = ({ gameObjects, gameObjectSelectedIndex }) => {
 
   const buttonReset = devtool.querySelector('[name="reset"]')
   buttonReset.onclick = () => {
-    gameObjects.splice(5, gameObjects.length)
-    gameObjectSelectedIndex = -1
+    onReset()
   }
 }

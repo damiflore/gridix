@@ -3,28 +3,27 @@ import { substractVector } from "./vector.js"
 
 export const updatePhysicForArcadeGame = (gameObjects) => {
   const collidingPairs = detectCollidingPairs(gameObjects)
-
-  collidingPairs.forEach((gameObjectA, gameObjectB) => {
-    gameObjectA.isColliding = true
-    gameObjectB.isColliding = true
+  gameObjects.forEach((gameObject) => {
+    gameObject.isColliding = false
+  })
+  collidingPairs.forEach((collidingPair) => {
+    const [a, b] = collidingPair
+    a.isColliding = true
+    b.isColliding = true
   })
 }
 
 const testGameObjectBound = (a, b) => {
-  if (a.type === "circle" && b.type === "circle") {
-    return testCircleToCircleBound(a, b)
-  }
-  
-  return false
+  return testCircleBound(a, b)
 }
 
-const testCircleToCircleBound = (circleA, circleB) => {
+const testCircleBound = (circleA, circleB) => {
   const centerDiff = substractVector(
-    { x: circleA.x, y: circleA.y },
+    { x: circleA.centerX, y: circleA.centerY },
     { x: circleB.centerX, y: circleB.centerY },
   )
   const centerDistance = getVectorLength(centerDiff)
-  const radiusSum = circleA.radius + circleB.radius
+  const radiusSum = circleA.boundRadius + circleB.boundRadius
 
   if (centerDistance > radiusSum) {
     return false
