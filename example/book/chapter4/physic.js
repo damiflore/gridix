@@ -39,6 +39,25 @@ export const updatePhysicForArcadeGame = ({
   }
 }
 
+export const moveAllowedFromMass = (mass) => {
+  // object with a negative mass would move to -Infinity
+  if (mass < 0) {
+    return false
+  }
+
+  // object without mass (0) would move to +Infinity
+  if (mass === 0) {
+    return false
+  }
+
+  // object with Infinity mass cannot move -> they tend to 0
+  if (mass === Infinity) {
+    return false
+  }
+
+  return true
+}
+
 const handleCollision = ({ gameObjects, drawCollision, context }) => {
   const collidingPairs = detectCollidingPairs(gameObjects)
   gameObjects.forEach((gameObject) => {
@@ -75,14 +94,14 @@ const handleCollision = ({ gameObjects, drawCollision, context }) => {
 const resolveCollision = (a, b, collisionInfo) => {
   const aMass = a.mass
   const bMass = b.mass
-  const aMassInverted = aMass < 0 || aMass === 0 || aMass === Infinity ? 0 : 1 / aMass
-  const bMassInverted = bMass < 0 || bMass === 0 || bMass === Infinity ? 0 : 1 / bMass
-  // object with Infinity mass cannot move -> they tend to 0
-  // object without mass (0) would move to +Infinity
-  // object with a negative mass would move to -Infinity
-  if (aMassInverted === 0 && bMassInverted === 0) {
+  const aMovedAllowedByMass = moveAllowedFromMass(aMass)
+  const bMoveAllowedByMass = moveAllowedFromMass(bMass)
+  if (!aMovedAllowedByMass && !bMoveAllowedByMass) {
     return
   }
+
+  const aMassInverted = aMovedAllowedByMass ? 1 / aMass : 0
+  const bMassInverted = bMoveAllowedByMass ? 1 / bMass : 0
   const massInvertedSum = aMassInverted + bMassInverted
 
   adjustPositionToSolveCollision(a, b, {

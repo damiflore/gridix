@@ -1,4 +1,4 @@
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -11,12 +11,16 @@ function MyGame() {
     var height = gEngine.Core.mHeight;
     var r1 = new Rectangle(new Vec2(width / 2, height / 2), 3, 3, 0);
 
-    var r2 = new Rectangle(new Vec2(200, 400), 400, 20, 0, 1, 0);
-  
+    // var r2 = new Rectangle(new Vec2(200, 400), 400, 20, 0, 1, 0);
+
     var up = new Rectangle(new Vec2(width / 2, 0), width, 3, 0);
     var down = new Rectangle(new Vec2(width / 2, height), width, 3, 0);
     var left = new Rectangle(new Vec2(0, height / 2), 3, height, 0);
     var right = new Rectangle(new Vec2(width, height / 2), 3, height, 0);
+
+    const circle = new Circle(new Vec2(250, 50), 20, 10)
+    circle.mVelocity.x = -100
+    circle.mVelocity.y = 200
 }
 
 

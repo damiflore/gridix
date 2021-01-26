@@ -10,7 +10,6 @@ export const GameObject = {
   friction: 0.8,
   restitution: 0.2,
 
-  moveAllowed: false,
   velocityX: 0,
   velocityY: 0,
   velocityAngle: 0,

@@ -3,7 +3,7 @@ import { createRectangle, drawRectangle } from "./rectangle.js"
 import { createCircle, drawCircle } from "./circle.js"
 import { gameInit } from "./gameInit.js"
 import { updateDevtool } from "./devtool.js"
-import { updatePhysicForArcadeGame } from "./physic.js"
+import { moveAllowedFromMass, updatePhysicForArcadeGame } from "./physic.js"
 
 const width = 400
 const height = 250
@@ -231,8 +231,10 @@ const runGameLoop = () => {
       },
       "excite": () => {
         gameObjects.forEach((gameObject) => {
-          gameObject.velocityX = Math.random() * 500 - 250
-          gameObject.velocityY = Math.random() * 500 - 250
+          if (moveAllowedFromMass(gameObject.mass)) {
+            gameObject.velocityX = Math.random() * 500 - 250
+            gameObject.velocityY = Math.random() * 500 - 250
+          }
         })
       },
       "reset": () => {

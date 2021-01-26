@@ -2,11 +2,44 @@ import { createRectangle } from "./rectangle.js"
 import { createCircle } from "./circle.js"
 
 export const gameInit = ({ gameObjects, width, height }) => {
-  addTwoCollidingCircleTopLeft({ gameObjects })
-  addTwoCollidingCircleCenterLeft({ gameObjects })
-  addTwoCollidingRectangleTopRight({ gameObjects })
+  const circleA = createCircle({
+    centerX: 250,
+    centerY: 50,
+    radius: 20,
+    velocityX: 100,
+    velocityY: 200,
+    mass: 10,
+  })
+  gameObjects.push(circleA)
+  // const circleB = createCircle({
+  //   centerX: 120,
+  //   centerY: 60,
+  //   radius: 20,
+  //   mass: 5,
+  //   velocityX: -200,
+  // })
+  // gameObjects.push(circleB)
 
-  addCircleAndRectangleCollidingBottomRight({ gameObjects })
+  // const rectangleA = createRectangle({
+  //   centerX: 0,
+  //   centerY: 150,
+  //   width: 20,
+  //   height: 20,
+  //   velocityX: 200,
+  //   velocity: 10,
+  //   mass: 5,
+  // })
+  // gameObjects.push(rectangleA)
+  // const rectangleB = createRectangle({
+  //   centerX: 220,
+  //   centerY: 160,
+  //   width: 20,
+  //   height: 20,
+  //   mass: 10,
+  //   velocityX: -200,
+  //   velocityY: -30,
+  // })
+  // gameObjects.push(rectangleB)
 
   const worldBoundarySize = 3
 
@@ -61,68 +94,4 @@ export const gameInit = ({ gameObjects, width, height }) => {
   //   angle: 10,
   // })
   // gameObjects.push(initialObject)
-}
-
-const addTwoCollidingCircleTopLeft = ({ gameObjects }) => {
-  const circleA = createCircle({
-    centerX: 50,
-    centerY: 50,
-    radius: 20,
-  })
-  gameObjects.push(circleA)
-  const circleB = createCircle({
-    centerX: 60,
-    centerY: 60,
-    radius: 20,
-  })
-  gameObjects.push(circleB)
-}
-
-const addTwoCollidingCircleCenterLeft = ({ gameObjects }) => {
-  const circleC = createCircle({
-    centerX: 110,
-    centerY: 110,
-    radius: 25,
-  })
-  gameObjects.push(circleC)
-  const circleD = createCircle({
-    centerX: 100,
-    centerY: 100,
-    radius: 20,
-  })
-  gameObjects.push(circleD)
-}
-
-const addTwoCollidingRectangleTopRight = ({ gameObjects }) => {
-  const rectangleA = createRectangle({
-    centerX: 270,
-    centerY: 40,
-    width: 40,
-    height: 40,
-  })
-  gameObjects.push(rectangleA)
-  const rectangleB = createRectangle({
-    centerX: 290,
-    centerY: 60,
-    width: 60,
-    height: 60,
-  })
-  gameObjects.push(rectangleB)
-}
-
-const addCircleAndRectangleCollidingBottomRight = ({ gameObjects }) => {
-  const circle = createCircle({
-    centerX: 150,
-    centerY: 150,
-    radius: 20,
-  })
-  gameObjects.push(circle)
-  const rectangle = createRectangle({
-    centerX: 170,
-    centerY: 160,
-    width: 40,
-    height: 30,
-    angle: 10,
-  })
-  gameObjects.push(rectangle)
 }
