@@ -43,15 +43,18 @@ const testBoundingBoxCollision = (a, b) => {
   if (a.shape === "circle" && b.shape === "circle") {
     return circleHitCircle(a, b)
   }
+
   if (a.shape === "rectangle" && b.shape === "rectangle") {
     return rectangleHitRectangle(a, b)
   }
+
   if (a.shape === "circle" && b.shape === "rectangle") {
     return circleHitRectangle(a, b)
   }
   if (a.shape === "rectangle" && b.shape === "circle") {
     return circleHitRectangle(b, a)
   }
+
   return false
 }
 
