@@ -22,15 +22,12 @@ export const updatePhysicForArcadeGame = ({
     gameObject.velocityY += gameObject.accelerationY * ellapsedSeconds
     gameObject.velocityAngle += gameObject.accelerationAngle * ellapsedSeconds
 
-    // object with an Infinite mass cannot move (static objects)
-    if (gameObject.mass !== Infinity) {
-      // position += vitesse * time
-      moveGameObject(gameObject, {
-        x: gameObject.centerX + gameObject.velocityX * ellapsedSeconds,
-        y: gameObject.centerY + gameObject.velocityY * ellapsedSeconds,
-      })
-      rotateGameObject(gameObject, gameObject.angle + gameObject.velocityAngle * ellapsedSeconds)
-    }
+    // position += vitesse * time
+    moveGameObject(gameObject, {
+      x: gameObject.centerX + gameObject.velocityX * ellapsedSeconds,
+      y: gameObject.centerY + gameObject.velocityY * ellapsedSeconds,
+    })
+    rotateGameObject(gameObject, gameObject.angle + gameObject.velocityAngle * ellapsedSeconds)
   })
 
   let collisionIterations = 1
