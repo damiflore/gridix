@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chapter 3</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+    <script type="importmap" src="../../../importmap.prod.importmap"></script>
+  </head>
+
+  <body>
+    <div id="container"></div>
+    <div id="devtool">
+      <p>Number of game objects: <span id="game-objects-length"></span></p>
+
+      <fieldset>
+        <legend>Selected Object</legend>
+        <ul>
+          <li>Id: <span id="game-object-selected-id"></span></li>
+          <li>Center: <span id="game-object-selected-center"></span></li>
+          <li>Angle: <span id="game-object-selected-angle"></span></li>
+        </ul>
+      </fieldset>
+
+      <fieldset>
+        <legend>Control of selected object</legend>
+        <ul>
+          <li><b>Num</b> or <b>Up/Down Arrow</b>: SelectObject</li>
+          <li><b>F/G</b>: Spawn [Rectangle/Circle] at random location</li>
+          <li><b>WASD</b> + <b>QE</b>: Position [Move + Rotate]</li>
+        </ul>
+      </fieldset>
+
+      <p>
+        <button name="reset">Reset system</button>
+      </p>
+    </div>
+    <script type="module" src="./chapter3.js"></script>
+  </body>
+</html>
