@@ -22,91 +22,11 @@ gameInit({
   gameObjects,
 })
 
-document.addEventListener("keydown", (keydownEvent) => {
-  const { code } = keydownEvent
-
-  const gameObjectSelected =
-    gameObjectSelectedIndex === -1 ? null : gameObjects[gameObjectSelectedIndex]
-
-  if (code === "KeyF") {
-    const rectangle = createRectangle({
-      centerX: gameObjectSelected ? gameObjectSelected.centerX : Math.random() * width * 0.8,
-      centerY: gameObjectSelected ? gameObjectSelected.centerY : Math.random() * height * 0.8,
-      width: Math.random() * 30 + 10,
-      height: Math.random() * 30 + 10,
-      canMove: true,
-    })
-    gameObjects.push(rectangle)
-  }
-
-  if (code === "KeyG") {
-    const circle = createCircle({
-      centerX: gameObjectSelected ? gameObjectSelected.centerX : Math.random() * width * 0.8,
-      centerY: gameObjectSelected ? gameObjectSelected.centerY : Math.random() * height * 0.8,
-      radius: Math.random() * 10 + 20,
-      canMove: true,
-    })
-    gameObjects.push(circle)
-  }
-
-  if (code.startsWith("Digit")) {
-    const keyDigit = parseInt(code.slice("Digit".length))
-    if (keyDigit < gameObjects.length - 1) {
-      gameObjectSelectedIndex = keyDigit
-    }
-  }
-
-  if (code === "ArrowUp") {
-    if (gameObjectSelectedIndex > 0) {
-      gameObjectSelectedIndex--
-    }
-  }
-
-  if (code === "ArrowDown") {
-    if (gameObjectSelectedIndex < gameObjects.length - 1) {
-      gameObjectSelectedIndex++
-    }
-  }
-
-  if (code === "KeyW") {
-    if (gameObjectSelected) {
-      moveGameObject(gameObjectSelected, { y: gameObjectSelected.centerY - 10 })
-    }
-  }
-  if (code === "KeyS") {
-    if (gameObjectSelected) {
-      moveGameObject(gameObjectSelected, { y: gameObjectSelected.centerY + 10 })
-    }
-  }
-  if (code === "KeyA") {
-    if (gameObjectSelected) {
-      moveGameObject(gameObjectSelected, { x: gameObjectSelected.centerX - 10 })
-    }
-  }
-  if (code === "KeyD") {
-    if (gameObjectSelected) {
-      moveGameObject(gameObjectSelected, { x: gameObjectSelected.centerX + 10 })
-    }
-  }
-
-  if (code === "KeyQ") {
-    if (gameObjectSelected) {
-      rotateGameObject(gameObjectSelected, gameObjectSelected.angle - 0.1)
-    }
-  }
-
-  if (code === "KeyE") {
-    if (gameObjectSelected) {
-      rotateGameObject(gameObjectSelected, gameObjectSelected.angle + 0.1)
-    }
-  }
-})
-
-const updateState = ({ secondsEllapsed }) => {
+const updateState = (options) => {
   gameObjects.forEach((gameObject) => {
     gameObject.updateState(gameObject)
   })
-  updatePhysicForArcadeGame({ gameObjects, secondsEllapsed, context })
+  updatePhysicForArcadeGame({ gameObjects, context, ...options })
 }
 
 const updateDraw = () => {
@@ -129,6 +49,7 @@ const framePerSecond = 60
 const secondsPerFrame = 1 / framePerSecond
 const msPerFrame = secondsPerFrame * 1000
 let lagMs = 0
+let gravityY = 0
 
 const runGameLoop = () => {
   requestAnimationFrame(() => {
@@ -147,15 +68,152 @@ const runGameLoop = () => {
   // it is updated enough times
   while (lagMs >= msPerFrame) {
     lagMs -= msPerFrame
-    updateState({ secondsEllapsed: secondsPerFrame })
+    updateState({ ellapsedSeconds: secondsPerFrame, gravityY })
   }
 
+  const gameObjectSelected =
+    gameObjectSelectedIndex === -1 ? null : gameObjects[gameObjectSelectedIndex]
   updateDevtool({
-    gameObjects,
-    gameObjectSelectedIndex,
-    onReset: () => {
-      gameObjects.splice(5, gameObjects.length)
-      gameObjectSelectedIndex = 4
+    textContents: {
+      "game-objects-length": gameObjects.length,
+      "game-object-selected-id": gameObjectSelectedIndex,
+      "game-object-selected-center-x": gameObjectSelected
+        ? gameObjectSelected.centerX.toPrecision(3)
+        : "",
+      "game-object-selected-center-y": gameObjectSelected
+        ? gameObjectSelected.centerY.toPrecision(3)
+        : "",
+      "game-object-selected-angle": gameObjectSelected
+        ? gameObjectSelected.angle.toPrecision(3)
+        : "",
+      "game-object-selected-velocity-x": gameObjectSelected
+        ? gameObjectSelected.velocityX.toPrecision(3)
+        : "",
+      "game-object-selected-velocity-y": gameObjectSelected
+        ? gameObjectSelected.velocityY.toPrecision(3)
+        : "",
+      "game-object-selected-velocity-angle": gameObjectSelected
+        ? gameObjectSelected.velocityAngle.toPrecision(3)
+        : "",
+      "game-object-selected-mass": gameObjectSelected ? gameObjectSelected.mass : "",
+    },
+
+    onClicks: {
+      "select-prev": () => {
+        if (gameObjectSelectedIndex > 0) {
+          gameObjectSelectedIndex--
+        }
+      },
+      "select-next": () => {
+        if (gameObjectSelectedIndex < gameObjects.length - 1) {
+          gameObjectSelectedIndex++
+        }
+      },
+      "spawn-circle": () => {
+        const circle = createCircle({
+          centerX: gameObjectSelected ? gameObjectSelected.centerX : Math.random() * width * 0.8,
+          centerY: gameObjectSelected ? gameObjectSelected.centerY : Math.random() * height * 0.8,
+          radius: Math.random() * 10 + 20,
+          canMove: true,
+        })
+        gameObjects.push(circle)
+      },
+      "spawn-rectangle": () => {
+        const rectangle = createRectangle({
+          centerX: gameObjectSelected ? gameObjectSelected.centerX : Math.random() * width * 0.8,
+          centerY: gameObjectSelected ? gameObjectSelected.centerY : Math.random() * height * 0.8,
+          width: Math.random() * 30 + 10,
+          height: Math.random() * 30 + 10,
+          canMove: true,
+        })
+        gameObjects.push(rectangle)
+      },
+      "move-left": () => {
+        if (gameObjectSelected) {
+          moveGameObject(gameObjectSelected, { x: gameObjectSelected.centerX - 10 })
+        }
+      },
+      "move-right": () => {
+        if (gameObjectSelected) {
+          moveGameObject(gameObjectSelected, { x: gameObjectSelected.centerX + 10 })
+        }
+      },
+      "move-up": () => {
+        if (gameObjectSelected) {
+          moveGameObject(gameObjectSelected, { y: gameObjectSelected.centerY - 10 })
+        }
+      },
+      "move-down": () => {
+        if (gameObjectSelected) {
+          moveGameObject(gameObjectSelected, { y: gameObjectSelected.centerY + 10 })
+        }
+      },
+      "rotate-decrease": () => {
+        if (gameObjectSelected) {
+          rotateGameObject(gameObjectSelected, gameObjectSelected.angle - 0.1)
+        }
+      },
+      "rotate-increase": () => {
+        if (gameObjectSelected) {
+          rotateGameObject(gameObjectSelected, gameObjectSelected.angle + 0.1)
+        }
+      },
+      "velocity-x-decrease": () => {
+        if (gameObjectSelected) {
+          gameObjectSelected.velocityX -= 0.1
+        }
+      },
+      "velocity-x-increase": () => {
+        if (gameObjectSelected) {
+          gameObjectSelected.velocityX += 0.1
+        }
+      },
+      "velocity-y-decrease": () => {
+        if (gameObjectSelected) {
+          gameObjectSelected.velocityY -= 0.1
+        }
+      },
+      "velocity-y-increase": () => {
+        if (gameObjectSelected) {
+          gameObjectSelected.velocityY += 0.1
+        }
+      },
+      "velocity-angle-decrease": () => {
+        if (gameObjectSelected) {
+          gameObjectSelected.velocityAngle -= 0.1
+        }
+      },
+      "velocity-angle-increase": () => {
+        if (gameObjectSelected) {
+          gameObjectSelected.velocityAngle += 0.1
+        }
+      },
+      "mass-negative": () => {
+        if (gameObjectSelected) {
+          gameObjectSelected.mass = -1
+        }
+      },
+      "mass-positive": () => {
+        if (gameObjectSelected) {
+          gameObjectSelected.mass = 1
+        }
+      },
+      "gravity-enable": () => {
+        gravityY = 10
+      },
+      "gravity-disable": () => {
+        gravityY = 0
+      },
+      "excite": () => {
+        gameObjects.forEach((gameObject) => {
+          gameObject.velocityX = Math.random() * 20 - 10
+          gameObject.velocityY = Math.random() * 20 - 10
+        })
+      },
+      "reset": () => {
+        gameObjects.splice(5, gameObjects.length)
+        gameObjectSelectedIndex = 4
+      },
     },
   })
 }

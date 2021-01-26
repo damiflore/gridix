@@ -6,7 +6,7 @@ export const updatePhysicForArcadeGame = ({
   gameObjects,
   ellapsedSeconds,
   gravityX = 0,
-  gravityY = 10,
+  gravityY = 0,
   context,
   drawCollision = true,
 }) => {
@@ -18,14 +18,17 @@ export const updatePhysicForArcadeGame = ({
     // vitesse += acceleration * time
     gameObject.velocityX += gameObject.accelerationX * ellapsedSeconds
     gameObject.velocityY += gameObject.accelerationY * ellapsedSeconds
-    gameObject.velocityAngular += gameObject.accelerationAngular * ellapsedSeconds
+    gameObject.velocityAngle += gameObject.accelerationAngle * ellapsedSeconds
 
-    // position += vitesse * time
-    moveGameObject(gameObject, {
-      x: gameObject.centerX + gameObject.velocityX * ellapsedSeconds,
-      y: gameObject.centerY + gameObject.velocityY * ellapsedSeconds,
-    })
-    rotateGameObject(gameObject, gameObject.angle + gameObject.velocityAngular * ellapsedSeconds)
+    // object with an Infinite mass cannot move (static objects)
+    if (gameObject.mass !== Infinity) {
+      // position += vitesse * time
+      moveGameObject(gameObject, {
+        x: gameObject.centerX + gameObject.velocityX * ellapsedSeconds,
+        y: gameObject.centerY + gameObject.velocityY * ellapsedSeconds,
+      })
+      rotateGameObject(gameObject, gameObject.angle + gameObject.velocityAngle * ellapsedSeconds)
+    }
   })
 
   const collidingPairs = detectCollidingPairs(gameObjects)
