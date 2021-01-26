@@ -1,7 +1,33 @@
 import { substractVector, getScalarProduct, getVectorLength } from "./vector.js"
 import { getGameObjectCollisionInfo, getOppositeCollisionInfo } from "./collision/collisionInfo.js"
+import { moveGameObject, rotateGameObject } from "../chapter2/gameObject.js"
 
-export const updatePhysicForArcadeGame = ({ gameObjects, context, drawCollision = true }) => {
+export const updatePhysicForArcadeGame = ({
+  gameObjects,
+  ellapsedSeconds,
+  gravityX = 0,
+  gravityY = 10,
+  context,
+  drawCollision = true,
+}) => {
+  gameObjects.forEach((gameObject) => {
+    // gravity
+    gameObject.accelerationX = gravityX
+    gameObject.accelerationY = gravityY
+
+    // vitesse += acceleration * time
+    gameObject.velocityX += gameObject.accelerationX * ellapsedSeconds
+    gameObject.velocityY += gameObject.accelerationY * ellapsedSeconds
+    gameObject.velocityAngular += gameObject.accelerationAngular * ellapsedSeconds
+
+    // position += vitesse * time
+    moveGameObject(gameObject, {
+      x: gameObject.centerX + gameObject.velocityX * ellapsedSeconds,
+      y: gameObject.centerY + gameObject.velocityY * ellapsedSeconds,
+    })
+    rotateGameObject(gameObject, gameObject.angle + gameObject.velocityAngular * ellapsedSeconds)
+  })
+
   const collidingPairs = detectCollidingPairs(gameObjects)
   gameObjects.forEach((gameObject) => {
     gameObject.collisionInfo = null

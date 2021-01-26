@@ -102,11 +102,11 @@ document.addEventListener("keydown", (keydownEvent) => {
   }
 })
 
-const updateState = () => {
+const updateState = ({ secondsEllapsed }) => {
   gameObjects.forEach((gameObject) => {
     gameObject.updateState(gameObject)
   })
-  updatePhysicForArcadeGame({ gameObjects, context })
+  updatePhysicForArcadeGame({ gameObjects, secondsEllapsed, context })
 }
 
 const updateDraw = () => {
@@ -126,7 +126,8 @@ const updateDraw = () => {
 
 let previousMs = Date.now()
 const framePerSecond = 60
-const msPerFrame = 1000 / framePerSecond
+const secondsPerFrame = 1 / framePerSecond
+const msPerFrame = secondsPerFrame * 1000
 let lagMs = 0
 
 const runGameLoop = () => {
@@ -146,7 +147,7 @@ const runGameLoop = () => {
   // it is updated enough times
   while (lagMs >= msPerFrame) {
     lagMs -= msPerFrame
-    updateState()
+    updateState({ secondsEllapsed: secondsPerFrame })
   }
 
   updateDevtool({
