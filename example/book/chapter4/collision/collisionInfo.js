@@ -3,18 +3,24 @@ import { getCollisionInfoForRectangleToRectangle } from "./rectangleToRectangle.
 import { getCollisionInfoForRectangleToCircle } from "./rectangleToCircle.js"
 
 export const getGameObjectCollisionInfo = (gameObject, otherGameObject) => {
-  if (gameObject.shape === "circle" && otherGameObject.shape === "circle") {
+  const shape = gameObject.shape
+  const otherShape = otherGameObject.shape
+
+  if (shape === "circle" && otherShape === "circle") {
     return getCollisionInfoForCircleToCircle(gameObject, otherGameObject)
   }
-  if (gameObject.shape === "rectangle" && otherGameObject.shape === "rectangle") {
+
+  if (shape === "rectangle" && otherShape === "rectangle") {
     return getCollisionInfoForRectangleToRectangle(gameObject, otherGameObject)
   }
-  if (gameObject.shape === "rectangle" && otherGameObject.shape === "circle") {
+
+  if (shape === "rectangle" && otherShape === "circle") {
     return getCollisionInfoForRectangleToCircle(gameObject, otherGameObject)
   }
-  if (gameObject.shape === "circle" && otherGameObject.shape === "rectangle") {
+  if (shape === "circle" && otherShape === "rectangle") {
     return getCollisionInfoForRectangleToCircle(otherGameObject, gameObject)
   }
+
   return null
 }
 

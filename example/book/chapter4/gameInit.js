@@ -8,42 +8,48 @@ export const gameInit = ({ gameObjects, width, height }) => {
 
   addCircleAndRectangleCollidingBottomRight({ gameObjects })
 
-  const up = createRectangle({
-    name: "world-boundary-up",
-    centerX: width / 2,
-    centerY: 0,
-    width,
-    height: 3,
+  const worldBoundaryProps = {
     mass: Infinity,
-  })
-  gameObjects.push(up)
-  const down = createRectangle({
-    name: "world-boundary-down",
-    centerX: width / 2,
-    centerY: height,
-    width,
-    height: 3,
-    mass: Infinity,
-  })
-  gameObjects.push(down)
+    // fillStyle: "green",
+    boundingBox: null,
+    // boundingBox: "auto",
+  }
   const left = createRectangle({
     name: "world-boundary-left",
-    centerX: 0,
+    centerX: -2,
     centerY: height / 2,
-    width: 3,
-    height,
-    mass: Infinity,
+    width: 4,
+    height: height - 2,
+    ...worldBoundaryProps,
   })
   gameObjects.push(left)
+  const top = createRectangle({
+    name: "world-boundary-top",
+    centerX: width / 2,
+    centerY: -2,
+    width,
+    height: 4,
+    ...worldBoundaryProps,
+  })
+  gameObjects.push(top)
   const right = createRectangle({
     name: "world-boundary-right",
-    centerX: width,
+    centerX: width + 2,
     centerY: height / 2,
-    width: 3,
-    height,
-    mass: Infinity,
+    width: 4,
+    height: height - 2,
+    ...worldBoundaryProps,
   })
   gameObjects.push(right)
+  const bottom = createRectangle({
+    name: "world-boundary-bottom",
+    centerX: width / 2,
+    centerY: height + 2,
+    width,
+    height: 4,
+    ...worldBoundaryProps,
+  })
+  gameObjects.push(bottom)
 
   // const initialObject = createRectangle({
   //   centerX: width / 2,
