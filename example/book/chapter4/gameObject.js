@@ -19,7 +19,7 @@ export const GameObject = {
   accelerationY: 0,
   accelerationAngle: 0,
 
-  boundingCircleRadius: undefined,
+  boundingBox: "auto",
   collisionInfo: null,
   updateState: () => {},
 }
