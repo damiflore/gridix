@@ -9,6 +9,9 @@ export const GameObject = {
   mass: 1,
   friction: 0.8,
   restitution: 0.2,
+  // 0 means object has no inertia
+  // 1 means object has full inertia (mass * area is considered to slow down a movement)
+  inertiaCoef: 0.08,
 
   velocityX: 0,
   velocityY: 0,

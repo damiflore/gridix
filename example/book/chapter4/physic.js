@@ -1,5 +1,5 @@
 /* eslint-disable operator-assignment */
-import { getScalarProduct, scaleVector, normalizeVector } from "./vector.js"
+import { getScalarProduct, scaleVector, normalizeVector, getVectorialProduct } from "./vector.js"
 import { testGameObjectBoundingBox } from "./collision/boundingBox.js"
 import { getGameObjectCollisionInfo, getOppositeCollisionInfo } from "./collision/collisionInfo.js"
 import { moveGameObject, rotateGameObject } from "./gameObject.js"
@@ -53,6 +53,38 @@ export const moveAllowedFromMass = (mass) => {
   }
 
   return true
+}
+
+const inertiaFromGameObject = (gameObject) => {
+  if (gameObject.shape === "circle") {
+    return circleToInertia(gameObject)
+  }
+
+  if (gameObject.shape === "rectangle") {
+    return rectangleToInertia(gameObject)
+  }
+
+  return 0
+}
+
+const circleToInertia = ({ mass, radius, inertiaCoef }) => {
+  if (!moveAllowedFromMass(mass)) {
+    return 0
+  }
+
+  const area = radius * radius
+  const massTotal = mass * area
+  return massTotal * inertiaCoef
+}
+
+const rectangleToInertia = ({ mass, width, height, inertiaCoef }) => {
+  if (!moveAllowedFromMass(mass)) {
+    return 0
+  }
+
+  const area = width * width + height * height
+  const massTotal = mass * area
+  return massTotal * inertiaCoef
 }
 
 const handleCollision = ({ gameObjects, drawCollision, context }) => {
@@ -124,35 +156,81 @@ const applyCollisionImpactOnVelocity = (
   const aVelocityY = a.velocityY
   const bVelocityX = b.velocityX
   const bVelocityY = b.velocityY
-  const velocityXDiff = bVelocityX - aVelocityX
-  const velocityYDiff = bVelocityY - aVelocityY
-  const normalX = collisionInfo.normalX
-  const normalY = collisionInfo.normalY
-  const velocityRelativeToNormal = getScalarProduct(
-    { x: velocityXDiff, y: velocityYDiff },
-    { x: normalX, y: normalY },
-  )
+  const aVelocityAngular = a.velocityAngular
+  const bVelocityAngular = b.velocityAngular
+
+  // TODO: rename collisionInfo property like this
+  // (startX -> collisionStartX)
+  const collisionNormalX = collisionInfo.normalX
+  const collisionNormalY = collisionInfo.normalY
+  const normal = {
+    x: collisionNormalX,
+    y: collisionNormalY,
+  }
+  const collisionStartX = collisionInfo.startX
+  const collisionStartY = collisionInfo.startY
+  const collisionEndX = collisionInfo.endX
+  const collisionEndY = collisionInfo.endY
+
+  // angular impulse
+  const massStartScale = bMassInverted / massInvertedSum
+  const massEndScale = aMassInverted / massInvertedSum
+  const collisionStartXScaledWithMass = collisionStartX * massStartScale
+  const collisionStartYScaledWithMass = collisionStartY * massStartScale
+  const collisionEndXScaledWithMass = collisionEndX * massEndScale
+  const collisionEndYScaledWithMass = collisionEndY * massEndScale
+  const collisionXScaledSum = collisionStartXScaledWithMass + collisionEndXScaledWithMass
+  const collisionYScaledSum = collisionStartYScaledWithMass + collisionEndYScaledWithMass
+  const aCollisionCenterDiff = {
+    x: collisionXScaledSum - a.centerX,
+    y: collisionYScaledSum - a.centerY,
+  }
+  const bCollisionCenterDiff = {
+    x: collisionXScaledSum - b.centerX,
+    y: collisionYScaledSum - b.centerY,
+  }
+
+  const aVelocityXAfterAngularImpulse = aVelocityX + -1 * aVelocityAngular * aCollisionCenterDiff.y
+  const aVelocityYAfterAngularImpulse = aVelocityY + aVelocityAngular * aCollisionCenterDiff.x
+  const bVelocityXAfterAngularImpulse = bVelocityX + -1 * bVelocityAngular * bCollisionCenterDiff.y
+  const bVelocityYAfterAngularImpulse = bVelocityY + bVelocityAngular * bCollisionCenterDiff.x
+  const velocityXDiff = bVelocityXAfterAngularImpulse - aVelocityXAfterAngularImpulse
+  const velocityYDiff = bVelocityYAfterAngularImpulse - aVelocityYAfterAngularImpulse
+  const velocityRelativeToNormal = getScalarProduct({ x: velocityXDiff, y: velocityYDiff }, normal)
   // if objects moving apart ignore
   if (velocityRelativeToNormal > 0) {
     return
   }
 
+  const aInertia = inertiaFromGameObject(a)
+  const bInertia = inertiaFromGameObject(b)
+
   // normal impulse
   const restitutionForImpact = Math.min(a.restitution, b.restitution)
+  const aCollisionNormalProduct = getVectorialProduct(aCollisionCenterDiff, normal)
+  const bCollisionNormalProduct = getVectorialProduct(bCollisionCenterDiff, normal)
   const impulseStart = -(1 + restitutionForImpact)
-  const normalImpulseScale = (impulseStart * velocityRelativeToNormal) / massInvertedSum
-  const normalImpulseX = normalX * normalImpulseScale
-  const normalImpulseY = normalY * normalImpulseScale
+  const normalImpulseDivider =
+    massInvertedSum +
+    aCollisionNormalProduct * aCollisionNormalProduct * aInertia +
+    bCollisionNormalProduct * bCollisionNormalProduct * bInertia
+  const normalImpulseScale = (impulseStart * velocityRelativeToNormal) / normalImpulseDivider
+  const normalImpulseX = collisionNormalX * normalImpulseScale
+  const normalImpulseY = collisionNormalY * normalImpulseScale
   const aVelocityXAfterNormalImpulse = aVelocityX - normalImpulseX * aMassInverted
   const aVelocityYAfterNormalImpulse = aVelocityY - normalImpulseY * aMassInverted
   const bVelocityXAfterNormalImpulse = bVelocityX + normalImpulseX * bMassInverted
   const bVelocityYAfterNormalImpulse = bVelocityY + normalImpulseY * bMassInverted
+  const aVelocityAngularAfterNormalImpulse =
+    aVelocityAngular - aCollisionNormalProduct * normalImpulseScale * aInertia
+  const bVelocityAngularAfterNormalImpulse =
+    bVelocityAngular + bCollisionNormalProduct * normalImpulseScale * bInertia
 
   // tangent impulse
   const tangent = scaleVector(
     normalizeVector({
-      x: velocityXDiff - normalX * velocityRelativeToNormal,
-      y: velocityYDiff - normalY * velocityRelativeToNormal,
+      x: velocityXDiff - collisionNormalX * velocityRelativeToNormal,
+      y: velocityYDiff - collisionNormalY * velocityRelativeToNormal,
     }),
     -1,
   )
@@ -160,9 +238,15 @@ const applyCollisionImpactOnVelocity = (
     { x: velocityXDiff, y: velocityYDiff },
     tangent,
   )
+  const aCollisionTangentProduct = getVectorialProduct(aCollisionCenterDiff, tangent)
+  const bCollisionTangentProduct = getVectorialProduct(bCollisionCenterDiff, tangent)
+  const tangentImpulseDivider =
+    massInvertedSum +
+    aCollisionTangentProduct * aCollisionTangentProduct * aInertia +
+    bCollisionTangentProduct * bCollisionTangentProduct * bInertia
   const frictionForImpact = Math.min(a.friction, b.friction)
   const tangentImpulseScale = Math.min(
-    (impulseStart * velocityRelativeToTangent * frictionForImpact) / massInvertedSum,
+    (impulseStart * velocityRelativeToTangent * frictionForImpact) / tangentImpulseDivider,
     // friction should be less than force in normal direction
     normalImpulseScale,
   )
@@ -176,11 +260,17 @@ const applyCollisionImpactOnVelocity = (
     bVelocityXAfterNormalImpulse + tangentImpulseX * bMassInverted
   const bVelocityYAfterTangentImpulse =
     bVelocityYAfterNormalImpulse + tangentImpulseY * bMassInverted
+  const aVelocityAngularAfterTangentImpulse =
+    aVelocityAngularAfterNormalImpulse - aCollisionTangentProduct * tangentImpulseScale * aInertia
+  const bVelocityAngularAfterTangentImpulse =
+    bVelocityAngularAfterNormalImpulse + bCollisionTangentProduct * tangentImpulseScale * bInertia
 
   a.velocityX = aVelocityXAfterTangentImpulse
   a.velocityY = aVelocityYAfterTangentImpulse
+  a.velocityAngular = aVelocityAngularAfterTangentImpulse
   b.velocityX = bVelocityXAfterTangentImpulse
   b.velocityY = bVelocityYAfterTangentImpulse
+  b.velocityAngular = bVelocityAngularAfterTangentImpulse
 }
 
 const adjustPositionToSolveCollision = (
