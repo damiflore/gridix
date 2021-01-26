@@ -44,7 +44,7 @@ const updateDraw = () => {
   })
 }
 
-let previousMs = Date.now()
+let previousMs
 const framePerSecond = 60
 const secondsPerFrame = 1 / framePerSecond
 const msPerFrame = secondsPerFrame * 1000
@@ -56,6 +56,7 @@ let running = false
 const stopGameLoop = () => {
   window.cancelAnimationFrame(frame)
   running = false
+  previousMs = undefined
 }
 
 const runGameLoop = () => {
@@ -66,7 +67,9 @@ const runGameLoop = () => {
     }
   })
   const currentMs = Date.now()
-  const ellapsedMs = currentMs - previousMs
+  // when it has never been called, previousMs is undefined
+  // in that case run it once
+  const ellapsedMs = previousMs ? currentMs - previousMs : msPerFrame
   previousMs = currentMs
 
   // for the rest of the book draw comes before update
@@ -83,11 +86,9 @@ const runGameLoop = () => {
   } else {
     updateCount = updateIdealCount
   }
-  let ellapsedSeconds = 0
   while (updateCount--) {
-    ellapsedSeconds += secondsPerFrame
     updateState({
-      ellapsedSeconds,
+      ellapsedSeconds: secondsPerFrame,
       gravityY,
     })
   }
@@ -96,6 +97,7 @@ const runGameLoop = () => {
     gameObjectSelectedIndex === -1 ? null : gameObjects[gameObjectSelectedIndex]
   updateDevtool({
     textContents: {
+      "frame-per-second": Math.round(1000 / ellapsedMs),
       "game-objects-length": gameObjects.length,
       "game-object-selected-id": gameObjectSelectedIndex,
       "game-object-selected-center-x": gameObjectSelected
@@ -117,6 +119,8 @@ const runGameLoop = () => {
         ? gameObjectSelected.velocityAngle.toPrecision(3)
         : "",
       "game-object-selected-mass": gameObjectSelected ? gameObjectSelected.mass : "",
+      "game-object-selected-restitution": gameObjectSelected ? gameObjectSelected.restitution : "",
+      "game-object-selected-friction": gameObjectSelected ? gameObjectSelected.friction : "",
     },
 
     onClicks: {
@@ -181,22 +185,22 @@ const runGameLoop = () => {
       },
       "velocity-x-decrease": () => {
         if (gameObjectSelected) {
-          gameObjectSelected.velocityX -= 0.1
+          gameObjectSelected.velocityX -= 1
         }
       },
       "velocity-x-increase": () => {
         if (gameObjectSelected) {
-          gameObjectSelected.velocityX += 0.1
+          gameObjectSelected.velocityX += 1
         }
       },
       "velocity-y-decrease": () => {
         if (gameObjectSelected) {
-          gameObjectSelected.velocityY -= 0.1
+          gameObjectSelected.velocityY -= 1
         }
       },
       "velocity-y-increase": () => {
         if (gameObjectSelected) {
-          gameObjectSelected.velocityY += 0.1
+          gameObjectSelected.velocityY += 1
         }
       },
       "velocity-angle-decrease": () => {
@@ -227,8 +231,8 @@ const runGameLoop = () => {
       },
       "excite": () => {
         gameObjects.forEach((gameObject) => {
-          gameObject.velocityX = Math.random() * 20 - 10
-          gameObject.velocityY = Math.random() * 20 - 10
+          gameObject.velocityX = Math.random() * 500 - 250
+          gameObject.velocityY = Math.random() * 500 - 250
         })
       },
       "reset": () => {

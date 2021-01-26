@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Chapter 3</title>
+    <title>Chapter 4</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="data:," />
@@ -29,6 +29,7 @@
       </style>
 
       <p>Number of game objects: <span id="game-objects-length"></span></p>
+      <p>Frame per second: <span id="frame-per-second"></span></p>
 
       <fieldset>
         <legend>Selected object</legend>
@@ -85,6 +86,14 @@
             <span id="game-object-selected-mass"></span>
             <button name="mass-negative">Set -1</button>
             <button name="mass-positive">Set +1</button>
+          </li>
+          <li>
+            Restitution:
+            <span id="game-object-selected-restitution"></span>
+          </li>
+          <li>
+            Friction:
+            <span id="game-object-selected-friction"></span>
           </li>
         </ul>
       </fieldset>
