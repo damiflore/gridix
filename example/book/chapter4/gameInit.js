@@ -1,16 +1,20 @@
 import { createRectangle } from "./rectangle.js"
 import { createCircle } from "./circle.js"
 
-export const gameInit = ({ gameObjects, width, height }) => {
+export const gameInit = ({ gameObjects, width, height, worldBounds = true }) => {
   const circleA = createCircle({
     centerX: 250,
     centerY: 50,
     radius: 20,
-    velocityX: 100,
-    velocityY: 200,
+    // velocityX: 100,
+    // velocityY: 200,
     mass: 10,
   })
   gameObjects.push(circleA)
+
+  if (worldBounds) {
+    addWorldBounds({ gameObjects, width, height })
+  }
   // const circleB = createCircle({
   //   centerX: 120,
   //   centerY: 60,
@@ -41,8 +45,18 @@ export const gameInit = ({ gameObjects, width, height }) => {
   // })
   // gameObjects.push(rectangleB)
 
-  const worldBoundarySize = 3
+  // const initialObject = createRectangle({
+  //   centerX: width / 2,
+  //   centerY: height / 2,
+  //   width: 30,
+  //   height: 30,
+  //   angle: 10,
+  // })
+  // gameObjects.push(initialObject)
+}
 
+const addWorldBounds = ({ gameObjects, width, height }) => {
+  const worldBoundarySize = 3
   const worldBoundaryProps = {
     mass: Infinity,
     // fillStyle: "green",
@@ -85,13 +99,4 @@ export const gameInit = ({ gameObjects, width, height }) => {
     ...worldBoundaryProps,
   })
   gameObjects.push(bottom)
-
-  // const initialObject = createRectangle({
-  //   centerX: width / 2,
-  //   centerY: height / 2,
-  //   width: 30,
-  //   height: 30,
-  //   angle: 10,
-  // })
-  // gameObjects.push(initialObject)
 }

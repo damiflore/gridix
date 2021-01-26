@@ -1,62 +1,79 @@
-/* eslint-disable operator-assignment */
-import { getScalarProduct, scaleVector, normalizeVector, getVectorialProduct } from "./vector.js"
-import { testGameObjectBoundingBox } from "./collision/boundingBox.js"
-import { getGameObjectCollisionInfo, getOppositeCollisionInfo } from "./collision/collisionInfo.js"
-import { moveGameObject, rotateGameObject } from "./gameObject.js"
+import {
+  getScalarProduct,
+  scaleVector,
+  normalizeVector,
+  getVectorialProduct,
+} from "../geometry/vector.js"
+import { testGameObjectBoundingBox } from "../collision/boundingBox.js"
+import { getGameObjectCollisionInfo, getOppositeCollisionInfo } from "../collision/collisionInfo.js"
+import {
+  moveAllowedFromMass,
+  updateGameObjectVelocity,
+  updateGameObjectPosition,
+} from "./physic.movement.js"
 
-export const updatePhysicForArcadeGame = ({
-  gameObjects,
-  ellapsedSeconds,
-  gravityX = 0,
-  gravityY = 0,
-  drawCollision = true,
-  context,
-}) => {
-  gameObjects.forEach((gameObject) => {
-    // gravity
-    if (!moveAllowedFromMass(gameObject.mass)) {
-      return
-    }
-
-    gameObject.accelerationX = gravityX
-    gameObject.accelerationY = gravityY
-
-    // vitesse += acceleration * time
-    gameObject.velocityX += gameObject.accelerationX * ellapsedSeconds
-    gameObject.velocityY += gameObject.accelerationY * ellapsedSeconds
-    gameObject.velocityAngle += gameObject.accelerationAngle * ellapsedSeconds
-
-    // position += vitesse * time
-    moveGameObject(gameObject, {
-      x: gameObject.centerX + gameObject.velocityX * ellapsedSeconds,
-      y: gameObject.centerY + gameObject.velocityY * ellapsedSeconds,
-    })
-    rotateGameObject(gameObject, gameObject.angle + gameObject.velocityAngle * ellapsedSeconds)
-  })
-
+export const handleCollision = ({ gameObjects, drawCollision, context }) => {
   let collisionIterations = 1
   while (collisionIterations--) {
-    handleCollision({ gameObjects, drawCollision, context })
+    iterateOnCollision({ gameObjects, drawCollision, context })
   }
 }
 
-export const moveAllowedFromMass = (mass) => {
-  // object with a negative mass would move to -Infinity
-  if (mass < 0) {
-    return false
+const iterateOnCollision = ({ gameObjects, drawCollision, context }) => {
+  const collidingPairs = detectCollidingPairs(gameObjects)
+  collidingPairs.forEach((collidingPair) => {
+    const [a, b] = collidingPair
+    let collisionInfo = getGameObjectCollisionInfo(a, b)
+    if (!collisionInfo) {
+      return
+    }
+
+    const collisionNormal = {
+      x: collisionInfo.normalX,
+      y: collisionInfo.normalY,
+    }
+    const centerDiff = {
+      x: b.centerX - a.centerX,
+      y: b.centerY - a.centerY,
+    }
+    if (getScalarProduct(collisionNormal, centerDiff) < 0) {
+      collisionInfo = getOppositeCollisionInfo(collisionInfo)
+    }
+
+    a.collisionInfo = collisionInfo
+    b.collisionInfo = collisionInfo
+    if (drawCollision) {
+      drawCollisionInfo(collisionInfo, context)
+    }
+    resolveCollision(a, b, collisionInfo)
+  })
+}
+
+const detectCollidingPairs = (blocs) => {
+  return findPairs(blocs, (blocA, blocB) => {
+    blocA.collisionInfo = null
+    return testGameObjectBoundingBox(blocA, blocB)
+  })
+}
+
+const findPairs = (array, pairPredicate) => {
+  const pairs = []
+
+  let i = 0
+  while (i < array.length) {
+    const value = array[i]
+    i++
+    let j = i
+    while (j < array.length) {
+      const otherValue = array[j]
+      j++
+      if (pairPredicate(value, otherValue)) {
+        pairs.push([value, otherValue])
+      }
+    }
   }
 
-  // object without mass (0) would move to +Infinity
-  if (mass === 0) {
-    return false
-  }
-
-  // object with Infinity mass cannot move -> they tend to 0
-  if (mass === Infinity) {
-    return false
-  }
-
-  return true
+  return pairs
 }
 
 const inertiaFromGameObject = (gameObject) => {
@@ -89,39 +106,6 @@ const rectangleToInertia = ({ mass, width, height, inertiaCoef }) => {
   const area = width * width + height * height
   const massTotal = mass * area
   return 1 / (massTotal * inertiaCoef)
-}
-
-const handleCollision = ({ gameObjects, drawCollision, context }) => {
-  const collidingPairs = detectCollidingPairs(gameObjects)
-  gameObjects.forEach((gameObject) => {
-    gameObject.collisionInfo = null
-  })
-  collidingPairs.forEach((collidingPair) => {
-    const [a, b] = collidingPair
-    let collisionInfo = getGameObjectCollisionInfo(a, b)
-    if (!collisionInfo) {
-      return
-    }
-
-    const collisionNormal = {
-      x: collisionInfo.normalX,
-      y: collisionInfo.normalY,
-    }
-    const centerDiff = {
-      x: b.centerX - a.centerX,
-      y: b.centerY - a.centerY,
-    }
-    if (getScalarProduct(collisionNormal, centerDiff) < 0) {
-      collisionInfo = getOppositeCollisionInfo(collisionInfo)
-    }
-
-    a.collisionInfo = collisionInfo
-    b.collisionInfo = collisionInfo
-    if (drawCollision) {
-      drawCollisionInfo(collisionInfo, context)
-    }
-    resolveCollision(a, b, collisionInfo)
-  })
 }
 
 const resolveCollision = (a, b, collisionInfo) => {
@@ -269,12 +253,16 @@ const applyCollisionImpactOnVelocity = (
   const bVelocityAngleAfterTangentImpulse =
     bVelocityAngleAfterNormalImpulse + bCollisionTangentProduct * tangentImpulseScale * bInertia
 
-  a.velocityX = aVelocityXAfterTangentImpulse
-  a.velocityY = aVelocityYAfterTangentImpulse
-  a.velocityAngle = aVelocityAngleAfterTangentImpulse
-  b.velocityX = bVelocityXAfterTangentImpulse
-  b.velocityY = bVelocityYAfterTangentImpulse
-  b.velocityAngle = bVelocityAngleAfterTangentImpulse
+  updateGameObjectVelocity(a, {
+    x: aVelocityXAfterTangentImpulse,
+    y: aVelocityYAfterTangentImpulse,
+    angle: aVelocityAngleAfterTangentImpulse,
+  })
+  updateGameObjectVelocity(b, {
+    x: bVelocityXAfterTangentImpulse,
+    y: bVelocityYAfterTangentImpulse,
+    angle: bVelocityAngleAfterTangentImpulse,
+  })
 }
 
 const adjustPositionToSolveCollision = (
@@ -287,13 +275,13 @@ const adjustPositionToSolveCollision = (
   const correction = correctionTotal * correctionRatio
   const aPositionXCorrection = a.centerX + collisionInfo.normalX * correction * aMassInverted * -1
   const aPositionYCorrection = a.centerY + collisionInfo.normalY * correction * aMassInverted * -1
-  moveGameObject(a, {
+  updateGameObjectPosition(a, {
     x: aPositionXCorrection,
     y: aPositionYCorrection,
   })
   const bPositionXCorrection = b.centerX + collisionInfo.normalX * correction * bMassInverted
   const bPositionYCorrection = b.centerY + collisionInfo.normalY * correction * bMassInverted
-  moveGameObject(b, {
+  updateGameObjectPosition(b, {
     x: bPositionXCorrection,
     y: bPositionYCorrection,
   })
@@ -306,30 +294,4 @@ const drawCollisionInfo = (collisionInfo, context) => {
   context.closePath()
   context.strokeStyle = "orange"
   context.stroke()
-}
-
-const detectCollidingPairs = (blocs) => {
-  return findPairs(blocs, (blocA, blocB) => {
-    return testGameObjectBoundingBox(blocA, blocB)
-  })
-}
-
-const findPairs = (array, pairPredicate) => {
-  const pairs = []
-
-  let i = 0
-  while (i < array.length) {
-    const value = array[i]
-    i++
-    let j = i
-    while (j < array.length) {
-      const otherValue = array[j]
-      j++
-      if (pairPredicate(value, otherValue)) {
-        pairs.push([value, otherValue])
-      }
-    }
-  }
-
-  return pairs
 }
