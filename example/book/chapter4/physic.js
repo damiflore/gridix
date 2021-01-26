@@ -14,6 +14,10 @@ export const updatePhysicForArcadeGame = ({
 }) => {
   gameObjects.forEach((gameObject) => {
     // gravity
+    if (!moveAllowedFromMass(gameObject.mass)) {
+      return
+    }
+
     gameObject.accelerationX = gravityX
     gameObject.accelerationY = gravityY
 
@@ -84,7 +88,7 @@ const rectangleToInertia = ({ mass, width, height, inertiaCoef }) => {
 
   const area = width * width + height * height
   const massTotal = mass * area
-  return massTotal * inertiaCoef
+  return 1 / (massTotal * inertiaCoef)
 }
 
 const handleCollision = ({ gameObjects, drawCollision, context }) => {
@@ -156,8 +160,8 @@ const applyCollisionImpactOnVelocity = (
   const aVelocityY = a.velocityY
   const bVelocityX = b.velocityX
   const bVelocityY = b.velocityY
-  const aVelocityAngular = a.velocityAngular
-  const bVelocityAngular = b.velocityAngular
+  const aVelocityAngle = a.velocityAngle
+  const bVelocityAngle = b.velocityAngle
 
   // TODO: rename collisionInfo property like this
   // (startX -> collisionStartX)
@@ -190,10 +194,10 @@ const applyCollisionImpactOnVelocity = (
     y: collisionYScaledSum - b.centerY,
   }
 
-  const aVelocityXAfterAngularImpulse = aVelocityX + -1 * aVelocityAngular * aCollisionCenterDiff.y
-  const aVelocityYAfterAngularImpulse = aVelocityY + aVelocityAngular * aCollisionCenterDiff.x
-  const bVelocityXAfterAngularImpulse = bVelocityX + -1 * bVelocityAngular * bCollisionCenterDiff.y
-  const bVelocityYAfterAngularImpulse = bVelocityY + bVelocityAngular * bCollisionCenterDiff.x
+  const aVelocityXAfterAngularImpulse = aVelocityX + -1 * aVelocityAngle * aCollisionCenterDiff.y
+  const aVelocityYAfterAngularImpulse = aVelocityY + aVelocityAngle * aCollisionCenterDiff.x
+  const bVelocityXAfterAngularImpulse = bVelocityX + -1 * bVelocityAngle * bCollisionCenterDiff.y
+  const bVelocityYAfterAngularImpulse = bVelocityY + bVelocityAngle * bCollisionCenterDiff.x
   const velocityXDiff = bVelocityXAfterAngularImpulse - aVelocityXAfterAngularImpulse
   const velocityYDiff = bVelocityYAfterAngularImpulse - aVelocityYAfterAngularImpulse
   const velocityRelativeToNormal = getScalarProduct({ x: velocityXDiff, y: velocityYDiff }, normal)
@@ -221,10 +225,10 @@ const applyCollisionImpactOnVelocity = (
   const aVelocityYAfterNormalImpulse = aVelocityY - normalImpulseY * aMassInverted
   const bVelocityXAfterNormalImpulse = bVelocityX + normalImpulseX * bMassInverted
   const bVelocityYAfterNormalImpulse = bVelocityY + normalImpulseY * bMassInverted
-  const aVelocityAngularAfterNormalImpulse =
-    aVelocityAngular - aCollisionNormalProduct * normalImpulseScale * aInertia
-  const bVelocityAngularAfterNormalImpulse =
-    bVelocityAngular + bCollisionNormalProduct * normalImpulseScale * bInertia
+  const aVelocityAngleAfterNormalImpulse =
+    aVelocityAngle - aCollisionNormalProduct * normalImpulseScale * aInertia
+  const bVelocityAngleAfterNormalImpulse =
+    bVelocityAngle + bCollisionNormalProduct * normalImpulseScale * bInertia
 
   // tangent impulse
   const tangent = scaleVector(
@@ -260,17 +264,17 @@ const applyCollisionImpactOnVelocity = (
     bVelocityXAfterNormalImpulse + tangentImpulseX * bMassInverted
   const bVelocityYAfterTangentImpulse =
     bVelocityYAfterNormalImpulse + tangentImpulseY * bMassInverted
-  const aVelocityAngularAfterTangentImpulse =
-    aVelocityAngularAfterNormalImpulse - aCollisionTangentProduct * tangentImpulseScale * aInertia
-  const bVelocityAngularAfterTangentImpulse =
-    bVelocityAngularAfterNormalImpulse + bCollisionTangentProduct * tangentImpulseScale * bInertia
+  const aVelocityAngleAfterTangentImpulse =
+    aVelocityAngleAfterNormalImpulse - aCollisionTangentProduct * tangentImpulseScale * aInertia
+  const bVelocityAngleAfterTangentImpulse =
+    bVelocityAngleAfterNormalImpulse + bCollisionTangentProduct * tangentImpulseScale * bInertia
 
   a.velocityX = aVelocityXAfterTangentImpulse
   a.velocityY = aVelocityYAfterTangentImpulse
-  a.velocityAngular = aVelocityAngularAfterTangentImpulse
+  a.velocityAngle = aVelocityAngleAfterTangentImpulse
   b.velocityX = bVelocityXAfterTangentImpulse
   b.velocityY = bVelocityYAfterTangentImpulse
-  b.velocityAngular = bVelocityAngularAfterTangentImpulse
+  b.velocityAngle = bVelocityAngleAfterTangentImpulse
 }
 
 const adjustPositionToSolveCollision = (
