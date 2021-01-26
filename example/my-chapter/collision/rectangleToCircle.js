@@ -1,5 +1,10 @@
-import { getScalarProduct, scaleVector, normalizeVector, getVectorLength } from "../vector.js"
-import { rectangleToCorners, rectangleToNormals } from "../rectangle.js"
+import {
+  getScalarProduct,
+  scaleVector,
+  normalizeVector,
+  getVectorLength,
+} from "../geometry/vector.js"
+import { rectangleToCorners, rectangleToNormals } from "../shape/rectangle.js"
 import { createCollisionInfo } from "./collisionInfo.js"
 
 export const getCollisionInfoForRectangleToCircle = (rectangle, circle) => {

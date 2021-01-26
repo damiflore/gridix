@@ -1,9 +1,34 @@
-import { moveGameObject, rotateGameObject } from "./gameObject.js"
-import { createRectangle, drawRectangle } from "./rectangle.js"
-import { createCircle, drawCircle } from "./circle.js"
+/**
+TODO
+
+- extraire le travail dans un repo
+
+- rename accelerationX, Y into force X,Y? at least for the gravity
+et remet le a zero a chaque tour, il faudra que la force soit réappliqué pour etre considérée
+comme une acceleration
+une force sera ainsi considérée pnctuelle par défaut
+
+- see if rectangle and circle (at least some part) could go into geometry/
+the idea is that if we want to put a circle or a rectangle in the game it's a less generic name we'll use
+ça serais cool qu'en gros un objet de jeu puisse etre associé a une forme géométrique (genre dans hitbox)
+et comme ça l'objet de jeu lui meme ne connais pas sa forme ? ou en tous cas on peut réutiliser le concept
+générique de forme sans avoir a le mixer au game object ?
+
+- renommer collisionInfo qui sont retournée
+
+- documentation de ce que j'ai compris pour expliquer comme fonctionne certaines propriétés
+
+- plein de unit tests ou on teste le moteur physique (voir comment faire)
+ou au moin de petit fichier html pour tester des cas concrets
+
+*/
+
+import { updateGameObjectPosition, updateGameObjectVelocity } from "./physic/physic.movement.js"
+import { updatePhysicForArcadeGame } from "./physic/physic.js"
+import { createRectangle, drawRectangle } from "./shape/rectangle.js"
+import { createCircle, drawCircle } from "./shape/circle.js"
 import { gameInit } from "./gameInit.js"
 import { updateDevtool } from "./devtool.js"
-import { moveAllowedFromMass, updatePhysicForArcadeGame } from "./physic.js"
 
 const width = 800
 const height = 450
@@ -155,32 +180,32 @@ const runGameLoop = () => {
       },
       "move-left": () => {
         if (gameObjectSelected) {
-          moveGameObject(gameObjectSelected, { x: gameObjectSelected.centerX - 10 })
+          updateGameObjectPosition(gameObjectSelected, { x: gameObjectSelected.centerX - 10 })
         }
       },
       "move-right": () => {
         if (gameObjectSelected) {
-          moveGameObject(gameObjectSelected, { x: gameObjectSelected.centerX + 10 })
+          updateGameObjectPosition(gameObjectSelected, { x: gameObjectSelected.centerX + 10 })
         }
       },
       "move-up": () => {
         if (gameObjectSelected) {
-          moveGameObject(gameObjectSelected, { y: gameObjectSelected.centerY - 10 })
+          updateGameObjectPosition(gameObjectSelected, { y: gameObjectSelected.centerY - 10 })
         }
       },
       "move-down": () => {
         if (gameObjectSelected) {
-          moveGameObject(gameObjectSelected, { y: gameObjectSelected.centerY + 10 })
+          updateGameObjectPosition(gameObjectSelected, { y: gameObjectSelected.centerY + 10 })
         }
       },
       "rotate-decrease": () => {
         if (gameObjectSelected) {
-          rotateGameObject(gameObjectSelected, gameObjectSelected.angle - 0.1)
+          updateGameObjectPosition(gameObjectSelected, { angle: gameObjectSelected.angle - 0.1 })
         }
       },
       "rotate-increase": () => {
         if (gameObjectSelected) {
-          rotateGameObject(gameObjectSelected, gameObjectSelected.angle + 0.1)
+          updateGameObjectPosition(gameObjectSelected, { angle: gameObjectSelected.angle + 0.1 })
         }
       },
       "velocity-x-decrease": () => {
@@ -231,10 +256,10 @@ const runGameLoop = () => {
       },
       "excite": () => {
         gameObjects.forEach((gameObject) => {
-          if (moveAllowedFromMass(gameObject.mass)) {
-            gameObject.velocityX = Math.random() * 500 - 250
-            gameObject.velocityY = Math.random() * 500 - 250
-          }
+          updateGameObjectVelocity(gameObject, {
+            x: Math.random() * 500 - 250,
+            y: Math.random() * 500 - 250,
+          })
         })
       },
       "reset": () => {

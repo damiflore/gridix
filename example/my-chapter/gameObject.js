@@ -22,15 +22,10 @@ export const GameObject = {
   accelerationAngle: 0,
 
   boundingBox: "auto",
+  // ideally a game object would have a hitBox that could be different
+  // from the object dimension. In practice, I don't need that for now
+  // If we want to do that, the hitBox coordinates should be updated every time
+  // the object is moved, following also eventual angle (rotation)
   collisionInfo: null,
   updateState: () => {},
-}
-
-export const moveGameObject = (gameObject, { x = gameObject.centerX, y = gameObject.centerY }) => {
-  gameObject.centerX = x
-  gameObject.centerY = y
-}
-
-export const rotateGameObject = (gameObject, angle) => {
-  gameObject.angle = angle
 }

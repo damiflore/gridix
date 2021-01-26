@@ -1,5 +1,5 @@
-import { createRectangle } from "./rectangle.js"
-import { createCircle } from "./circle.js"
+import { createRectangle } from "./shape/rectangle.js"
+import { createCircle } from "./shape/circle.js"
 
 export const gameInit = ({ gameObjects, width, height, worldBounds = true }) => {
   if (worldBounds) {

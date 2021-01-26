@@ -1,5 +1,5 @@
-import { GameObject } from "./gameObject.js"
-import { substractVector, normalizeVector, rotateVector } from "./vector.js"
+import { substractVector, normalizeVector, rotateVector } from "../geometry/vector.js"
+import { GameObject } from "../gameObject.js"
 
 export const createRectangle = ({ centerX, centerY, width, height, ...props }) => {
   return {

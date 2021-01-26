@@ -1,4 +1,9 @@
-import { substractVector, getVectorLength, normalizeVector, scaleVector } from "../vector.js"
+import {
+  substractVector,
+  getVectorLength,
+  normalizeVector,
+  scaleVector,
+} from "../geometry/vector.js"
 import { createCollisionInfo } from "./collisionInfo.js"
 
 export const getCollisionInfoForCircleToCircle = (circleA, circleB) => {

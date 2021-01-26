@@ -1,5 +1,5 @@
-import { GameObject } from "./gameObject.js"
-import { rotateVector } from "./vector.js"
+import { GameObject } from "../gameObject.js"
+import { rotateVector } from "../geometry/vector.js"
 
 export const createCircle = ({ centerX, centerY, radius, ...props }) => {
   return {

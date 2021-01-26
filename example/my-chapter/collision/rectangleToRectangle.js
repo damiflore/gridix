@@ -1,5 +1,5 @@
-import { rectangleToCorners, rectangleToNormals } from "../rectangle.js"
-import { substractVector, getScalarProduct, scaleVector } from "../vector.js"
+import { substractVector, getScalarProduct, scaleVector } from "../geometry/vector.js"
+import { rectangleToCorners, rectangleToNormals } from "../shape/rectangle.js"
 import { createCollisionInfo } from "./collisionInfo.js"
 
 export const getCollisionInfoForRectangleToRectangle = (rectangleA, rectangleB) => {
@@ -83,7 +83,7 @@ const findFarthestSupportPoint = (corners, dir, pointOnEdge) => {
   let supportPointY = null
   const cornerKeys = Object.keys(corners)
   let i = 0
-  while (i< 4) {
+  while (i < 4) {
     const corner = corners[cornerKeys[i]]
     i++
     const cornerAndPointDiff = substractVector(corner, pointOnEdge)
