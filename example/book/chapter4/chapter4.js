@@ -50,10 +50,20 @@ const secondsPerFrame = 1 / framePerSecond
 const msPerFrame = secondsPerFrame * 1000
 let lagMs = 0
 let gravityY = 0
+let frame
+let running = false
+
+const stopGameLoop = () => {
+  window.cancelAnimationFrame(frame)
+  running = false
+}
 
 const runGameLoop = () => {
-  requestAnimationFrame(() => {
-    runGameLoop()
+  running = true
+  frame = requestAnimationFrame(() => {
+    if (running) {
+      runGameLoop()
+    }
   })
   const currentMs = Date.now()
   const ellapsedMs = currentMs - previousMs
@@ -218,5 +228,8 @@ const runGameLoop = () => {
   })
 }
 runGameLoop()
+window.addEventListener("error", () => {
+  stopGameLoop()
+})
 
 window.gameObjects = gameObjects
