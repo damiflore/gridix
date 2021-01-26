@@ -1,4 +1,5 @@
-import { getScalarProduct } from "./vector.js"
+/* eslint-disable operator-assignment */
+import { getScalarProduct, scaleVector, normalizeVector } from "./vector.js"
 import { testGameObjectBoundingBox } from "./collision/boundingBox.js"
 import { getGameObjectCollisionInfo, getOppositeCollisionInfo } from "./collision/collisionInfo.js"
 import { moveGameObject, rotateGameObject } from "./gameObject.js"
@@ -72,21 +73,105 @@ const handleCollision = ({ gameObjects, drawCollision, context }) => {
 }
 
 const resolveCollision = (a, b, collisionInfo) => {
-  adjustPositionToSolveCollision(a, b, collisionInfo)
-}
-
-const adjustPositionToSolveCollision = (a, b, collisionInfo) => {
   const aMass = a.mass
   const bMass = b.mass
-  const aMassInverted = aMass === 0 || aMass === Infinity ? 0 : 1 / aMass
-  const bMassInverted = bMass === 0 || bMass === Infinity ? 0 : 1 / bMass
-  // cannot move object with Infinity mass
-  // and cannot move object without mass (they would move to Infinity)
+  const aMassInverted = aMass < 0 || aMass === 0 || aMass === Infinity ? 0 : 1 / aMass
+  const bMassInverted = bMass < 0 || bMass === 0 || bMass === Infinity ? 0 : 1 / bMass
+  // object with Infinity mass cannot move -> they tend to 0
+  // object without mass (0) would move to +Infinity
+  // object with a negative mass would move to -Infinity
   if (aMassInverted === 0 && bMassInverted === 0) {
     return
   }
-
   const massInvertedSum = aMassInverted + bMassInverted
+
+  adjustPositionToSolveCollision(a, b, {
+    aMassInverted,
+    bMassInverted,
+    massInvertedSum,
+    collisionInfo,
+  })
+  applyCollisionImpactOnVelocity(a, b, {
+    aMassInverted,
+    bMassInverted,
+    massInvertedSum,
+    collisionInfo,
+  })
+}
+
+const applyCollisionImpactOnVelocity = (
+  a,
+  b,
+  { aMassInverted, bMassInverted, massInvertedSum, collisionInfo },
+) => {
+  const aVelocityX = a.velocityX
+  const aVelocityY = a.velocityY
+  const bVelocityX = b.velocityX
+  const bVelocityY = b.velocityY
+  const velocityXDiff = bVelocityX - aVelocityX
+  const velocityYDiff = bVelocityY - aVelocityY
+  const normalX = collisionInfo.normalX
+  const normalY = collisionInfo.normalY
+  const velocityRelativeToNormal = getScalarProduct(
+    { x: velocityXDiff, y: velocityYDiff },
+    { x: normalX, y: normalY },
+  )
+  // if objects moving apart ignore
+  if (velocityRelativeToNormal > 0) {
+    return
+  }
+
+  // normal impulse
+  const restitutionForImpact = Math.min(a.restitution, b.restitution)
+  const impulseStart = -(1 + restitutionForImpact)
+  const normalImpulseScale = (impulseStart * velocityRelativeToNormal) / massInvertedSum
+  const normalImpulseX = normalX * normalImpulseScale
+  const normalImpulseY = normalY * normalImpulseScale
+  const aVelocityXAfterNormalImpulse = aVelocityX - normalImpulseX * aMassInverted
+  const aVelocityYAfterNormalImpulse = aVelocityY - normalImpulseY * aMassInverted
+  const bVelocityXAfterNormalImpulse = bVelocityX + normalImpulseX * bMassInverted
+  const bVelocityYAfterNormalImpulse = bVelocityY + normalImpulseY * bMassInverted
+
+  // tangent impulse
+  const tangent = scaleVector(
+    normalizeVector({
+      x: velocityXDiff - normalX * velocityRelativeToNormal,
+      y: velocityYDiff - normalY * velocityRelativeToNormal,
+    }),
+    -1,
+  )
+  const velocityRelativeToTangent = getScalarProduct(
+    { x: velocityXDiff, y: velocityYDiff },
+    tangent,
+  )
+  const frictionForImpact = Math.min(a.friction, b.friction)
+  const tangentImpulseScale = Math.min(
+    (impulseStart * velocityRelativeToTangent * frictionForImpact) / massInvertedSum,
+    // friction should be less than force in normal direction
+    normalImpulseScale,
+  )
+  const tangentImpulseX = tangent.x * tangentImpulseScale
+  const tangentImpulseY = tangent.y * tangentImpulseScale
+  const aVelocityXAfterTangentImpulse =
+    aVelocityXAfterNormalImpulse - tangentImpulseX * aMassInverted
+  const aVelocityYAfterTangentImpulse =
+    aVelocityYAfterNormalImpulse - tangentImpulseY * aMassInverted
+  const bVelocityXAfterTangentImpulse =
+    bVelocityXAfterNormalImpulse + tangentImpulseX * bMassInverted
+  const bVelocityYAfterTangentImpulse =
+    bVelocityYAfterNormalImpulse + tangentImpulseY * bMassInverted
+
+  a.velocityX = aVelocityXAfterTangentImpulse
+  a.velocityY = aVelocityYAfterTangentImpulse
+  b.velocityX = bVelocityXAfterTangentImpulse
+  b.velocityY = bVelocityYAfterTangentImpulse
+}
+
+const adjustPositionToSolveCollision = (
+  a,
+  b,
+  { aMassInverted, bMassInverted, massInvertedSum, collisionInfo },
+) => {
   const correctionRatio = 1
   const correctionTotal = collisionInfo.depth / massInvertedSum
   const correction = correctionTotal * correctionRatio
