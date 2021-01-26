@@ -77,7 +77,7 @@ const runGameLoop = () => {
   let updateCount
   if (updateIdealCount > maxUpdatesPerFrame) {
     console.warn(
-      `too many update to perform, only ${maxUpdatesPerFrame} out of ${updateIdealCount} will be done`,
+      `too many updates to perform, only ${maxUpdatesPerFrame} out of ${updateIdealCount} iterations will be done`,
     )
     updateCount = maxUpdatesPerFrame
   } else {
