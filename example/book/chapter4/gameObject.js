@@ -6,7 +6,7 @@ export const GameObject = {
   // positive angle -> rotate counterclockwise
   angle: 0,
 
-  mass: 0,
+  mass: 1,
   friction: 0.8,
   restitution: 0.2,
 

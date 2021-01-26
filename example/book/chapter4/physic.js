@@ -7,8 +7,8 @@ export const updatePhysicForArcadeGame = ({
   ellapsedSeconds,
   gravityX = 0,
   gravityY = 0,
-  context,
   drawCollision = true,
+  context,
 }) => {
   gameObjects.forEach((gameObject) => {
     // gravity
@@ -31,6 +31,13 @@ export const updatePhysicForArcadeGame = ({
     }
   })
 
+  let collisionIterations = 1
+  while (collisionIterations--) {
+    handleCollision({ gameObjects, drawCollision, context })
+  }
+}
+
+const handleCollision = ({ gameObjects, drawCollision, context }) => {
   const collidingPairs = detectCollidingPairs(gameObjects)
   gameObjects.forEach((gameObject) => {
     gameObject.collisionInfo = null
@@ -59,6 +66,40 @@ export const updatePhysicForArcadeGame = ({
     if (drawCollision) {
       drawCollisionInfo(collisionInfo, context)
     }
+    resolveCollision(a, b, collisionInfo)
+  })
+}
+
+const resolveCollision = (a, b, collisionInfo) => {
+  adjustPositionToSolveCollision(a, b, collisionInfo)
+}
+
+const adjustPositionToSolveCollision = (a, b, collisionInfo) => {
+  const aMass = a.mass
+  const bMass = b.mass
+  const aMassInverted = aMass === 0 || aMass === Infinity ? 0 : 1 / aMass
+  const bMassInverted = bMass === 0 || bMass === Infinity ? 0 : 1 / bMass
+  // cannot move object with Infinity mass
+  // and cannot move object without mass (they would move to Infinity)
+  if (aMassInverted === 0 && bMassInverted === 0) {
+    return
+  }
+
+  const massInvertedSum = aMassInverted + bMassInverted
+  const correctionRatio = 1
+  const correctionTotal = collisionInfo.depth / massInvertedSum
+  const correction = correctionTotal * correctionRatio
+  const aPositionXCorrection = a.centerX + collisionInfo.normalX * correction * aMassInverted * -1
+  const aPositionYCorrection = a.centerY + collisionInfo.normalY * correction * aMassInverted * -1
+  moveGameObject(a, {
+    x: aPositionXCorrection,
+    y: aPositionYCorrection,
+  })
+  const bPositionXCorrection = b.centerX + collisionInfo.normalX * correction * bMassInverted
+  const bPositionYCorrection = b.centerY + collisionInfo.normalY * correction * bMassInverted
+  moveGameObject(b, {
+    x: bPositionXCorrection,
+    y: bPositionYCorrection,
   })
 }
 
