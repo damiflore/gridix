@@ -8,7 +8,6 @@ export const createCircle = ({ centerX, centerY, radius, ...props }) => {
     centerX,
     centerY,
     radius,
-    boundRadius: radius,
     ...props,
   }
 }

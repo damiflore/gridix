@@ -44,12 +44,32 @@ const drawCollisionInfo = (collisionInfo, context) => {
 
 const detectCollidingPairs = (blocs) => {
   return findPairs(blocs, (blocA, blocB) => {
-    return testGameObjectBound(blocA, blocB)
+    return testGameObjectBoundindCircle(blocA, blocB)
   })
 }
 
-const testGameObjectBound = (a, b) => {
+const testGameObjectBoundindCircle = (a, b) => {
   return testCircleBound(a, b)
+}
+
+const gameObjectToBoundingCircleRadius = (gameObject) => {
+  const { boundingCircleRadius } = gameObject
+  if (typeof boundingCircleRadius === "number") {
+    return boundingCircleRadius
+  }
+
+  const { shape } = gameObject
+  if (shape === "rectangle") {
+    const { width, height } = gameObject
+    return Math.sqrt(width * width + height * height) / 2
+  }
+
+  if (shape === "circle") {
+    const { radius } = gameObject
+    return radius
+  }
+
+  return 0
 }
 
 const testCircleBound = (circleA, circleB) => {
@@ -58,7 +78,9 @@ const testCircleBound = (circleA, circleB) => {
     { x: circleB.centerX, y: circleB.centerY },
   )
   const centerDistance = getVectorLength(centerDiff)
-  const radiusSum = circleA.boundRadius + circleB.boundRadius
+  const circleABoundingRadius = gameObjectToBoundingCircleRadius(circleA)
+  const circleBBoundingRadius = gameObjectToBoundingCircleRadius(circleB)
+  const radiusSum = circleABoundingRadius + circleBBoundingRadius
 
   if (centerDistance > radiusSum) {
     return false

@@ -14,7 +14,7 @@ export const gameInit = ({ gameObjects, width, height }) => {
     centerY: 0,
     width,
     height: 3,
-    boundRadius: 0,
+    boundingCircleRadius: 0,
   })
   gameObjects.push(up)
   const down = createRectangle({
@@ -23,7 +23,7 @@ export const gameInit = ({ gameObjects, width, height }) => {
     centerY: height,
     width,
     height: 3,
-    boundRadius: 0,
+    boundingCircleRadius: 0,
   })
   gameObjects.push(down)
   const left = createRectangle({
@@ -32,7 +32,7 @@ export const gameInit = ({ gameObjects, width, height }) => {
     centerY: height / 2,
     width: 3,
     height,
-    boundRadius: 0,
+    boundingCircleRadius: 0,
   })
   gameObjects.push(left)
   const right = createRectangle({
@@ -41,7 +41,7 @@ export const gameInit = ({ gameObjects, width, height }) => {
     centerY: height / 2,
     width: 3,
     height,
-    boundRadius: 0,
+    boundingCircleRadius: 0,
   })
   gameObjects.push(right)
 
