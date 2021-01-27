@@ -16,7 +16,6 @@ import { updateGameObjectPosition, updateGameObjectVelocity } from "./physic/phy
 import { updatePhysicForArcadeGame } from "./physic/physic.js"
 import { PHYSIC_CONSTANTS } from "./physic/physic.constants.js"
 import { createRigidRectangle, createRigidCircle } from "./physic/shape.js"
-import { drawRectangle, drawCircle } from "./draw/draw.js"
 import { gameInit } from "./gameInit.js"
 import { updateDevtool } from "./devtool.js"
 
@@ -46,16 +45,9 @@ const updateState = (options) => {
 
 const updateDraw = () => {
   context.clearRect(0, 0, width, height)
-  gameObjects.forEach((gameObject, index) => {
-    context.strokeStyle = "blue"
-    if (index === gameObjectSelectedIndex) {
-      context.strokeStyle = "red"
-    }
-    if (gameObject.radius) {
-      drawCircle(gameObject, context)
-    } else {
-      drawRectangle(gameObject, context)
-    }
+  context.strokeStyle = "blue"
+  gameObjects.forEach((gameObject) => {
+    gameObject.updateDraw(gameObject, context)
   })
 }
 

@@ -29,10 +29,16 @@
       </style>
 
       <p>Number of game objects: <span id="game-objects-length"></span></p>
-      <p>Frame per second: <span id="frame-per-second"></span></p>
 
-      <fieldset>
-        <legend>Selected object</legend>
+      <p>
+        <button name="excite">Excite all objects</button>
+        <button name="gravity-enable">Enable gravity</button>
+        <button name="gravity-disable">Disable gravity</button>
+        <button name="reset">Reset system</button>
+      </p>
+
+      <details>
+        <summary>Selected object</summary>
         <ul>
           <li>Id: <span id="game-object-selected-id"></span></li>
           <li>
@@ -96,14 +102,12 @@
             <span id="game-object-selected-friction"></span>
           </li>
         </ul>
-      </fieldset>
+      </details>
 
-      <p>
-        <button name="excite">Excite all objects</button>
-        <button name="gravity-enable">Enable gravity</button>
-        <button name="gravity-disable">Disable gravity</button>
-        <button name="reset">Reset system</button>
-      </p>
+      <details>
+        <summary>Frame per second</summary>
+        <span id="frame-per-second"></span>
+      </details>
     </div>
     <script type="module" src="./my-chapter.js"></script>
   </body>

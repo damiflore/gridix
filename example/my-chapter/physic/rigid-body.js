@@ -1,5 +1,8 @@
 export const RigidBody = {
   name: "anonymous",
+  updateState: () => {},
+  updateDraw: () => {},
+
   centerX: 0,
   centerY: 0,
   // negative angle -> rotate clockwise
@@ -32,6 +35,4 @@ export const RigidBody = {
 
   // hitBox: null,
   boundingBox: "auto",
-
-  updateState: () => {},
 }
