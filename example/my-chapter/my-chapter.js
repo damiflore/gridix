@@ -1,11 +1,7 @@
 /**
 TODO
 
-- see if rectangle and circle (at least some part) could go into geometry/
-the idea is that if we want to put a circle or a rectangle in the game it's a less generic name we'll use
-ça serais cool qu'en gros un objet de jeu puisse etre associé a une forme géométrique (genre dans hitbox)
-et comme ça l'objet de jeu lui meme ne connais pas sa forme ? ou en tous cas on peut réutiliser le concept
-générique de forme sans avoir a le mixer au game object ?
+- browser tab lose focus comme dans black engine
 
 - plein de unit tests ou on teste le moteur physique (voir comment faire)
 ou au moin de petit fichier html pour tester des cas concrets
@@ -54,7 +50,7 @@ const gameEngine = createGameEngine({
       collisionCallback: ({ collisionInfo }) => {
         collisionInfos.push(collisionInfo)
       },
-      collisionPositionResolution: false,
+      collisionPositionResolution: true,
       collisionVelocityImpact: true,
     })
   },
@@ -224,7 +220,7 @@ const gameEngine = createGameEngine({
     })
   },
 })
-PHYSIC_CONSTANTS.forceYAmbient = 20
+PHYSIC_CONSTANTS.forceYAmbient = 200
 window.addEventListener("error", () => {
   gameEngine.stopGameLoop()
 })
