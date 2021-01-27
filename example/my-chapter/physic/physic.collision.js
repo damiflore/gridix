@@ -11,27 +11,23 @@ import {
   updateGameObjectPosition,
 } from "./physic.movement.js"
 
-export const handleCollision = ({ gameObjects, drawCollision, context }) => {
+export const handleCollision = ({ gameObjects, collisionCallback = () => {} }) => {
   let collisionIterations = 1
   while (collisionIterations--) {
     iterateOnCollision({
       gameObjects,
-      drawCollision,
-      context,
+      collisionCallback,
     })
   }
 }
 
-const iterateOnCollision = ({ gameObjects, drawCollision, context }) => {
+const iterateOnCollision = ({ gameObjects, collisionCallback }) => {
   forEachPairs(gameObjects, (a, b) => {
     const collisionInfo = getCollisionInfo(a, b)
     if (!collisionInfo) {
       return
     }
-
-    if (drawCollision) {
-      drawCollisionInfo(collisionInfo, context)
-    }
+    collisionCallback({ a, b, collisionInfo })
     resolveCollision(a, b, collisionInfo)
   })
 }
@@ -263,16 +259,4 @@ const applyCollisionImpactOnVelocity = (
     y: bVelocityYAfterTangentImpulse,
     angle: bVelocityAngleAfterTangentImpulse,
   })
-}
-
-const drawCollisionInfo = (
-  { collisionStartX, collisionStartY, collisionEndX, collisionEndY },
-  context,
-) => {
-  context.beginPath()
-  context.moveTo(collisionStartX, collisionStartY)
-  context.lineTo(collisionEndX, collisionEndY)
-  context.closePath()
-  context.strokeStyle = "orange"
-  context.stroke()
 }

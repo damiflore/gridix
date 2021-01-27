@@ -28,3 +28,15 @@ export const drawCircle = ({ centerX, centerY, radius, angle }, context) => {
   context.closePath()
   context.stroke()
 }
+
+export const drawCollisionInfo = (
+  { collisionStartX, collisionStartY, collisionEndX, collisionEndY },
+  context,
+) => {
+  context.beginPath()
+  context.moveTo(collisionStartX, collisionStartY)
+  context.lineTo(collisionEndX, collisionEndY)
+  context.closePath()
+  context.strokeStyle = "orange"
+  context.stroke()
+}
