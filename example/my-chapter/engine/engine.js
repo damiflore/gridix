@@ -6,7 +6,8 @@ export const createGameEngine = ({
 }) => {
   let previousMs
   let frame
-  let running = false
+  let started = false
+  let paused = false
 
   const gameEngine = {
     framePerSecond,
@@ -16,12 +17,15 @@ export const createGameEngine = ({
   }
 
   const gameLoop = () => {
-    if (!running) {
+    if (!started) {
       return
     }
-    gameEngine.frameCount++
     frame = requestAnimationFrame(gameLoop)
+    if (paused) {
+      return
+    }
 
+    gameEngine.frameCount++
     // reread them in case they got updated from outside
     const { framePerSecond, maxUpdatesPerFrame } = gameEngine
 
@@ -54,25 +58,42 @@ export const createGameEngine = ({
     updateDraw(gameEngine)
   }
 
-  const startGameLoop = () => {
-    if (running) {
+  const pauseGameLoop = () => {
+    if (paused) {
       return
     }
-    running = true
+    paused = true
+  }
+
+  const resumeGameLoop = () => {
+    if (!paused) {
+      return
+    }
+    paused = false
+    previousMs = undefined
+  }
+
+  const startGameLoop = () => {
+    if (started) {
+      return
+    }
+    started = true
     gameLoop()
   }
 
   const stopGameLoop = () => {
-    if (!running) {
+    if (!started) {
       return
     }
-    running = false
+    started = false
     window.cancelAnimationFrame(frame)
     previousMs = undefined
   }
 
   Object.assign(gameEngine, {
     startGameLoop,
+    pauseGameLoop,
+    resumeGameLoop,
     stopGameLoop,
   })
 

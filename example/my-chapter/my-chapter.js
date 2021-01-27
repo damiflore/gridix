@@ -17,6 +17,7 @@ import { gameInit } from "./gameInit.js"
 import { updateDevtool } from "./devtool.js"
 import { createGameEngine } from "./engine/engine.js"
 import { drawCollisionInfo } from "./draw/draw.js"
+import { registerPageLifecyle } from "./page/page-lifecyle.js"
 
 const width = 800
 const height = 450
@@ -227,5 +228,23 @@ window.addEventListener("error", () => {
   gameEngine.stopGameLoop()
 })
 gameEngine.startGameLoop()
+
+registerPageLifecyle({
+  active: () => {
+    gameEngine.resumeGameLoop()
+    document.title = "active"
+  },
+  passive: () => {
+    gameEngine.resumeGameLoop()
+    document.title = "passive"
+  },
+  hidden: () => {
+    gameEngine.pauseGameLoop()
+    document.title = "hidden"
+  },
+  frozen: () => {
+    gameEngine.pauseGameLoop()
+  },
+})
 
 window.gameObjects = gameObjects

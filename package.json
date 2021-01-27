@@ -49,6 +49,7 @@
     "@jsenv/pwa": "3.0.6",
     "@jsenv/server": "5.4.2",
     "black-engine": "0.5.12",
+    "page-lifecycle": "0.1.2",
     "phaser": "3.52.0",
     "systemjs": "6.8.3"
   },
