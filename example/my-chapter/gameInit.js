@@ -1,11 +1,11 @@
-import { createRigidRectangle, createRigidCircle } from "./physic/shape.js"
+import { createRectangle, createCircle } from "./game/shape.js"
 
 export const gameInit = ({ gameObjects, width, height, worldBounds = true }) => {
   if (worldBounds) {
     addWorldBounds({ gameObjects, width, height })
   }
   gameObjects.push(
-    createRigidRectangle({
+    createRectangle({
       centerX: 500,
       centerY: 200,
       width: 400,
@@ -14,10 +14,11 @@ export const gameInit = ({ gameObjects, width, height, worldBounds = true }) => 
       friction: 0.3,
       restitution: 0,
       angle: 2.8,
+      rigid: true,
     }),
   )
   gameObjects.push(
-    createRigidRectangle({
+    createRectangle({
       centerX: 200,
       centerY: 400,
       width: 400,
@@ -25,19 +26,21 @@ export const gameInit = ({ gameObjects, width, height, worldBounds = true }) => 
       mass: 0,
       friction: 1,
       restitution: 0.5,
+      rigid: true,
     }),
   )
   gameObjects.push(
-    createRigidRectangle({
+    createRectangle({
       centerX: 100,
       centerY: 200,
       width: 200,
       height: 20,
       mass: 0,
+      rigid: true,
     }),
   )
   gameObjects.push(
-    createRigidRectangle({
+    createRectangle({
       centerX: 10,
       centerY: 360,
       width: 20,
@@ -45,13 +48,14 @@ export const gameInit = ({ gameObjects, width, height, worldBounds = true }) => 
       mass: 0,
       friction: 0,
       restitution: 1,
+      rigid: true,
     }),
   )
 
   let i = 10
   while (i--) {
     gameObjects.push(
-      createRigidRectangle({
+      createRectangle({
         centerX: Math.random() * width,
         centerY: (Math.random() * height) / 2,
         width: Math.random() * 50 + 10,
@@ -61,10 +65,11 @@ export const gameInit = ({ gameObjects, width, height, worldBounds = true }) => 
         restitution: Math.random(),
         velocityX: Math.random() * 60 - 30,
         velocityY: Math.random() * 60 - 30,
+        rigid: true,
       }),
     )
     gameObjects.push(
-      createRigidCircle({
+      createCircle({
         centerX: Math.random() * width,
         centerY: (Math.random() * height) / 2,
         radius: Math.random() * 20 + 10,
@@ -73,6 +78,7 @@ export const gameInit = ({ gameObjects, width, height, worldBounds = true }) => 
         restitution: Math.random(),
         velocityX: Math.random() * 60 - 30,
         velocityY: Math.random() * 60 - 30,
+        rigid: true,
       }),
     )
   }
@@ -83,10 +89,9 @@ const addWorldBounds = ({ gameObjects, width, height }) => {
   const worldBoundaryProps = {
     mass: Infinity,
     // fillStyle: "green",
-    // boundingBox: null,
-    boundingBox: "auto",
+    rigid: true,
   }
-  const left = createRigidRectangle({
+  const left = createRectangle({
     name: "world-boundary-left",
     centerX: -worldBoundarySize / 2,
     centerY: height / 2,
@@ -95,7 +100,7 @@ const addWorldBounds = ({ gameObjects, width, height }) => {
     ...worldBoundaryProps,
   })
   gameObjects.push(left)
-  const top = createRigidRectangle({
+  const top = createRectangle({
     name: "world-boundary-top",
     centerX: width / 2,
     centerY: -worldBoundarySize / 2,
@@ -104,7 +109,7 @@ const addWorldBounds = ({ gameObjects, width, height }) => {
     ...worldBoundaryProps,
   })
   gameObjects.push(top)
-  const right = createRigidRectangle({
+  const right = createRectangle({
     name: "world-boundary-right",
     centerX: width + worldBoundarySize / 2,
     centerY: height / 2,
@@ -113,7 +118,7 @@ const addWorldBounds = ({ gameObjects, width, height }) => {
     ...worldBoundaryProps,
   })
   gameObjects.push(right)
-  const bottom = createRigidRectangle({
+  const bottom = createRectangle({
     name: "world-boundary-bottom",
     centerX: width / 2,
     centerY: height + worldBoundarySize / 2,

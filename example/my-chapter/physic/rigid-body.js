@@ -1,7 +1,6 @@
 export const RigidBody = {
-  name: "anonymous",
-  updateState: () => {},
-  updateDraw: () => {},
+  // hitBox: null,
+  boundingBox: "auto",
 
   centerX: 0,
   centerY: 0,
@@ -32,7 +31,4 @@ export const RigidBody = {
   forceX: 0,
   forceY: 0,
   forceAngle: 0,
-
-  // hitBox: null,
-  boundingBox: "auto",
 }
