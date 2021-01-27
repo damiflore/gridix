@@ -18,8 +18,12 @@ export const updatePhysicForArcadeGame = ({
 
   // comment détecter qu'on objet arrete de bouger pendant un certain temps ?
   // on pourrait garder en mémoire la derniere position + le temps
-  // donc tant que la position bouge de plus de X, on reset le lastMoveMs
-  // et sinon check ms vs lastNotableFrameCount et si > 2s alors sleeping
+  // chaque fois qu'on objet bouge, on regarde de combien entre
+  // avant la mise a jour physique de sa position et apres.
+  // si cela représente plus que lastNotableMoveEllapsedSeconds
+  // on le met a jour
+  // dans handleSleep on regarde tout les objet n'ayant pas bougé
+  // et on compare avec ellapsedSeconds, si cela dépasse X alors on met l'objet en sleeping
 
   // IL FAUT DESACTIVER LA DETECTION DE COLLISION ENTRE SLEEPING ET STATIC!!!
   // https://gamedev.stackexchange.com/questions/114925/in-a-2d-physics-engine-how-do-i-avoid-useless-collision-resolutions-when-object

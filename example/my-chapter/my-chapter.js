@@ -192,7 +192,7 @@ const gameEngine = createGameEngine({
           }
         },
         "gravity-enable": () => {
-          PHYSIC_CONSTANTS.forceYAmbient = 20
+          PHYSIC_CONSTANTS.forceYAmbient = 200
         },
         "gravity-disable": () => {
           PHYSIC_CONSTANTS.forceYAmbient = 0
