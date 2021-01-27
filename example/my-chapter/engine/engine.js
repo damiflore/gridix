@@ -25,12 +25,15 @@ export const createGameEngine = ({
       return
     }
 
-    gameEngine.frameCount++
     // reread them in case they got updated from outside
     const { framePerSecond, maxUpdatesPerFrame } = gameEngine
-
     const secondsPerFrame = 1 / framePerSecond
+    const frameCount = gameEngine.frameCount + 1
     const msPerFrame = secondsPerFrame * 1000
+
+    gameEngine.frameCount = frameCount
+    gameEngine.secondsPerFrame = secondsPerFrame
+    gameEngine.ellapsedSeconds = frameCount * secondsPerFrame
 
     const currentMs = Date.now()
     // when it has never been called, previousMs is undefined
@@ -51,7 +54,6 @@ export const createGameEngine = ({
     gameEngine.framePerSecondEstimation = Math.round(1000 / ellapsedMs)
     gameEngine.memoryUsed = Math.round(window.performance.memory.usedJSHeapSize / 1048576)
     gameEngine.memoryLimit = window.performance.memory.jsHeapSizeLimit / 1048576
-    gameEngine.ellapsedSeconds = secondsPerFrame
     while (updateCount--) {
       updateState(gameEngine)
     }
