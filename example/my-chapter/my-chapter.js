@@ -12,7 +12,6 @@ ou au moin de petit fichier html pour tester des cas concrets
 import { updateGameObjectPosition, updateGameObjectVelocity } from "./physic/physic.movement.js"
 import { updatePhysicForArcadeGame } from "./physic/physic.js"
 import { PHYSIC_CONSTANTS } from "./physic/physic.constants.js"
-import { createRectangle, createCircle } from "./game/shape.js"
 import { gameObjectFromPoint } from "./game/game.js"
 import { gameInit } from "./gameInit.js"
 import { updateDevtool } from "./devtool.js"
@@ -78,8 +77,12 @@ const gameEngine = createGameEngine({
         "frame-per-second": framePerSecondEstimation,
         "js-heap-size-used": memoryUsed,
         "js-heap-size-limit": memoryLimit,
+
         "game-objects-length": gameObjects.length,
-        "game-object-selected-id": gameObjectSelectedIndex,
+        "game-object-selected-sleeping": gameObjectSelected
+          ? String(gameObjectSelected.sleeping)
+          : "",
+
         "game-object-selected-center-x": gameObjectSelected
           ? gameObjectSelected.centerX.toPrecision(3)
           : "",
@@ -106,35 +109,17 @@ const gameEngine = createGameEngine({
       },
 
       onClicks: {
-        "select-prev": () => {
-          if (gameObjectSelectedIndex > 0) {
-            gameObjectSelectedIndex--
+        "wakeup": () => {
+          if (gameObjectSelected) {
+            gameObjectSelected.sleeping = false
           }
         },
-        "select-next": () => {
-          if (gameObjectSelectedIndex < gameObjects.length - 1) {
-            gameObjectSelectedIndex++
+        "sleep": () => {
+          if (gameObjectSelected) {
+            gameObjectSelected.sleeping = true
           }
         },
-        "spawn-circle": () => {
-          const circle = createCircle({
-            centerX: gameObjectSelected ? gameObjectSelected.centerX : Math.random() * width * 0.8,
-            centerY: gameObjectSelected ? gameObjectSelected.centerY : Math.random() * height * 0.8,
-            radius: Math.random() * 10 + 20,
-            rigid: true,
-          })
-          gameObjects.push(circle)
-        },
-        "spawn-rectangle": () => {
-          const rectangle = createRectangle({
-            centerX: gameObjectSelected ? gameObjectSelected.centerX : Math.random() * width * 0.8,
-            centerY: gameObjectSelected ? gameObjectSelected.centerY : Math.random() * height * 0.8,
-            width: Math.random() * 30 + 10,
-            height: Math.random() * 30 + 10,
-            rigid: true,
-          })
-          gameObjects.push(rectangle)
-        },
+
         "move-left": () => {
           if (gameObjectSelected) {
             updateGameObjectPosition(gameObjectSelected, { x: gameObjectSelected.centerX - 10 })

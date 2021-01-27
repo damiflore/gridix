@@ -1,5 +1,7 @@
 export const RigidBody = {
   rigid: true,
+  sleeping: false,
+  sleepingFrameCount: 0,
   // hitBox: null,
 
   centerX: 0,

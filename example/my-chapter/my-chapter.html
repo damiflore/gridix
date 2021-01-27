@@ -40,16 +40,11 @@
       <details>
         <summary>Selected object</summary>
         <ul>
-          <li>Id: <span id="game-object-selected-id"></span></li>
           <li>
-            Selected object:
-            <button name="select-prev">Prev</button>
-            <button name="select-next">Next</button>
-          </li>
-          <li>
-            Spawn:
-            <button name="spawn-circle">random circle</button>
-            <button name="spawn-rectangle">random rectangle</button>
+            Sleeping:
+            <span id="game-object-selected-sleeping"></span>
+            <button name="wakeup">Wakeup</button>
+            <button name="sleep">Sleep</button>
           </li>
           <li>
             CenterX:
@@ -106,11 +101,11 @@
 
       <details>
         <summary>Performances</summary>
+        <p>Frame per second: <span id="frame-per-second"></span></p>
         <p>
-          Frame per second: <span id="frame-per-second"></span>
-        </p>
-        <p>
-          Memory heap size: <span id="js-heap-size-used"></span>/<span id="js-heap-size-limit"></span>
+          Memory heap size: <span id="js-heap-size-used"></span>/<span
+            id="js-heap-size-limit"
+          ></span>
         </p>
       </details>
     </div>

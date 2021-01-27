@@ -35,6 +35,12 @@ const iterateOnCollision = ({
   collisionCallback,
 }) => {
   forEachPairs(gameObjects, (a, b) => {
+    if (a.sleeping) {
+      return
+    }
+    if (b.sleeping) {
+      return
+    }
     if (!a.rigid || !b.rigid) {
       return
     }
