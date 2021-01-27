@@ -55,7 +55,7 @@ const gameEngine = createGameEngine({
     })
   },
 
-  updateDraw: ({ ellapsedSeconds }) => {
+  updateDraw: ({ framePerSecondEstimation, memoryUsed, memoryLimit }) => {
     context.clearRect(0, 0, width, height)
     context.strokeStyle = "blue"
     gameObjects.forEach((gameObject) => {
@@ -70,7 +70,9 @@ const gameEngine = createGameEngine({
       gameObjectSelectedIndex === -1 ? null : gameObjects[gameObjectSelectedIndex]
     updateDevtool({
       textContents: {
-        "frame-per-second": Math.round(1 / ellapsedSeconds),
+        "frame-per-second": framePerSecondEstimation,
+        "js-heap-size-used": memoryUsed,
+        "js-heap-size-limit": memoryLimit,
         "game-objects-length": gameObjects.length,
         "game-object-selected-id": gameObjectSelectedIndex,
         "game-object-selected-center-x": gameObjectSelected

@@ -44,6 +44,9 @@ export const createGameEngine = ({
     } else {
       updateCount = updateIdealCount
     }
+    gameEngine.framePerSecondEstimation = Math.round(1000 / ellapsedMs)
+    gameEngine.memoryUsed = Math.round(window.performance.memory.usedJSHeapSize / 1048576)
+    gameEngine.memoryLimit = window.performance.memory.jsHeapSizeLimit / 1048576
     gameEngine.ellapsedSeconds = secondsPerFrame
     while (updateCount--) {
       updateState(gameEngine)
