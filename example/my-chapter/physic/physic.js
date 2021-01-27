@@ -10,6 +10,13 @@ export const updatePhysicForArcadeGame = ({
   collisionPositionResolution = true,
   collisionVelocityImpact = true,
 
+  // pour bounce threshold
+  // this is the right keywords for the bounce issue: "rigid body bounce ground"
+  // https://forum.unity.com/threads/bouncy-character-when-landed-on-ground.408821/
+  // c'est surement une solution aussi: bounceThreshold
+  // https://github.com/MassiveHeights/Black/blob/e4967f19cbdfe42b3612981c810ac499ad34b154/src/physics/arcade/pairs/Pair.js#L51
+
+  // pour sleeping qui se comporte un peu mieux
   // if an object is resting on the floor and the object
   // does not move beyond a minimal distance in about two seconds,
   // then the physics calculations are disabled
@@ -24,8 +31,6 @@ export const updatePhysicForArcadeGame = ({
   // on le met a jour
   // dans handleSleep on regarde tout les objet n'ayant pas bougé
   // et on compare avec ellapsedSeconds, si cela dépasse X alors on met l'objet en sleeping
-
-  // IL FAUT DESACTIVER LA DETECTION DE COLLISION ENTRE SLEEPING ET STATIC!!!
   // https://gamedev.stackexchange.com/questions/114925/in-a-2d-physics-engine-how-do-i-avoid-useless-collision-resolutions-when-object
 
   // when sleep is enabled, if object velocity x, y, and angle is too small

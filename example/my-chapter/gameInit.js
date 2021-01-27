@@ -63,6 +63,7 @@ export const gameInit = ({ gameObjects, width, height, worldBounds = true }) => 
         mass: Math.random() * 30,
         friction: Math.random(),
         restitution: Math.random(),
+        // restitution: Math.max(Math.random() - 0.5, 0),
         velocityX: Math.random() * 60 - 30,
         velocityY: Math.random() * 60 - 30,
         rigid: true,
@@ -85,11 +86,12 @@ export const gameInit = ({ gameObjects, width, height, worldBounds = true }) => 
 }
 
 const addWorldBounds = ({ gameObjects, width, height }) => {
-  const worldBoundarySize = 3
+  const worldBoundarySize = 30
   const worldBoundaryProps = {
     mass: Infinity,
     // fillStyle: "green",
     rigid: true,
+    // restitution: 0,
   }
   const left = createRectangle({
     name: "world-boundary-left",
