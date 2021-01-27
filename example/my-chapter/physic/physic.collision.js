@@ -4,8 +4,8 @@ import {
   normalizeVector,
   getVectorialProduct,
 } from "../geometry/vector.js"
-import { testGameObjectBoundingBox } from "../collision/boundingBox.js"
-import { getGameObjectCollisionInfo, getOppositeCollisionInfo } from "../collision/collisionInfo.js"
+
+import { getCollisionInfo } from "../collision/collisionInfo.js"
 import {
   moveAllowedFromMass,
   updateGameObjectVelocity,
@@ -15,33 +15,21 @@ import {
 export const handleCollision = ({ gameObjects, drawCollision, context }) => {
   let collisionIterations = 1
   while (collisionIterations--) {
-    iterateOnCollision({ gameObjects, drawCollision, context })
+    iterateOnCollision({
+      gameObjects,
+      drawCollision,
+      context,
+    })
   }
 }
 
 const iterateOnCollision = ({ gameObjects, drawCollision, context }) => {
-  const collidingPairs = detectCollidingPairs(gameObjects)
-  collidingPairs.forEach((collidingPair) => {
-    const [a, b] = collidingPair
-    let collisionInfo = getGameObjectCollisionInfo(a, b)
+  forEachPairs(gameObjects, (a, b) => {
+    const collisionInfo = getCollisionInfo(a, b)
     if (!collisionInfo) {
       return
     }
 
-    const collisionNormal = {
-      x: collisionInfo.normalX,
-      y: collisionInfo.normalY,
-    }
-    const centerDiff = {
-      x: b.centerX - a.centerX,
-      y: b.centerY - a.centerY,
-    }
-    if (getScalarProduct(collisionNormal, centerDiff) < 0) {
-      collisionInfo = getOppositeCollisionInfo(collisionInfo)
-    }
-
-    a.collisionInfo = collisionInfo
-    b.collisionInfo = collisionInfo
     if (drawCollision) {
       drawCollisionInfo(collisionInfo, context)
     }
@@ -49,16 +37,7 @@ const iterateOnCollision = ({ gameObjects, drawCollision, context }) => {
   })
 }
 
-const detectCollidingPairs = (blocs) => {
-  return findPairs(blocs, (blocA, blocB) => {
-    blocA.collisionInfo = null
-    return testGameObjectBoundingBox(blocA, blocB)
-  })
-}
-
-const findPairs = (array, pairPredicate) => {
-  const pairs = []
-
+const forEachPairs = (array, callback) => {
   let i = 0
   while (i < array.length) {
     const value = array[i]
@@ -67,13 +46,9 @@ const findPairs = (array, pairPredicate) => {
     while (j < array.length) {
       const otherValue = array[j]
       j++
-      if (pairPredicate(value, otherValue)) {
-        pairs.push([value, otherValue])
-      }
+      callback(value, otherValue)
     }
   }
-
-  return pairs
 }
 
 const inertiaFromGameObject = (gameObject) => {

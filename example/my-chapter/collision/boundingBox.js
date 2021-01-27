@@ -2,7 +2,7 @@
 import { getVectorLength } from "../geometry/vector.js"
 import { rectangleToCorners } from "../shape/rectangle.js"
 
-export const testGameObjectBoundingBox = (a, b) => {
+export const testBoundingBoxContact = (a, b) => {
   const aBoundingBox = getGameObjectBoundingBox(a)
   if (!aBoundingBox) {
     return false
@@ -13,7 +13,7 @@ export const testGameObjectBoundingBox = (a, b) => {
     return false
   }
 
-  return testBoundingBoxCollision(aBoundingBox, bBoundingBox)
+  return testShapeContact(aBoundingBox, bBoundingBox)
 }
 
 const getGameObjectBoundingBox = (gameObject) => {
@@ -54,7 +54,7 @@ const getGameObjectBoundingBox = (gameObject) => {
   return null
 }
 
-const testBoundingBoxCollision = (a, b) => {
+const testShapeContact = (a, b) => {
   if (a.shape === "circle" && b.shape === "circle") {
     return circleHitCircle(a, b)
   }
