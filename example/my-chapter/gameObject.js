@@ -17,9 +17,9 @@ export const GameObject = {
   velocityY: 0,
   velocityAngle: 0,
 
-  accelerationX: 0,
-  accelerationY: 0,
-  accelerationAngle: 0,
+  forceX: 0,
+  forceY: 0,
+  forceAngle: 0,
 
   boundingBox: "auto",
   // ideally a game object would have a hitBox that could be different

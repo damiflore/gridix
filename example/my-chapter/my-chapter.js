@@ -1,22 +1,15 @@
 /**
 TODO
 
-- extraire le travail dans un repo
+- renommer collisionInfo qui sont retournée
 
-- rename accelerationX, Y into force X,Y? at least for the gravity
-et remet le a zero a chaque tour, il faudra que la force soit réappliqué pour etre considérée
-comme une acceleration
-une force sera ainsi considérée pnctuelle par défaut
+- documentation de ce que j'ai compris pour expliquer comme fonctionne certaines propriétés
 
 - see if rectangle and circle (at least some part) could go into geometry/
 the idea is that if we want to put a circle or a rectangle in the game it's a less generic name we'll use
 ça serais cool qu'en gros un objet de jeu puisse etre associé a une forme géométrique (genre dans hitbox)
 et comme ça l'objet de jeu lui meme ne connais pas sa forme ? ou en tous cas on peut réutiliser le concept
 générique de forme sans avoir a le mixer au game object ?
-
-- renommer collisionInfo qui sont retournée
-
-- documentation de ce que j'ai compris pour expliquer comme fonctionne certaines propriétés
 
 - plein de unit tests ou on teste le moteur physique (voir comment faire)
 ou au moin de petit fichier html pour tester des cas concrets

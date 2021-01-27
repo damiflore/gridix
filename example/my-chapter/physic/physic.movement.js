@@ -2,17 +2,26 @@ import { PHYSIC_CONSTANTS } from "./physic.constants.js"
 
 export const handleMovement = ({ gameObjects, ellapsedSeconds }) => {
   gameObjects.forEach((gameObject) => {
-    updateGameObjectAcceleration(gameObject, {
-      x: PHYSIC_CONSTANTS.gravityX,
-      y: PHYSIC_CONSTANTS.gravityY,
+    updateGameObjectForce(gameObject, {
+      x: gameObject.forceX + PHYSIC_CONSTANTS.forceXAmbient,
+      y: gameObject.forceY + PHYSIC_CONSTANTS.forceYAmbient,
+      angle: gameObject.forceAngle + PHYSIC_CONSTANTS.forceAngleAmbient,
     })
 
-    // vitesse += acceleration * time
+    // vitesse += force * time
     updateGameObjectVelocity(gameObject, {
-      x: gameObject.velocityX + gameObject.accelerationX * ellapsedSeconds,
-      y: gameObject.velocityY + gameObject.accelerationY * ellapsedSeconds,
-      angle: gameObject.velocityAngle + gameObject.accelerationAngle * ellapsedSeconds,
+      x: gameObject.velocityX + gameObject.forceX * ellapsedSeconds,
+      y: gameObject.velocityY + gameObject.forceY * ellapsedSeconds,
+      angle: gameObject.velocityAngle + gameObject.forceAngle * ellapsedSeconds,
     })
+
+    // forces are punctual by default
+    // if there is a constant force dragging object to the bottom (gravity)
+    // it must be reapplied every update
+    // this can be implement doing PHYSIC_CONSTANTS.forceYAmbient = 20
+    gameObject.forceX = 0
+    gameObject.forceY = 0
+    gameObject.forceAngle = 0
 
     // position += vitesse * time
     updateGameObjectPosition(gameObject, {
@@ -46,18 +55,14 @@ export const updateGameObjectVelocity = (
   }
 }
 
-export const updateGameObjectAcceleration = (
+export const updateGameObjectForce = (
   gameObject,
-  {
-    x = gameObject.accelerationX,
-    y = gameObject.accelerationY,
-    angle = gameObject.accelerationAngle,
-  },
+  { x = gameObject.forceX, y = gameObject.forceY, angle = gameObject.forceAngle },
 ) => {
   if (moveAllowedFromMass(gameObject.mass)) {
-    gameObject.accelerationX = x
-    gameObject.accelerationY = y
-    gameObject.accelerationAngle = angle
+    gameObject.forceX = x
+    gameObject.forceY = y
+    gameObject.forceAngle = angle
   }
 }
 
