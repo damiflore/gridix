@@ -6,11 +6,20 @@ export const GameObject = {
   // positive angle -> rotate counterclockwise
   angle: 0,
 
+  // Object with negavite, 0, or infinite mass cannot move.
+  // colliding such object has no impact on the object itself
+  // big mass are less impacted by collision with object with smaller mass
   mass: 1,
+
+  // friction is involved into collision resolution
+  // this represents a part of the energy lost in the collision
   friction: 0.8,
+
+  // ratio of energy sent back to something colliding into this game object
+  // 0: the object absorbs all the energy of the collision
+  // 1: object sends back all the energy of the collision
   restitution: 0.2,
-  // 0 means object has no inertia
-  // 1 means object has full inertia (mass * area is considered to slow down a movement)
+
   inertiaCoef: 0.08,
 
   velocityX: 0,
@@ -21,11 +30,8 @@ export const GameObject = {
   forceY: 0,
   forceAngle: 0,
 
+  // hitBox: null,
   boundingBox: "auto",
-  // ideally a game object would have a hitBox that could be different
-  // from the object dimension. In practice, I don't need that for now
-  // If we want to do that, the hitBox coordinates should be updated every time
-  // the object is moved, following also eventual angle (rotation)
-  collisionInfo: null,
+
   updateState: () => {},
 }

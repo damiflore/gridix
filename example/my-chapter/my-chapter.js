@@ -1,8 +1,6 @@
 /**
 TODO
 
-- documentation de ce que j'ai compris pour expliquer comme fonctionne certaines propriétés
-
 - see if rectangle and circle (at least some part) could go into geometry/
 the idea is that if we want to put a circle or a rectangle in the game it's a less generic name we'll use
 ça serais cool qu'en gros un objet de jeu puisse etre associé a une forme géométrique (genre dans hitbox)
