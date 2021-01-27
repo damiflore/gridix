@@ -20,6 +20,7 @@ import { createRectangle, createCircle } from "./game/shape.js"
 import { gameInit } from "./gameInit.js"
 import { updateDevtool } from "./devtool.js"
 import { createGameEngine } from "./engine/engine.js"
+import { drawCollisionInfo } from "./draw/draw.js"
 
 const width = 800
 const height = 450
@@ -38,6 +39,7 @@ gameInit({
   gameObjects,
 })
 
+const collisionInfos = []
 const gameEngine = createGameEngine({
   framePerSecond: 60,
   updateState: ({ ellapsedSeconds }) => {
@@ -45,10 +47,13 @@ const gameEngine = createGameEngine({
       gameObject.updateState(gameObject)
     })
 
+    collisionInfos.length = 0
     updatePhysicForArcadeGame({
       gameObjects,
       ellapsedSeconds,
-      collisionCallback: () => {},
+      collisionCallback: ({ collisionInfo }) => {
+        collisionInfos.push(collisionInfo)
+      },
     })
   },
 
@@ -57,6 +62,10 @@ const gameEngine = createGameEngine({
     context.strokeStyle = "blue"
     gameObjects.forEach((gameObject) => {
       gameObject.updateDraw(gameObject, context)
+    })
+
+    collisionInfos.forEach((collisionInfo) => {
+      drawCollisionInfo(collisionInfo, context)
     })
 
     const gameObjectSelected =
