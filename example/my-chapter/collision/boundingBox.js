@@ -17,38 +17,32 @@ export const testBoundingBoxContact = (a, b) => {
 }
 
 const getGameObjectBoundingBox = (gameObject) => {
-  const { boundingBox } = gameObject
+  const { shape } = gameObject
+  if (shape === "circle") {
+    return circleToBoundingCircle(gameObject)
+  }
 
-  if (boundingBox === "auto") {
-    const { shape } = gameObject
-    if (shape === "circle") {
-      return circleToBoundingCircle(gameObject)
+  if (shape === "rectangle") {
+    const { angle } = gameObject
+    if (angle === 0) {
+      return rectangleToBoundingRectangle(gameObject)
     }
 
-    if (shape === "rectangle") {
-      const { angle } = gameObject
-      if (angle === 0) {
-        return rectangleToBoundingRectangle(gameObject)
-      }
-      const { width, height } = gameObject
-
-      const rectangleAspectRatio = width > height ? width / height : height / width
-      // when rectangle is almost squarish, the circle bounding box is a good approximation
-      // and circle bounding box is cheaper to compute
-      if (rectangleAspectRatio < 3) {
-        return rectangleToBoundingCircle(gameObject)
-      }
-
-      // for very small rectangle it's fine too to use a circle
-      const rectangleArea = width * height
-      if (rectangleArea < 6) {
-        return rectangleToBoundingCircle(gameObject)
-      }
-
-      return rotatedRectangleToBoundingRectangle(gameObject)
+    const { width, height } = gameObject
+    const rectangleAspectRatio = width > height ? width / height : height / width
+    // when rectangle is almost squarish, the circle bounding box is a good approximation
+    // and circle bounding box is cheaper to compute
+    if (rectangleAspectRatio < 3) {
+      return rectangleToBoundingCircle(gameObject)
     }
 
-    return null
+    // for very small rectangle it's fine too to use a circle
+    const rectangleArea = width * height
+    if (rectangleArea < 6) {
+      return rectangleToBoundingCircle(gameObject)
+    }
+
+    return rotatedRectangleToBoundingRectangle(gameObject)
   }
 
   return null

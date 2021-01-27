@@ -35,10 +35,15 @@ const iterateOnCollision = ({
   collisionCallback,
 }) => {
   forEachPairs(gameObjects, (a, b) => {
+    if (!a.rigid || !b.rigid) {
+      return
+    }
+
     const collisionInfo = getCollisionInfo(a, b)
     if (!collisionInfo) {
       return
     }
+
     collisionCallback({
       a,
       b,

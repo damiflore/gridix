@@ -1,7 +1,7 @@
 /**
 TODO
 
-- browser tab lose focus comme dans black engine
+- frictionAmbient
 
 - plein de unit tests ou on teste le moteur physique (voir comment faire)
 ou au moin de petit fichier html pour tester des cas concrets

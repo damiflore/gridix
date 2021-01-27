@@ -2,6 +2,10 @@ import { PHYSIC_CONSTANTS } from "./physic.constants.js"
 
 export const handleMovement = ({ gameObjects, ellapsedSeconds }) => {
   gameObjects.forEach((gameObject) => {
+    if (!gameObject.rigid) {
+      return
+    }
+
     updateGameObjectForce(gameObject, {
       x: gameObject.forceX + PHYSIC_CONSTANTS.forceXAmbient,
       y: gameObject.forceY + PHYSIC_CONSTANTS.forceYAmbient,

@@ -1,6 +1,6 @@
 export const RigidBody = {
+  rigid: true,
   // hitBox: null,
-  boundingBox: "auto",
 
   centerX: 0,
   centerY: 0,
