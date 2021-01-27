@@ -54,6 +54,8 @@ const gameEngine = createGameEngine({
       collisionCallback: ({ collisionInfo }) => {
         collisionInfos.push(collisionInfo)
       },
+      collisionPositionResolution: false,
+      collisionVelocityImpact: true,
     })
   },
 

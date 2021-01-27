@@ -11,24 +11,46 @@ import {
   updateGameObjectPosition,
 } from "./physic.movement.js"
 
-export const handleCollision = ({ gameObjects, collisionCallback = () => {} }) => {
+export const handleCollision = ({
+  gameObjects,
+  collisionCallback,
+  collisionPositionResolution,
+  collisionVelocityImpact,
+}) => {
   let collisionIterations = 1
   while (collisionIterations--) {
     iterateOnCollision({
       gameObjects,
+      collisionPositionResolution,
+      collisionVelocityImpact,
       collisionCallback,
     })
   }
 }
 
-const iterateOnCollision = ({ gameObjects, collisionCallback }) => {
+const iterateOnCollision = ({
+  gameObjects,
+  collisionPositionResolution,
+  collisionVelocityImpact,
+  collisionCallback,
+}) => {
   forEachPairs(gameObjects, (a, b) => {
     const collisionInfo = getCollisionInfo(a, b)
     if (!collisionInfo) {
       return
     }
-    collisionCallback({ a, b, collisionInfo })
-    resolveCollision(a, b, collisionInfo)
+    collisionCallback({
+      a,
+      b,
+      collisionInfo,
+    })
+    resolveCollision({
+      a,
+      b,
+      collisionInfo,
+      collisionPositionResolution,
+      collisionVelocityImpact,
+    })
   })
 }
 
@@ -46,39 +68,13 @@ const forEachPairs = (array, callback) => {
   }
 }
 
-const inertiaFromGameObject = (gameObject) => {
-  if (gameObject.shape === "circle") {
-    return circleToInertia(gameObject)
-  }
-
-  if (gameObject.shape === "rectangle") {
-    return rectangleToInertia(gameObject)
-  }
-
-  return 0
-}
-
-const circleToInertia = ({ mass, radius, inertiaCoef }) => {
-  if (!moveAllowedFromMass(mass)) {
-    return 0
-  }
-
-  const area = radius * radius
-  const massTotal = mass * area
-  return massTotal * inertiaCoef
-}
-
-const rectangleToInertia = ({ mass, width, height, inertiaCoef }) => {
-  if (!moveAllowedFromMass(mass)) {
-    return 0
-  }
-
-  const area = width * width + height * height
-  const massTotal = mass * area
-  return 1 / (massTotal * inertiaCoef)
-}
-
-const resolveCollision = (a, b, collisionInfo) => {
+const resolveCollision = ({
+  a,
+  b,
+  collisionInfo,
+  collisionPositionResolution,
+  collisionVelocityImpact,
+}) => {
   const aMass = a.mass
   const bMass = b.mass
   const aMovedAllowedByMass = moveAllowedFromMass(aMass)
@@ -90,19 +86,22 @@ const resolveCollision = (a, b, collisionInfo) => {
   const aMassInverted = aMovedAllowedByMass ? 1 / aMass : 0
   const bMassInverted = bMoveAllowedByMass ? 1 / bMass : 0
   const massInvertedSum = aMassInverted + bMassInverted
-
-  adjustPositionToSolveCollision(a, b, {
-    aMassInverted,
-    bMassInverted,
-    massInvertedSum,
-    collisionInfo,
-  })
-  applyCollisionImpactOnVelocity(a, b, {
-    aMassInverted,
-    bMassInverted,
-    massInvertedSum,
-    collisionInfo,
-  })
+  if (collisionPositionResolution) {
+    adjustPositionToSolveCollision(a, b, {
+      aMassInverted,
+      bMassInverted,
+      massInvertedSum,
+      collisionInfo,
+    })
+  }
+  if (collisionVelocityImpact) {
+    applyCollisionImpactOnVelocity(a, b, {
+      aMassInverted,
+      bMassInverted,
+      massInvertedSum,
+      collisionInfo,
+    })
+  }
 }
 
 const adjustPositionToSolveCollision = (
@@ -259,4 +258,36 @@ const applyCollisionImpactOnVelocity = (
     y: bVelocityYAfterTangentImpulse,
     angle: bVelocityAngleAfterTangentImpulse,
   })
+}
+
+const inertiaFromGameObject = (gameObject) => {
+  if (gameObject.shape === "circle") {
+    return circleToInertia(gameObject)
+  }
+
+  if (gameObject.shape === "rectangle") {
+    return rectangleToInertia(gameObject)
+  }
+
+  return 0
+}
+
+const circleToInertia = ({ mass, radius, inertiaCoef }) => {
+  if (!moveAllowedFromMass(mass)) {
+    return 0
+  }
+
+  const area = radius * radius
+  const massTotal = mass * area
+  return massTotal * inertiaCoef
+}
+
+const rectangleToInertia = ({ mass, width, height, inertiaCoef }) => {
+  if (!moveAllowedFromMass(mass)) {
+    return 0
+  }
+
+  const area = width * width + height * height
+  const massTotal = mass * area
+  return 1 / (massTotal * inertiaCoef)
 }
