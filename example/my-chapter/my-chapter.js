@@ -18,6 +18,7 @@ ou au moin de petit fichier html pour tester des cas concrets
 
 import { updateGameObjectPosition, updateGameObjectVelocity } from "./physic/physic.movement.js"
 import { updatePhysicForArcadeGame } from "./physic/physic.js"
+import { PHYSIC_CONSTANTS } from "./physic/physic.constants.js"
 import { createRectangle, drawRectangle } from "./shape/rectangle.js"
 import { createCircle, drawCircle } from "./shape/circle.js"
 import { gameInit } from "./gameInit.js"
@@ -67,7 +68,6 @@ const framePerSecond = 60
 const secondsPerFrame = 1 / framePerSecond
 const msPerFrame = secondsPerFrame * 1000
 const maxUpdatesPerFrame = 30
-let gravityY = 20
 let frame
 let running = false
 
@@ -107,7 +107,6 @@ const runGameLoop = () => {
   while (updateCount--) {
     updateState({
       ellapsedSeconds: secondsPerFrame,
-      gravityY,
     })
   }
 
@@ -242,10 +241,10 @@ const runGameLoop = () => {
         }
       },
       "gravity-enable": () => {
-        gravityY = 20
+        PHYSIC_CONSTANTS.forceYAmbient = 20
       },
       "gravity-disable": () => {
-        gravityY = 0
+        PHYSIC_CONSTANTS.forceYAmbient = 0
       },
       "excite": () => {
         gameObjects.forEach((gameObject) => {
