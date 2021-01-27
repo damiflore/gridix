@@ -4,15 +4,18 @@ import { limitNumberPrecision } from "../math/limitNumberPrecision.js"
 
 const limitVelocityPrecision = limitNumberPrecision(4)
 
-export const handleMovement = ({ gameObjects, ellapsedSeconds, moveCallback }) => {
+export const handleMovement = ({ gameObjects, secondsPerFrame, moveCallback }) => {
   gameObjects.forEach((gameObject) => {
     if (!gameObject.rigid) {
       return
     }
 
     const moveAllowedByMass = moveAllowedFromMass(gameObject.mass)
-
     if (!moveAllowedByMass) {
+      return
+    }
+
+    if (gameObject.sleeping) {
       return
     }
 
@@ -32,13 +35,13 @@ export const handleMovement = ({ gameObjects, ellapsedSeconds, moveCallback }) =
     const velocityAngle = gameObject.velocityAngle
     const frictionAmbientCoef = 1 - gameObject.frictionAmbient
     const velocityXAfterApplicationOfForces = limitVelocityPrecision(
-      (velocityX + forceX * ellapsedSeconds) * frictionAmbientCoef,
+      (velocityX + forceX * secondsPerFrame) * frictionAmbientCoef,
     )
     const velocityYAfterApplicationOfForces = limitVelocityPrecision(
-      (velocityY + forceY * ellapsedSeconds) * frictionAmbientCoef,
+      (velocityY + forceY * secondsPerFrame) * frictionAmbientCoef,
     )
     const velocityAngleAfterApplicationOfForces = limitVelocityPrecision(
-      (velocityAngle + forceAngle * ellapsedSeconds) * frictionAmbientCoef,
+      (velocityAngle + forceAngle * secondsPerFrame) * frictionAmbientCoef,
     )
 
     // update velocity
@@ -48,13 +51,13 @@ export const handleMovement = ({ gameObjects, ellapsedSeconds, moveCallback }) =
 
     const centerX = gameObject.centerX
     const centerXAfterApplicationOfVelocity =
-      centerX + velocityXAfterApplicationOfForces * ellapsedSeconds
+      centerX + velocityXAfterApplicationOfForces * secondsPerFrame
     const centerY = gameObject.centerY
     const centerYAfterApplicationOfVelocity =
-      centerY + velocityYAfterApplicationOfForces * ellapsedSeconds
+      centerY + velocityYAfterApplicationOfForces * secondsPerFrame
     const angle = gameObject.angle
     const angleAfterApplicationOfVelocity =
-      angle + velocityAngleAfterApplicationOfForces * ellapsedSeconds
+      angle + velocityAngleAfterApplicationOfForces * secondsPerFrame
 
     if (
       centerX !== centerXAfterApplicationOfVelocity ||
