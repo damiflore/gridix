@@ -35,13 +35,13 @@ const iterateOnCollision = ({
   collisionCallback,
 }) => {
   forEachPairs(gameObjects, (a, b) => {
-    if (a.sleeping) {
-      return
-    }
-    if (b.sleeping) {
-      return
-    }
     if (!a.rigid || !b.rigid) {
+      return
+    }
+
+    const aIsStatic = a.sleeping || !moveAllowedFromMass(a.mass)
+    const bIsStatic = b.sleeping || !moveAllowedFromMass(b.mass)
+    if (aIsStatic && bIsStatic) {
       return
     }
 
