@@ -66,12 +66,10 @@ const stopGameLoop = () => {
 }
 
 const runGameLoop = () => {
-  running = true
-  frame = requestAnimationFrame(() => {
-    if (running) {
-      runGameLoop()
-    }
-  })
+  if (!running) {
+    return
+  }
+  frame = requestAnimationFrame(runGameLoop)
   const currentMs = Date.now()
   // when it has never been called, previousMs is undefined
   // in that case run it once
@@ -247,9 +245,10 @@ const runGameLoop = () => {
     },
   })
 }
-runGameLoop()
 window.addEventListener("error", () => {
   stopGameLoop()
 })
+running = true
+runGameLoop()
 
 window.gameObjects = gameObjects
