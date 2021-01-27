@@ -17,6 +17,11 @@ export const RigidBody = {
   // this represents a part of the energy lost in the collision
   friction: 0.8,
 
+  // reistance of the environment to the object moving
+  // just like air, water oppose slows down/speed up a movement
+  // (depending the direction of the wind etc)
+  frictionAmbient: 0.02,
+
   // ratio of energy sent back to something colliding into this game object
   // 0: the object absorbs all the energy of the collision
   // 1: object sends back all the energy of the collision

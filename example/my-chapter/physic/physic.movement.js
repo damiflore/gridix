@@ -13,10 +13,12 @@ export const handleMovement = ({ gameObjects, ellapsedSeconds }) => {
     })
 
     // vitesse += force * time
+    const frictionAmbientCoef = 1 - gameObject.frictionAmbient
     updateGameObjectVelocity(gameObject, {
-      x: gameObject.velocityX + gameObject.forceX * ellapsedSeconds,
-      y: gameObject.velocityY + gameObject.forceY * ellapsedSeconds,
-      angle: gameObject.velocityAngle + gameObject.forceAngle * ellapsedSeconds,
+      x: gameObject.velocityX + gameObject.forceX * ellapsedSeconds * frictionAmbientCoef,
+      y: gameObject.velocityY + gameObject.forceY * ellapsedSeconds * frictionAmbientCoef,
+      angle:
+        gameObject.velocityAngle + gameObject.forceAngle * ellapsedSeconds * frictionAmbientCoef,
     })
 
     // forces are punctual by default
