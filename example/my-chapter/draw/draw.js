@@ -1,22 +1,40 @@
-import { rectangleToCorners } from "../geometry/rectangle.js"
+import { rectangleToTopLeftCorner } from "../geometry/rectangle.js"
 import { circleToStartPoint } from "../geometry/circle.js"
 
-export const drawRectangle = ({ centerX, centerY, width, height, angle }, context) => {
-  const { topLeftCorner } = rectangleToCorners({
+export const drawRectangle = (
+  { centerX, centerY, width, height, angle, strokeStyle, fillStyle },
+  context,
+) => {
+  const topLeftCorner = rectangleToTopLeftCorner({
     centerX,
     centerY,
     width,
     height,
     angle,
   })
+
   context.save()
+  context.beginPath()
   context.translate(topLeftCorner.x, topLeftCorner.y)
   context.rotate(angle)
-  context.strokeRect(0, 0, width, height)
+  context.rect(0, 0, width, height)
+  context.closePath()
+
+  if (strokeStyle) {
+    context.strokeStyle = strokeStyle
+    context.stroke()
+  }
+  if (fillStyle) {
+    context.fillStyle = fillStyle
+    context.fill()
+  }
   context.restore()
 }
 
-export const drawCircle = ({ centerX, centerY, radius, angle }, context) => {
+export const drawCircle = (
+  { centerX, centerY, radius, angle, strokeStyle, fillStyle },
+  context,
+) => {
   const startPoint = circleToStartPoint({ centerX, centerY, radius, angle })
 
   context.beginPath()
@@ -26,7 +44,17 @@ export const drawCircle = ({ centerX, centerY, radius, angle }, context) => {
   context.moveTo(startPoint.x, startPoint.y)
   context.lineTo(centerX, centerY)
   context.closePath()
-  context.stroke()
+
+  context.save()
+  if (strokeStyle) {
+    context.strokeStyle = strokeStyle
+    context.stroke()
+  }
+  if (fillStyle) {
+    context.fillStyle = fillStyle
+    context.fill()
+  }
+  context.restore()
 }
 
 export const drawCollisionInfo = (
