@@ -49,9 +49,6 @@ export const updateGameObjectVelocity = (
     gameObject.velocityX = x
     gameObject.velocityY = y
     gameObject.velocityAngle = angle
-    // gameObject.velocityX = x < PHYSIC_CONSTANTS.pointlessLinearVelocity ? 0 : x
-    // gameObject.velocityY = y < PHYSIC_CONSTANTS.pointlessLinearVelocity ? 0 : y
-    // gameObject.velocityAngle = angle < PHYSIC_CONSTANTS.pointlessAngularVelocity ? 0 : angle
   }
 }
 

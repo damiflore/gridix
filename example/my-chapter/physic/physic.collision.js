@@ -4,7 +4,6 @@ import {
   normalizeVector,
   getVectorialProduct,
 } from "../geometry/vector.js"
-
 import { getCollisionInfo } from "../collision/collisionInfo.js"
 import {
   moveAllowedFromMass,
