@@ -34,11 +34,17 @@ export const getVectorialProduct = (vectorA, vectorB) => {
 }
 
 export const rotateVector = (vector, { centerX, centerY, angle }) => {
+  if (angle === 0) {
+    return vector
+  }
+
   // rotate in counterclockwise
   const xDiff = vector.x - centerX
   const yDiff = vector.y - centerY
-  const x = xDiff * Math.cos(angle) - yDiff * Math.sin(angle)
-  const y = xDiff * Math.sin(angle) + yDiff * Math.cos(angle)
+  const angleSin = Math.sin(angle)
+  const angleCos = Math.cos(angle)
+  const x = xDiff * angleCos - yDiff * angleSin
+  const y = xDiff * angleSin + yDiff * angleCos
 
   return {
     x: x + centerX,
