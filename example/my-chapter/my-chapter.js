@@ -1,7 +1,7 @@
 /**
 TODO
 
-- frictionAmbient
+- la carte avec des carrés et le héro
 
 - plein de unit tests ou on teste le moteur physique (voir comment faire)
 ou au moin de petit fichier html pour tester des cas concrets
@@ -13,6 +13,7 @@ import { updateGameObjectPosition, updateGameObjectVelocity } from "./physic/phy
 import { updatePhysicForArcadeGame } from "./physic/physic.js"
 import { PHYSIC_CONSTANTS } from "./physic/physic.constants.js"
 import { createRectangle, createCircle } from "./game/shape.js"
+import { gameObjectFromPoint } from "./game/game.js"
 import { gameInit } from "./gameInit.js"
 import { updateDevtool } from "./devtool.js"
 import { createGameEngine } from "./engine/engine.js"
@@ -59,7 +60,10 @@ const gameEngine = createGameEngine({
   updateDraw: ({ framePerSecondEstimation, memoryUsed, memoryLimit }) => {
     context.clearRect(0, 0, width, height)
     context.strokeStyle = "blue"
-    gameObjects.forEach((gameObject) => {
+    gameObjects.forEach((gameObject, index) => {
+      gameObject.strokeStyle = "blue"
+      gameObject.fillStyle = gameObjectSelectedIndex === index ? "violet" : undefined
+
       gameObject.updateDraw(gameObject, context)
     })
 
@@ -226,6 +230,16 @@ const gameEngine = createGameEngine({
 PHYSIC_CONSTANTS.forceYAmbient = 200
 window.addEventListener("error", () => {
   gameEngine.stopGameLoop()
+})
+canvas.addEventListener("click", (clickEvent) => {
+  const clickPoint = {
+    x: clickEvent.offsetX,
+    y: clickEvent.offsetY,
+  }
+  const gameObjectUnderClick = gameObjectFromPoint(gameObjects, clickPoint)
+  if (gameObjectUnderClick) {
+    gameObjectSelectedIndex = gameObjects.indexOf(gameObjectUnderClick)
+  }
 })
 gameEngine.startGameLoop()
 

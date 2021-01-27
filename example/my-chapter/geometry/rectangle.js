@@ -1,11 +1,15 @@
 import { rotateVector, normalizeVector, substractVector } from "./vector.js"
 
+export const rectangleToTopLeftCorner = ({ centerX, centerY, width, height, angle }) => {
+  return rotateVector(
+    { x: centerX - width / 2, y: centerY - height / 2 },
+    { centerX, centerY, angle },
+  )
+}
+
 export const rectangleToCorners = ({ centerX, centerY, width, height, angle }) => {
   return {
-    topLeftCorner: rotateVector(
-      { x: centerX - width / 2, y: centerY - height / 2 },
-      { centerX, centerY, angle },
-    ),
+    topLeftCorner: rectangleToTopLeftCorner({ centerX, centerY, width, height, angle }),
     topRightCorner: rotateVector(
       { x: centerX + width / 2, y: centerY - height / 2 },
       { centerX, centerY, angle },
