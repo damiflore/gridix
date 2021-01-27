@@ -22,19 +22,19 @@ export const getCollisionInfoForCircleToCircle = (circleA, circleB) => {
   if (centerDistance === 0) {
     if (circleA.radius > circleB.radius) {
       return createCollisionInfo({
-        depth: radiusSum,
-        normalX: 0,
-        normalY: -1,
-        startX: circleB.centerX,
-        startY: circleB.centerY + circleB.radius,
+        collisionDepth: radiusSum,
+        collisionNormalX: 0,
+        collisionNormalY: -1,
+        collisionStartX: circleB.centerX,
+        collisionStartY: circleB.centerY + circleB.radius,
       })
     }
     return createCollisionInfo({
-      depth: radiusSum,
-      normalX: 0,
-      normalY: -1,
-      startX: circleA.centerX,
-      startY: circleA.centerY + circleA.radius,
+      collisionDepth: radiusSum,
+      collisionNormalX: 0,
+      collisionNormalY: -1,
+      collisionStartX: circleA.centerX,
+      collisionStartY: circleA.centerY + circleA.radius,
     })
   }
 
@@ -44,10 +44,10 @@ export const getCollisionInfoForCircleToCircle = (circleA, circleB) => {
   const centerDiffRadius = scaleVector(centerDiffInvertedAndNormalized, circleB.radius)
 
   return createCollisionInfo({
-    depth: radiusSum - centerDistance,
-    normalX: centerDiffNormalized.x,
-    normalY: centerDiffNormalized.y,
-    startX: circleB.centerX + centerDiffRadius.x,
-    startY: circleB.centerY + centerDiffRadius.y,
+    collisionDepth: radiusSum - centerDistance,
+    collisionNormalX: centerDiffNormalized.x,
+    collisionNormalY: centerDiffNormalized.y,
+    collisionStartX: circleB.centerX + centerDiffRadius.x,
+    collisionStartY: circleB.centerY + centerDiffRadius.y,
   })
 }

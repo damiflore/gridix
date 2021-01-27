@@ -49,11 +49,11 @@ export const getCollisionInfoForRectangleToCircle = (rectangle, circle) => {
     // the center of circle is inside of rectangle
     const radiusVector = scaleVector(nearestNormal, circleRadius)
     return createCollisionInfo({
-      depth: circleRadius - bestDistance,
-      normalX: nearestNormal.x,
-      normalY: nearestNormal.y,
-      startX: circleCenterX - radiusVector.x,
-      startY: circleCenterY - radiusVector.y,
+      collisionDepth: circleRadius - bestDistance,
+      collisionNormalX: nearestNormal.x,
+      collisionNormalY: nearestNormal.y,
+      collisionStartX: circleCenterX - radiusVector.x,
+      collisionStartY: circleCenterY - radiusVector.y,
     })
   }
 
@@ -81,11 +81,11 @@ export const getCollisionInfoForRectangleToCircle = (rectangle, circle) => {
     const circleAndNearestCornerDiffNormalized = normalizeVector(circleAndNearestCornerDiff)
     const radiusVector = scaleVector(circleAndNearestCornerDiffNormalized, -circleRadius)
     return createCollisionInfo({
-      depth: circleRadius - circleAndNearestCornerDistance,
-      normalX: circleAndNearestCornerDiffNormalized.x,
-      normalY: circleAndNearestCornerDiffNormalized.y,
-      startX: circleCenterX + radiusVector.x,
-      startY: circleCenterY + radiusVector.y,
+      collisionDepth: circleRadius - circleAndNearestCornerDistance,
+      collisionNormalX: circleAndNearestCornerDiffNormalized.x,
+      collisionNormalY: circleAndNearestCornerDiffNormalized.y,
+      collisionStartX: circleCenterX + radiusVector.x,
+      collisionStartY: circleCenterY + radiusVector.y,
     })
   }
 
@@ -106,11 +106,11 @@ export const getCollisionInfoForRectangleToCircle = (rectangle, circle) => {
     const circleAndNextCornerDiffNormalized = normalizeVector(circleAndNextCornerDiff)
     const radiusVector = scaleVector(circleAndNextCornerDiffNormalized, -circleRadius)
     return createCollisionInfo({
-      depth: circleRadius - circleAndNextCornerDistance,
-      normalX: circleAndNextCornerDiffNormalized.x,
-      normalY: circleAndNextCornerDiffNormalized.y,
-      startX: circleCenterX + radiusVector.x,
-      startY: circleCenterY + radiusVector.y,
+      collisionDepth: circleRadius - circleAndNextCornerDistance,
+      collisionNormalX: circleAndNextCornerDiffNormalized.x,
+      collisionNormalY: circleAndNextCornerDiffNormalized.y,
+      collisionStartX: circleCenterX + radiusVector.x,
+      collisionStartY: circleCenterY + radiusVector.y,
     })
   }
 
@@ -118,11 +118,11 @@ export const getCollisionInfoForRectangleToCircle = (rectangle, circle) => {
   if (bestDistance < circleRadius) {
     const radiusVector = scaleVector(nearestNormal, circleRadius)
     return createCollisionInfo({
-      depth: circleRadius - bestDistance,
-      normalX: nearestNormal.x,
-      normalY: nearestNormal.y,
-      startX: circleCenterX - radiusVector.x,
-      startY: circleCenterY - radiusVector.y,
+      collisionDepth: circleRadius - bestDistance,
+      collisionNormalX: nearestNormal.x,
+      collisionNormalY: nearestNormal.y,
+      collisionStartX: circleCenterX - radiusVector.x,
+      collisionStartY: circleCenterY - radiusVector.y,
     })
   }
 

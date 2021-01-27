@@ -110,6 +110,29 @@ const resolveCollision = (a, b, collisionInfo) => {
   })
 }
 
+const adjustPositionToSolveCollision = (
+  a,
+  b,
+  { aMassInverted, bMassInverted, massInvertedSum, collisionInfo },
+) => {
+  const { collisionDepth, collisionNormalX, collisionNormalY } = collisionInfo
+  const correctionRatio = 1
+  const correctionTotal = collisionDepth / massInvertedSum
+  const correction = correctionTotal * correctionRatio
+  const aPositionXCorrection = a.centerX + collisionNormalX * correction * aMassInverted * -1
+  const aPositionYCorrection = a.centerY + collisionNormalY * correction * aMassInverted * -1
+  updateGameObjectPosition(a, {
+    x: aPositionXCorrection,
+    y: aPositionYCorrection,
+  })
+  const bPositionXCorrection = b.centerX + collisionNormalX * correction * bMassInverted
+  const bPositionYCorrection = b.centerY + collisionNormalY * correction * bMassInverted
+  updateGameObjectPosition(b, {
+    x: bPositionXCorrection,
+    y: bPositionYCorrection,
+  })
+}
+
 const applyCollisionImpactOnVelocity = (
   a,
   b,
@@ -122,18 +145,18 @@ const applyCollisionImpactOnVelocity = (
   const aVelocityAngle = a.velocityAngle
   const bVelocityAngle = b.velocityAngle
 
-  // TODO: rename collisionInfo property like this
-  // (startX -> collisionStartX)
-  const collisionNormalX = collisionInfo.normalX
-  const collisionNormalY = collisionInfo.normalY
-  const normal = {
+  const {
+    collisionNormalX,
+    collisionNormalY,
+    collisionStartX,
+    collisionStartY,
+    collisionEndX,
+    collisionEndY,
+  } = collisionInfo
+  const collisionNormal = {
     x: collisionNormalX,
     y: collisionNormalY,
   }
-  const collisionStartX = collisionInfo.startX
-  const collisionStartY = collisionInfo.startY
-  const collisionEndX = collisionInfo.endX
-  const collisionEndY = collisionInfo.endY
 
   // angular impulse
   const massStartScale = bMassInverted / massInvertedSum
@@ -159,7 +182,10 @@ const applyCollisionImpactOnVelocity = (
   const bVelocityYAfterAngularImpulse = bVelocityY + bVelocityAngle * bCollisionCenterDiff.x
   const velocityXDiff = bVelocityXAfterAngularImpulse - aVelocityXAfterAngularImpulse
   const velocityYDiff = bVelocityYAfterAngularImpulse - aVelocityYAfterAngularImpulse
-  const velocityRelativeToNormal = getScalarProduct({ x: velocityXDiff, y: velocityYDiff }, normal)
+  const velocityRelativeToNormal = getScalarProduct(
+    { x: velocityXDiff, y: velocityYDiff },
+    collisionNormal,
+  )
   // if objects moving apart ignore
   if (velocityRelativeToNormal > 0) {
     return
@@ -170,8 +196,8 @@ const applyCollisionImpactOnVelocity = (
 
   // normal impulse
   const restitutionForImpact = Math.min(a.restitution, b.restitution)
-  const aCollisionNormalProduct = getVectorialProduct(aCollisionCenterDiff, normal)
-  const bCollisionNormalProduct = getVectorialProduct(bCollisionCenterDiff, normal)
+  const aCollisionNormalProduct = getVectorialProduct(aCollisionCenterDiff, collisionNormal)
+  const bCollisionNormalProduct = getVectorialProduct(bCollisionCenterDiff, collisionNormal)
   const impulseStart = -(1 + restitutionForImpact)
   const normalImpulseDivider =
     massInvertedSum +
@@ -240,32 +266,13 @@ const applyCollisionImpactOnVelocity = (
   })
 }
 
-const adjustPositionToSolveCollision = (
-  a,
-  b,
-  { aMassInverted, bMassInverted, massInvertedSum, collisionInfo },
+const drawCollisionInfo = (
+  { collisionStartX, collisionStartY, collisionEndX, collisionEndY },
+  context,
 ) => {
-  const correctionRatio = 1
-  const correctionTotal = collisionInfo.depth / massInvertedSum
-  const correction = correctionTotal * correctionRatio
-  const aPositionXCorrection = a.centerX + collisionInfo.normalX * correction * aMassInverted * -1
-  const aPositionYCorrection = a.centerY + collisionInfo.normalY * correction * aMassInverted * -1
-  updateGameObjectPosition(a, {
-    x: aPositionXCorrection,
-    y: aPositionYCorrection,
-  })
-  const bPositionXCorrection = b.centerX + collisionInfo.normalX * correction * bMassInverted
-  const bPositionYCorrection = b.centerY + collisionInfo.normalY * correction * bMassInverted
-  updateGameObjectPosition(b, {
-    x: bPositionXCorrection,
-    y: bPositionYCorrection,
-  })
-}
-
-const drawCollisionInfo = (collisionInfo, context) => {
   context.beginPath()
-  context.moveTo(collisionInfo.startX, collisionInfo.startY)
-  context.lineTo(collisionInfo.endX, collisionInfo.endY)
+  context.moveTo(collisionStartX, collisionStartY)
+  context.lineTo(collisionEndX, collisionEndY)
   context.closePath()
   context.strokeStyle = "orange"
   context.stroke()

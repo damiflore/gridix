@@ -13,28 +13,29 @@ export const getCollisionInfoForRectangleToRectangle = (rectangleA, rectangleB) 
     return null
   }
 
-  const firstCollisionDepth = firstCollisionInfo.depth
-  const secondCollisionDepth = secondCollisionInfo.depth
+  const firstCollisionDepth = firstCollisionInfo.collisionDepth
+  const secondCollisionDepth = secondCollisionInfo.collisionDepth
   if (firstCollisionDepth < secondCollisionDepth) {
-    const depthVector = {
-      x: firstCollisionInfo.normalX * firstCollisionDepth,
-      y: firstCollisionInfo.normalY * firstCollisionDepth,
-    }
+    const firstCollisionNormalX = firstCollisionInfo.collisionNormalX
+    const firstCollisionNormalY = firstCollisionInfo.collisionNormalY
+    const firstCollisionStartX = firstCollisionInfo.collisionStartX
+    const firstCollisionStartY = firstCollisionInfo.collisionStartY
+
     return createCollisionInfo({
-      depth: firstCollisionDepth,
-      normalX: firstCollisionInfo.normalX,
-      normalY: firstCollisionInfo.normalY,
-      startX: firstCollisionInfo.startX - depthVector.x,
-      startY: firstCollisionInfo.startY - depthVector.y,
+      collisionDepth: firstCollisionDepth,
+      collisionNormalX: firstCollisionNormalX,
+      collisionNormalY: firstCollisionNormalY,
+      collisionStartX: firstCollisionStartX - firstCollisionNormalX * firstCollisionDepth,
+      collisionStartY: firstCollisionStartY - firstCollisionNormalY * firstCollisionDepth,
     })
   }
 
   return createCollisionInfo({
-    depth: secondCollisionDepth,
-    normalX: secondCollisionInfo.normalX * -1,
-    normalY: secondCollisionInfo.normalY * -1,
-    startX: secondCollisionInfo.startX,
-    startY: secondCollisionInfo.startY,
+    collisionDepth: secondCollisionDepth,
+    collisionNormalX: secondCollisionInfo.collisionNormalX * -1,
+    collisionNormalY: secondCollisionInfo.collisionNormalY * -1,
+    collisionStartX: secondCollisionInfo.collisionStartX,
+    collisionStartY: secondCollisionInfo.collisionStartY,
   })
 }
 
@@ -69,11 +70,11 @@ const findShortestAxisPenetration = (rectangle, otherRectangle) => {
 
   const bestVector = scaleVector(bestNormal, bestDistance)
   return createCollisionInfo({
-    depth: bestDistance,
-    normalX: bestNormal.x,
-    normalY: bestNormal.y,
-    startX: bestSupportPoint.supportPointX + bestVector.x,
-    startY: bestSupportPoint.supportPointY + bestVector.y,
+    collisionDepth: bestDistance,
+    collisionNormalX: bestNormal.x,
+    collisionNormalY: bestNormal.y,
+    collisionStartX: bestSupportPoint.supportPointX + bestVector.x,
+    collisionStartY: bestSupportPoint.supportPointY + bestVector.y,
   })
 }
 

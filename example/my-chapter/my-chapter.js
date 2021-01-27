@@ -1,8 +1,6 @@
 /**
 TODO
 
-- renommer collisionInfo qui sont retournée
-
 - documentation de ce que j'ai compris pour expliquer comme fonctionne certaines propriétés
 
 - see if rectangle and circle (at least some part) could go into geometry/

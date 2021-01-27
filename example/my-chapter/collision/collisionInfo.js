@@ -11,14 +11,13 @@ export const getCollisionInfo = (gameObject, otherGameObject) => {
   }
 
   const collisionInfo = getRawCollisionInfo(gameObject, otherGameObject)
-
   if (!collisionInfo) {
     return null
   }
 
   const collisionNormal = {
-    x: collisionInfo.normalX,
-    y: collisionInfo.normalY,
+    x: collisionInfo.collisionNormalX,
+    y: collisionInfo.collisionNormalY,
   }
   const centerDiff = {
     x: otherGameObject.centerX - gameObject.centerX,
@@ -26,29 +25,49 @@ export const getCollisionInfo = (gameObject, otherGameObject) => {
   }
 
   if (getScalarProduct(collisionNormal, centerDiff) < 0) {
-    return getOppositeCollisionInfo(collisionInfo)
+    return reverseCollisionInfo(collisionInfo)
   }
 
   return collisionInfo
 }
 
 export const createCollisionInfo = ({
-  depth = 0,
-  normalX = 0,
-  normalY = 0,
-  startX = 0,
-  startY = 0,
-  endX = startX + normalX * depth,
-  endY = startY + normalY * depth,
+  collisionDepth = 0,
+  collisionNormalX = 0,
+  collisionNormalY = 0,
+  collisionStartX = 0,
+  collisionStartY = 0,
+  collisionEndX = collisionStartX + collisionNormalX * collisionDepth,
+  collisionEndY = collisionStartY + collisionNormalY * collisionDepth,
 }) => {
   return {
-    depth,
-    startX,
-    startY,
-    endX,
-    endY,
-    normalX,
-    normalY,
+    collisionDepth,
+    collisionNormalX,
+    collisionNormalY,
+    collisionStartX,
+    collisionStartY,
+    collisionEndX,
+    collisionEndY,
+  }
+}
+
+const reverseCollisionInfo = ({
+  collisionDepth,
+  collisionNormalX,
+  collisionNormalY,
+  collisionStartX,
+  collisionStartY,
+  collisionEndX,
+  collisionEndY,
+}) => {
+  return {
+    collisionDepth,
+    collisionNormalX: collisionNormalX * -1,
+    collisionNormalY: collisionNormalY * -1,
+    collisionStartX: collisionEndX,
+    collisionStartY: collisionEndY,
+    collisionEndX: collisionStartX,
+    collisionEndY: collisionStartY,
   }
 }
 
@@ -72,16 +91,4 @@ const getRawCollisionInfo = (gameObject, otherGameObject) => {
   }
 
   return null
-}
-
-const getOppositeCollisionInfo = ({ depth, normalX, normalY, startX, startY, endX, endY }) => {
-  return {
-    depth,
-    normalX: normalX * -1,
-    normalY: normalY * -1,
-    startX: endX,
-    startY: endY,
-    endX: startX,
-    endY: startY,
-  }
 }
