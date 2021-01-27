@@ -1,25 +1,19 @@
-import { GameObject } from "../gameObject.js"
-import { rotateVector } from "../geometry/vector.js"
+import { rectangleToCorners } from "../geometry/rectangle.js"
+import { circleToStartPoint } from "../geometry/circle.js"
 
-export const createCircle = ({ centerX, centerY, radius, ...props }) => {
-  return {
-    ...GameObject,
-    shape: "circle",
+export const drawRectangle = ({ centerX, centerY, width, height, angle }, context) => {
+  const { topLeftCorner } = rectangleToCorners({
     centerX,
     centerY,
-    radius,
-    ...props,
-  }
-}
-
-export const circleToStartPoint = ({ centerX, centerY, radius, angle }) => {
-  return rotateVector(
-    {
-      x: centerX,
-      y: centerY - radius,
-    },
-    { centerX, centerY, angle },
-  )
+    width,
+    height,
+    angle,
+  })
+  context.save()
+  context.translate(topLeftCorner.x, topLeftCorner.y)
+  context.rotate(angle)
+  context.strokeRect(0, 0, width, height)
+  context.restore()
 }
 
 export const drawCircle = ({ centerX, centerY, radius, angle }, context) => {

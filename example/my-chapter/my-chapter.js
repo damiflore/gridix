@@ -15,8 +15,8 @@ ou au moin de petit fichier html pour tester des cas concrets
 import { updateGameObjectPosition, updateGameObjectVelocity } from "./physic/physic.movement.js"
 import { updatePhysicForArcadeGame } from "./physic/physic.js"
 import { PHYSIC_CONSTANTS } from "./physic/physic.constants.js"
-import { createRectangle, drawRectangle } from "./shape/rectangle.js"
-import { createCircle, drawCircle } from "./shape/circle.js"
+import { createRigidRectangle, createRigidCircle } from "./physic/shape.js"
+import { drawRectangle, drawCircle } from "./draw/draw.js"
 import { gameInit } from "./gameInit.js"
 import { updateDevtool } from "./devtool.js"
 
@@ -148,21 +148,19 @@ const runGameLoop = () => {
         }
       },
       "spawn-circle": () => {
-        const circle = createCircle({
+        const circle = createRigidCircle({
           centerX: gameObjectSelected ? gameObjectSelected.centerX : Math.random() * width * 0.8,
           centerY: gameObjectSelected ? gameObjectSelected.centerY : Math.random() * height * 0.8,
           radius: Math.random() * 10 + 20,
-          canMove: true,
         })
         gameObjects.push(circle)
       },
       "spawn-rectangle": () => {
-        const rectangle = createRectangle({
+        const rectangle = createRigidRectangle({
           centerX: gameObjectSelected ? gameObjectSelected.centerX : Math.random() * width * 0.8,
           centerY: gameObjectSelected ? gameObjectSelected.centerY : Math.random() * height * 0.8,
           width: Math.random() * 30 + 10,
           height: Math.random() * 30 + 10,
-          canMove: true,
         })
         gameObjects.push(rectangle)
       },

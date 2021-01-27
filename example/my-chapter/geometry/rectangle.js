@@ -1,17 +1,4 @@
-import { substractVector, normalizeVector, rotateVector } from "../geometry/vector.js"
-import { GameObject } from "../gameObject.js"
-
-export const createRectangle = ({ centerX, centerY, width, height, ...props }) => {
-  return {
-    ...GameObject,
-    shape: "rectangle",
-    centerX,
-    centerY,
-    width,
-    height,
-    ...props,
-  }
-}
+import { rotateVector, normalizeVector, substractVector } from "./vector.js"
 
 export const rectangleToCorners = ({ centerX, centerY, width, height, angle }) => {
   return {
@@ -59,18 +46,3 @@ export const rectangleToNormals = ({ centerX, centerY, width, height, angle }) =
   }
 }
 export const RECTANGLE_NORMAL_KEYS = ["topNormal", "rightNormal", "bottomNormal", "leftNormal"]
-
-export const drawRectangle = ({ centerX, centerY, width, height, angle }, context) => {
-  const { topLeftCorner } = rectangleToCorners({
-    centerX,
-    centerY,
-    width,
-    height,
-    angle,
-  })
-  context.save()
-  context.translate(topLeftCorner.x, topLeftCorner.y)
-  context.rotate(angle)
-  context.strokeRect(0, 0, width, height)
-  context.restore()
-}

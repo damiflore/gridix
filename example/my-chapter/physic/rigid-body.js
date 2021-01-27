@@ -1,4 +1,4 @@
-export const GameObject = {
+export const RigidBody = {
   name: "anonymous",
   centerX: 0,
   centerY: 0,

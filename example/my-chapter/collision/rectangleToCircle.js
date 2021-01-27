@@ -4,7 +4,7 @@ import {
   normalizeVector,
   getVectorLength,
 } from "../geometry/vector.js"
-import { rectangleToCorners, rectangleToNormals } from "../shape/rectangle.js"
+import { rectangleToCorners, rectangleToNormals } from "../geometry/rectangle.js"
 import { createCollisionInfo } from "./collisionInfo.js"
 
 export const getCollisionInfoForRectangleToCircle = (rectangle, circle) => {

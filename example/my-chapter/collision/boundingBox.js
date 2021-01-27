@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import { getVectorLength } from "../geometry/vector.js"
-import { rectangleToCorners } from "../shape/rectangle.js"
+import { rectangleToCorners } from "../geometry/rectangle.js"
 
 export const testBoundingBoxContact = (a, b) => {
   const aBoundingBox = getGameObjectBoundingBox(a)
