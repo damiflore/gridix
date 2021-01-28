@@ -97,6 +97,12 @@ const resolveCollision = ({
   const aMassInverted = aMovedAllowedByMass ? 1 / aMass : 0
   const bMassInverted = bMoveAllowedByMass ? 1 / bMass : 0
   const massInvertedSum = aMassInverted + bMassInverted
+  if (a.debugCollisionResolution || b.debugCollisionResolution) {
+    a.debugCollisionResolution = false
+    b.debugCollisionResolution = false
+    // eslint-disable-next-line no-debugger
+    debugger
+  }
   if (collisionPositionResolution) {
     adjustPositionToSolveCollision(a, b, {
       aMassInverted,

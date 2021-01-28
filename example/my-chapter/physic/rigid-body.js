@@ -2,6 +2,8 @@ export const RigidBody = {
   rigid: true,
   sleeping: false,
   sleepingFrameCount: 0,
+  debugCollisionResolution: false,
+  debugCollisionDetection: false,
   // hitBox: null,
 
   centerX: 0,

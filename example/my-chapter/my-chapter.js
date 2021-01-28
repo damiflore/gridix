@@ -110,6 +110,17 @@ const gameEngine = createGameEngine({
       },
 
       onClicks: {
+        "debug-collision-detection": () => {
+          if (gameObjectSelected) {
+            gameObjectSelected.debugCollisionDetection = true
+          }
+        },
+        "debug-collision-resolution": () => {
+          if (gameObjectSelected) {
+            gameObjectSelected.debugCollisionResolution = true
+          }
+        },
+
         "wakeup": () => {
           if (gameObjectSelected) {
             gameObjectSelected.sleeping = false
