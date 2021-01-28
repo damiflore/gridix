@@ -50,6 +50,13 @@ const iterateOnCollision = ({
       return
     }
 
+    if (a.debugCollisionDetection || b.debugCollisionDetection) {
+      a.debugCollisionDetection = false
+      b.debugCollisionDetection = false
+      // eslint-disable-next-line no-debugger
+      debugger
+    }
+
     collisionCallback({
       a,
       b,
@@ -90,10 +97,6 @@ const resolveCollision = ({
   const bMass = b.mass
   const aMotionAllowedByMass = motionAllowedFromMass(aMass)
   const bMotionAllowedByMass = motionAllowedFromMass(bMass)
-  if (!aMotionAllowedByMass && !bMotionAllowedByMass) {
-    return
-  }
-
   const aMassInverted = aMotionAllowedByMass ? 1 / aMass : 0
   const bMassInverted = bMotionAllowedByMass ? 1 / bMass : 0
   const massInvertedSum = aMassInverted + bMassInverted
@@ -143,6 +146,9 @@ const adjustPositionToSolveCollision = (
     y: bPositionYCorrection,
   })
 }
+
+// min relative velocity between bodies to trigge the velocity impact
+const bounceThreshold = 1
 
 const applyCollisionImpactOnVelocity = (
   a,
@@ -199,6 +205,10 @@ const applyCollisionImpactOnVelocity = (
   )
   // if objects moving apart ignore
   if (velocityRelativeToNormal > 0) {
+    return
+  }
+  // not enough velocity to trigger the bounce
+  if (-velocityRelativeToNormal < bounceThreshold) {
     return
   }
 

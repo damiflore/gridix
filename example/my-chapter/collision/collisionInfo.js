@@ -5,13 +5,6 @@ import { getCollisionInfoForRectangleToRectangle } from "./rectangleToRectangle.
 import { getCollisionInfoForRectangleToCircle } from "./rectangleToCircle.js"
 
 export const getCollisionInfo = (gameObject, otherGameObject) => {
-  if (gameObject.debugCollisionDetection || otherGameObject.debugCollisionDetection) {
-    gameObject.debugCollisionDetection = false
-    otherGameObject.debugCollisionDetection = false
-    // eslint-disable-next-line no-debugger
-    debugger
-  }
-
   const boundingBoxContact = testBoundingBoxContact(gameObject, otherGameObject)
   if (!boundingBoxContact) {
     return null

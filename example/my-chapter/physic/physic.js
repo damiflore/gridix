@@ -21,25 +21,7 @@ export const updatePhysicForArcadeGame = ({
   // does not move beyond a minimal distance in about two seconds,
   // then the physics calculations are disabled
   // -> https://en.wikipedia.org/wiki/Physics_engine
-  // maybe this is what we want to implement
-
-  // comment détecter qu'on objet arrete de bouger pendant un certain temps ?
-  // on pourrait garder en mémoire la derniere position + le temps
-  // chaque fois qu'on objet bouge, on regarde de combien entre
-  // avant la mise a jour physique de sa position et apres.
-  // si cela représente plus que lastNotableMoveEllapsedSeconds
-  // on le met a jour
-  // dans handleSleep on regarde tout les objet n'ayant pas bougé
-  // et on compare avec ellapsedSeconds, si cela dépasse X alors on met l'objet en sleeping
   // https://gamedev.stackexchange.com/questions/114925/in-a-2d-physics-engine-how-do-i-avoid-useless-collision-resolutions-when-object
-
-  // when sleep is enabled, if object velocity x, y, and angle is too small
-  // according to sleepVelocityCeil and sleepVelocityAngleCeil
-  // during more then sleepFrameFloor object becomes sleeping
-  // when sleeping object collision are not checked and position is not updated.
-  // only a velocity update can awake that object, happens when:
-  // - an other moving object collides it (and update its velocity)
-  // - something else mutates the object velocity
   sleepEnabled = true,
   // when move (x+y+angle) is less than sleepMoveThreshold
   // we consider object as static/motionless
@@ -54,6 +36,7 @@ export const updatePhysicForArcadeGame = ({
   // https://forum.unity.com/threads/bouncy-character-when-landed-on-ground.408821/
   // c'est surement une solution aussi: bounceThreshold
   // https://github.com/MassiveHeights/Black/blob/e4967f19cbdfe42b3612981c810ac499ad34b154/src/physics/arcade/pairs/Pair.js#L51
+  // bounceThreshold = 1,
 }) => {
   if (motion) {
     handleMotion({
