@@ -17,7 +17,7 @@ export const handleCollision = ({
   gameObjects,
   collisionCallback,
   collisionPositionResolution,
-  collisionVelocityImpact,
+  collisionVelocityImpact, // could be renamed collisionImpulse
 }) => {
   let collisionIterations = 5
   while (collisionIterations--) {

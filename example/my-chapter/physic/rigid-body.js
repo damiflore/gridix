@@ -7,7 +7,6 @@ export const RigidBody = {
   anglePrev: undefined,
   debugCollisionResolution: false,
   debugCollisionDetection: false,
-  // hitBox: null,
 
   centerX: 0,
   centerY: 0,
