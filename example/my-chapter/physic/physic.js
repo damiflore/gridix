@@ -1,11 +1,18 @@
-import { handleMotion } from "./physic.motion.js"
+import { handleMotion, motionAllowedFromMass } from "./physic.motion.js"
 import { handleCollision } from "./physic.collision.js"
+
+// maybe rename time into gameTime ?
+// put sleepEnabled sur rigid body (pouvoir le controller par rigidBody)
 
 export const updatePhysicForArcadeGame = ({
   gameObjects,
   timePerFrame,
-  // time,
+  time,
   motion = true,
+  // beware it's move before collision resolution
+  // so not really useful, ideally callback should be called after collision resolution
+  moveCallback = () => {},
+
   collisionCallback = () => {},
   collisionPositionResolution = true,
   collisionVelocityImpact = true,
@@ -33,12 +40,13 @@ export const updatePhysicForArcadeGame = ({
   // only a velocity update can awake that object, happens when:
   // - an other moving object collides it (and update its velocity)
   // - something else mutates the object velocity
-  sleepEnabled = false,
-  // when move (x+y+angle) is less than sleepMotionThreshold
+  sleepEnabled = true,
+  // when move (x+y+angle) is less than sleepMoveThreshold
   // we consider object as static/motionless
   // when this happen for more than sleepStartSeconds
   // object is put to sleep
-  sleepMotionThreshold = 0.1,
+  sleepMoveThreshold = 0.1,
+  sleepVelocityThreshold = 0.1,
   sleepStartDuration = 2,
 
   // pour bounce threshold
@@ -47,15 +55,11 @@ export const updatePhysicForArcadeGame = ({
   // c'est surement une solution aussi: bounceThreshold
   // https://github.com/MassiveHeights/Black/blob/e4967f19cbdfe42b3612981c810ac499ad34b154/src/physics/arcade/pairs/Pair.js#L51
 }) => {
-  const moves = []
-
   if (motion) {
     handleMotion({
       gameObjects,
       timePerFrame,
-      moveCallback: (gameObject, from, to) => {
-        moves.push({ gameObject, from, to })
-      },
+      moveCallback,
     })
   }
   handleCollision({
@@ -67,86 +71,142 @@ export const updatePhysicForArcadeGame = ({
 
   if (sleepEnabled) {
     handleSleep({
-      moves,
       gameObjects,
-      sleepMotionThreshold,
+      sleepMoveThreshold,
+      sleepVelocityThreshold,
       sleepStartDuration,
+      time,
     })
   }
 }
 
 const handleSleep = ({
   gameObjects,
-  sleepVelocityAngleCeil,
-  sleepVelocityCeil,
-  sleepFrameFloor,
+  sleepMoveThreshold,
+  sleepVelocityThreshold,
+  sleepStartDuration,
+  time,
 }) => {
   gameObjects.forEach((gameObject) => {
+    const { centerX, centerY, angle } = gameObject
+    const { centerXPrev, centerYPrev, anglePrev } = gameObject
+    // now we know the move for this object, store current position
+    // for the next iteration
+    gameObject.centerXPrev = centerX
+    gameObject.centerYPrev = centerY
+    gameObject.anglePrev = angle
+
+    // this object is new, give up on detecting if it should sleep
+    if (centerXPrev === undefined) {
+      return
+    }
+
+    const moveX = centerX - centerXPrev
+    const moveY = centerY - centerYPrev
+    const moveAngle = angle - anglePrev
     updateSleepingState(gameObject, {
-      sleepVelocityAngleCeil,
-      sleepVelocityCeil,
-      sleepFrameFloor,
+      moveX,
+      moveY,
+      moveAngle,
+      sleepMoveThreshold,
+      sleepVelocityThreshold,
+      sleepStartDuration,
+      time,
     })
   })
 }
 
 const updateSleepingState = (
   gameObject,
-  { sleepVelocityAngleCeil, sleepVelocityCeil, sleepFrameFloor },
+  { moveX, moveY, moveAngle, sleepMoveThreshold, sleepVelocityThreshold, sleepStartDuration, time },
 ) => {
-  const { sleeping } = gameObject
-  const shouldSleep = getShouldSleep(gameObject, {
-    sleepVelocityAngleCeil,
-    sleepVelocityCeil,
-    sleepFrameFloor,
-  })
-
-  if (shouldSleep) {
-    // increment number of frame where object is sleeping
-    gameObject.sleepingFrameCount++
+  if (!gameObject.rigid) {
+    return
   }
 
-  // awake
-  if (sleeping && !shouldSleep) {
+  if (!motionAllowedFromMass(gameObject.mass)) {
+    return
+  }
+
+  const move = quantifyMove(gameObject, { moveX, moveY, moveAngle })
+  const moveBelowSleepThreshold = move < sleepMoveThreshold
+
+  // this object is moving enough to be considered awake
+  if (!moveBelowSleepThreshold) {
+    gameObject.lastNotableMoveTime = time
     gameObject.sleeping = false
-    gameObject.sleepingFrameCount = 0
-    return false
+    return
   }
 
-  // puts asleep
-  if (!sleeping && shouldSleep && gameObject.sleepingFrameCount > sleepFrameFloor) {
-    gameObject.sleeping = true
-    gameObject.velocityX = 0
-    gameObject.velocityY = 0
-    return true
+  if (gameObject.sleeping) {
+    // this object is certainly about to move because velocity
+    // is high enough, ensure it is awake
+    const velocity = quantifyVelocity(gameObject)
+    const velocityBelowSleepThreshold = velocity < sleepVelocityThreshold
+    if (!velocityBelowSleepThreshold) {
+      gameObject.sleeping = false
+      return
+    }
   }
 
-  return sleeping
+  // not moving enough
+  if (gameObject.sleeping) {
+    // already sleeping
+    return
+  }
+
+  // should we put object to sleep ?
+  const lastNotableMoveTime = gameObject.lastNotableMoveTime
+  const timeSinceLastNotableMove = time - lastNotableMoveTime
+  if (timeSinceLastNotableMove < sleepStartDuration) {
+    return
+  }
+
+  // put object to sleep
+  // we also reset velocity to ensure it won't try to move again (due to gravity)
+  // because in the last sleepStartDuration it had negligible impact
+  // on its position, its unlikely to ever change
+  gameObject.sleeping = true
+  gameObject.velocityX = 0
+  gameObject.velocityY = 0
+  gameObject.velocityAngle = 0
 }
 
-const getShouldSleep = (gameObject, { sleepVelocityAngleCeil, sleepVelocityCeil }) => {
-  // useless move
-  // const centerXBeforeUpdate = from.centerX
-  // const centerYBeforeUpdate = from.centerY
-  // const centerXAfterCollisionResolution = gameObject.centerX
-  // const centerYAfterCollisionResolution = gameObject.centerY
-  // const moveXDiff = centerXAfterCollisionResolution - centerXBeforeUpdate
-  // const moveYDiff = centerYAfterCollisionResolution - centerYBeforeUpdate
-  // const move = Math.sqrt(moveXDiff * moveXDiff + moveYDiff * moveYDiff)
-  // if (move < 0.1) {
-  //   return true
-  // }
+const quantifyMove = (gameObject, { moveX, moveY, moveAngle }) => {
+  let total = 0
 
-  const { velocityX, velocityY, velocityAngle } = gameObject
-  // awake by angle velocity
-  if (velocityAngle * velocityAngle >= sleepVelocityAngleCeil) {
-    return false
+  const moveFromXAndY = Math.sqrt(moveX * moveX + moveY * moveY)
+  total += moveFromXAndY
+
+  if (moveAngle) {
+    if (gameObject.shape === "circle") {
+      // nothing todo: rotating a circle does not impact its position
+    }
+    if (gameObject.shape === "rectangle") {
+      // not a super approximation, we should take into acount the dimension
+      const moveFromAngle = moveAngle * moveAngle
+      total += moveFromAngle
+    }
   }
 
-  // awake by x,y velocity
-  if (velocityX * velocityX + velocityY * velocityY >= sleepVelocityCeil) {
-    return false
+  return total
+}
+
+const quantifyVelocity = ({ shape, velocityX, velocityY, velocityAngle }) => {
+  let total = 0
+
+  const velocityFromXAndY = velocityX * velocityX + velocityY * velocityY
+  total += velocityFromXAndY
+
+  if (velocityAngle) {
+    if (shape === "circle") {
+      // nothing todo: rotating a circle does not impact its position
+    }
+    if (shape === "rectangle") {
+      const velocityFromAngle = velocityAngle * velocityAngle
+      total += velocityFromAngle
+    }
   }
 
-  return true
+  return total
 }

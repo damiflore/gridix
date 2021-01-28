@@ -215,7 +215,7 @@ const gameEngine = createGameEngine({
         },
         "excite": () => {
           gameObjects.forEach((gameObject) => {
-            if (motionAllowedFromMass(gameObject)) {
+            if (motionAllowedFromMass(gameObject.mass)) {
               updateGameObjectVelocity(gameObject, {
                 x: Math.random() * 500 - 250,
                 y: Math.random() * 500 - 250,

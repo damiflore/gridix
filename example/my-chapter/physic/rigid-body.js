@@ -1,7 +1,10 @@
 export const RigidBody = {
   rigid: true,
   sleeping: false,
-  lastNotableMotionTimestamp: 0, // in seconds
+  lastNotableMoveTime: 0,
+  centerXPrev: undefined,
+  centerYPrev: undefined,
+  anglePrev: undefined,
   debugCollisionResolution: false,
   debugCollisionDetection: false,
   // hitBox: null,
