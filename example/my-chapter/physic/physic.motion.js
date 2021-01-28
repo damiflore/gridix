@@ -1,8 +1,8 @@
 /* eslint-disable operator-assignment */
-import { PHYSIC_CONSTANTS } from "./physic.constants.js"
-import { limitNumberPrecision } from "../math/limitNumberPrecision.js"
+// import { PHYSIC_CONSTANTS } from "./physic.constants.js"
+// import { limitNumberPrecision } from "../math/limitNumberPrecision.js"
 
-const limitVelocityPrecision = limitNumberPrecision(4)
+// const limitVelocityPrecision = limitNumberPrecision(4)
 
 export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
   gameObjects.forEach((gameObject) => {
@@ -13,13 +13,19 @@ export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
     const velocityX = gameObject.velocityX
     const velocityY = gameObject.velocityY
     const velocityAngle = gameObject.velocityAngle
+    const forceX = gameObject.forceX
+    const forceY = gameObject.forceY
+    const forceAngle = gameObject.forceAngle
     const motionAllowedByMass = motionAllowedFromMass(gameObject.mass)
     if (!motionAllowedByMass) {
-      if (velocityX || velocityY || velocityAngle) {
+      if (velocityX || velocityY || velocityAngle || forceX || forceY || forceAngle) {
         if (import.meta.dev) {
-          console.warn(`found velocity on object unable of motion, force velocity to zero`)
+          console.warn(
+            `found forces on object unable of motion, all force and velocity forced to zero`,
+          )
         }
         gameObject.velocityX = gameObject.velocityY = gameObject.velocityAngle = 0
+        gameObject.forceX = gameObject.forceY = gameObject.forceAngle = 0
       }
       return
     }
@@ -28,9 +34,6 @@ export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
       return
     }
 
-    const forceX = gameObject.forceX + PHYSIC_CONSTANTS.forceXAmbient
-    const forceY = gameObject.forceY + PHYSIC_CONSTANTS.forceYAmbient
-    const forceAngle = gameObject.forceAngle + PHYSIC_CONSTANTS.forceAngleAmbient
     // forces are punctual by default
     // if there is a constant force dragging object to the bottom (gravity)
     // it must be reapplied every update
@@ -40,15 +43,15 @@ export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
     gameObject.forceAngle = 0
 
     const frictionAmbientCoef = 1 - gameObject.frictionAmbient
-    const velocityXAfterApplicationOfForces = limitVelocityPrecision(
-      (velocityX + forceX * timePerFrame) * frictionAmbientCoef,
-    )
-    const velocityYAfterApplicationOfForces = limitVelocityPrecision(
-      (velocityY + forceY * timePerFrame) * frictionAmbientCoef,
-    )
-    const velocityAngleAfterApplicationOfForces = limitVelocityPrecision(
-      (velocityAngle + forceAngle * timePerFrame) * frictionAmbientCoef,
-    )
+    const velocityXAfterApplicationOfForces =
+      (velocityX + forceX * timePerFrame) * frictionAmbientCoef
+
+    const velocityYAfterApplicationOfForces =
+      (velocityY + forceY * timePerFrame) * frictionAmbientCoef
+
+    const velocityAngleAfterApplicationOfForces = gameObject.angleLocked
+      ? 0
+      : (velocityAngle + forceAngle * timePerFrame) * frictionAmbientCoef
 
     // update velocity
     gameObject.velocityX = velocityXAfterApplicationOfForces

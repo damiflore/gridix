@@ -1,4 +1,7 @@
 import { createRectangle, createCircle } from "./game/shape.js"
+import { PHYSIC_CONSTANTS } from "./physic/physic.constants.js"
+
+PHYSIC_CONSTANTS.forceYAmbient = 200
 
 export const demoCool = ({ gameObjects, width, height, worldBounds = true }) => {
   if (worldBounds) {

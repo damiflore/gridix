@@ -14,6 +14,7 @@ export const RigidBody = {
   // negative angle -> rotate clockwise
   // positive angle -> rotate counterclockwise
   angle: 0,
+  angleLocked: false,
 
   // Object with negavite, 0, or infinite mass cannot move.
   // colliding such object has no impact on the object itself

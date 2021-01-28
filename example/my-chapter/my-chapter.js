@@ -24,8 +24,8 @@ import { createGameEngine } from "./engine/engine.js"
 import { drawCollisionInfo } from "./draw/draw.js"
 import { registerPageLifecyle } from "./page/page-lifecyle.js"
 
-const width = 800
-const height = 450
+const width = 32 * 4
+const height = 32 * 7
 const canvas = document.createElement("canvas")
 canvas.height = height
 canvas.width = width
@@ -46,7 +46,10 @@ const gameEngine = createGameEngine({
   framePerSecond: 60,
   updateState: ({ timePerFrame, time }) => {
     gameObjects.forEach((gameObject) => {
-      gameObject.updateState(gameObject)
+      const { updateState } = gameObject
+      if (updateState) {
+        updateState(gameObject)
+      }
     })
 
     collisionInfos.length = 0
@@ -66,6 +69,11 @@ const gameEngine = createGameEngine({
     context.clearRect(0, 0, width, height)
     context.strokeStyle = "blue"
     gameObjects.forEach((gameObject, index) => {
+      const { updateDraw } = gameObject
+      if (!updateDraw) {
+        return
+      }
+
       if (gameObjectSelectedIndex === index) {
         gameObject.strokeStyle = "orange"
         gameObject.lineWidth = 4
@@ -237,7 +245,6 @@ const gameEngine = createGameEngine({
     })
   },
 })
-PHYSIC_CONSTANTS.forceYAmbient = 200
 window.addEventListener("error", () => {
   gameEngine.stopGameLoop()
 })
