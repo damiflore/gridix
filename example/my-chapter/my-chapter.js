@@ -41,7 +41,7 @@ import { createGameEngine } from "./engine/engine.js"
 import { drawCollisionInfo } from "./draw/draw.js"
 import { registerPageLifecyle } from "./page/page-lifecyle.js"
 
-const width = 32 * 4
+const width = 32 * 7
 const height = 32 * 7
 const canvas = document.createElement("canvas")
 canvas.height = height

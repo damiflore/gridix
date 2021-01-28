@@ -31,40 +31,74 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
       centerX: column * cellSize + cellSize / 2,
       centerY: row * cellSize + cellSize / 2,
       updateState: (baril) => {
-        // uniquement si la vélocié est suffisament faible
-        // et non null (on veut pas toucher si sleeping ou ne bouge plus)
-        // juste faciliter le fait qu'un baril s'arrette cell perfect (pile dans une cellule)
-        const { velocityX, velocityY } = baril
-        const velocity = velocityX * velocityX + velocityY * velocityY
-        if (velocity > 10 || velocity === 0) {
+        // the goal here is to facilitate a moving baril to stop
+        // exactly on a cell.
+        // sleeping baril -> do nothing
+        // baril moving too fast -> do nothing
+        // baril moving the opposite direction of closest cell -> do nothing
+        // baril already "exactly" on the cell -> do nothing
+
+        const { sleeping } = baril
+        if (sleeping) {
           return
         }
 
+        const { velocityX, velocityY } = baril
+        // too fast
+        const velocityXStrength = Math.abs(velocityX)
+        if (velocityXStrength > 10) {
+          return
+        }
+        const velocityYStrength = Math.abs(velocityY)
+        if (velocityYStrength > 10) {
+          return
+        }
+
+        const force = 50
         const { centerX, centerY } = baril
         const closestCellCenter = closestCellCenterFromPoint(
           { x: centerX, y: centerY },
           { width, height, cellSize },
         )
-        const centerToCellCenterXDiff = centerX - closestCellCenter.x
-        const centerToCellCenterYDiff = centerY - closestCellCenter.y
-        const force = 50
+        const cellCenterToCenterXDiff = closestCellCenter.x - centerX
 
-        if (
-          (centerToCellCenterXDiff < 0 && velocityX >= 0) ||
-          (centerToCellCenterXDiff > 0 && velocityX <= 0)
-        ) {
-          if (Math.abs(centerToCellCenterXDiff) > 0.1 && velocityX !== 0) {
-            baril.velocityX -= centerToCellCenterXDiff * force
+        if (velocityXStrength > velocityYStrength) {
+          // no velocity, don't awake
+          if (velocityX === 0) {
+            return
           }
-        }
-        if (
-          (centerToCellCenterYDiff < 0 && velocityY >= 0) ||
-          (centerToCellCenterYDiff > 0 && velocityY <= 0)
-        ) {
-          if (Math.abs(centerToCellCenterYDiff) > 0.1 && velocityY !== 0) {
-            baril.velocityY -= centerToCellCenterYDiff * force
+          // velocity going the other way
+          if (cellCenterToCenterXDiff < 0 && velocityX > 0) {
+            return
           }
+          if (cellCenterToCenterXDiff > 0 && velocityX < 0) {
+            return
+          }
+          // no worthy adjustement on X required
+          if (Math.abs(cellCenterToCenterXDiff) < 0.1) {
+            return
+          }
+
+          baril.velocityX += cellCenterToCenterXDiff * force
+          return
         }
+
+        const cellCenterToCenterYDiff = closestCellCenter.y - centerY
+        if (velocityY === 0) {
+          return
+        }
+        if (cellCenterToCenterYDiff < 0 && velocityY > 0) {
+          return
+        }
+        if (cellCenterToCenterYDiff > 0 && velocityY < 0) {
+          return
+        }
+        // no worthy adjustement on Y required
+        if (Math.abs(cellCenterToCenterYDiff) < 0.1) {
+          return
+        }
+
+        baril.velocityY += cellCenterToCenterYDiff * force
       },
       angleLocked: true,
       sleeping: true,
@@ -97,6 +131,7 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
   addWall({ column: 1, row: 1 })
   addBaril({ column: 1, row: 2 })
   addBaril({ column: 2, row: 2 })
+  addBaril({ column: 4, row: 3 })
   addWall({ column: 1, row: 3 })
 
   const downKey = trackKeyboardKeydown({
