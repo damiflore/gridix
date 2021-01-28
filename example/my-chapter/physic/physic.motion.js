@@ -4,14 +4,23 @@ import { limitNumberPrecision } from "../math/limitNumberPrecision.js"
 
 const limitVelocityPrecision = limitNumberPrecision(4)
 
-export const handleMovement = ({ gameObjects, timePerFrame, moveCallback }) => {
+export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
   gameObjects.forEach((gameObject) => {
     if (!gameObject.rigid) {
       return
     }
 
-    const moveAllowedByMass = moveAllowedFromMass(gameObject.mass)
-    if (!moveAllowedByMass) {
+    const velocityX = gameObject.velocityX
+    const velocityY = gameObject.velocityY
+    const velocityAngle = gameObject.velocityAngle
+    const motionAllowedByMass = motionAllowedFromMass(gameObject.mass)
+    if (!motionAllowedByMass) {
+      if (velocityX || velocityY || velocityAngle) {
+        if (import.meta.dev) {
+          console.warn(`found velocity on object unable of motion, force velocity to zero`)
+        }
+        gameObject.velocityX = gameObject.velocityY = gameObject.velocityAngle = 0
+      }
       return
     }
 
@@ -30,9 +39,6 @@ export const handleMovement = ({ gameObjects, timePerFrame, moveCallback }) => {
     gameObject.forceY = 0
     gameObject.forceAngle = 0
 
-    const velocityX = gameObject.velocityX
-    const velocityY = gameObject.velocityY
-    const velocityAngle = gameObject.velocityAngle
     const frictionAmbientCoef = 1 - gameObject.frictionAmbient
     const velocityXAfterApplicationOfForces = limitVelocityPrecision(
       (velocityX + forceX * timePerFrame) * frictionAmbientCoef,
@@ -98,11 +104,9 @@ export const updateGameObjectVelocity = (
   gameObject,
   { x = gameObject.velocityX, y = gameObject.velocityY, angle = gameObject.velocityAngle },
 ) => {
-  if (moveAllowedFromMass(gameObject.mass)) {
-    gameObject.velocityX = x
-    gameObject.velocityY = y
-    gameObject.velocityAngle = angle
-  }
+  gameObject.velocityX = x
+  gameObject.velocityY = y
+  gameObject.velocityAngle = angle
 }
 
 export const updateGameObjectForce = (
@@ -114,7 +118,7 @@ export const updateGameObjectForce = (
   gameObject.forceAngle = angle
 }
 
-export const moveAllowedFromMass = (mass) => {
+export const motionAllowedFromMass = (mass) => {
   // object with a negative mass would move to -Infinity
   if (mass < 0) {
     return false

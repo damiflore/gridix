@@ -6,10 +6,10 @@ import {
 } from "../geometry/vector.js"
 import { getCollisionInfo } from "../collision/collisionInfo.js"
 import {
-  moveAllowedFromMass,
+  motionAllowedFromMass,
   updateGameObjectVelocity,
   updateGameObjectPosition,
-} from "./physic.movement.js"
+} from "./physic.motion.js"
 
 export const handleCollision = ({
   gameObjects,
@@ -39,8 +39,8 @@ const iterateOnCollision = ({
       return
     }
 
-    const aIsStatic = a.sleeping || !moveAllowedFromMass(a.mass)
-    const bIsStatic = b.sleeping || !moveAllowedFromMass(b.mass)
+    const aIsStatic = a.sleeping || !motionAllowedFromMass(a.mass)
+    const bIsStatic = b.sleeping || !motionAllowedFromMass(b.mass)
     if (aIsStatic && bIsStatic) {
       return
     }
@@ -88,14 +88,14 @@ const resolveCollision = ({
 }) => {
   const aMass = a.mass
   const bMass = b.mass
-  const aMovedAllowedByMass = moveAllowedFromMass(aMass)
-  const bMoveAllowedByMass = moveAllowedFromMass(bMass)
-  if (!aMovedAllowedByMass && !bMoveAllowedByMass) {
+  const aMotionAllowedByMass = motionAllowedFromMass(aMass)
+  const bMotionAllowedByMass = motionAllowedFromMass(bMass)
+  if (!aMotionAllowedByMass && !bMotionAllowedByMass) {
     return
   }
 
-  const aMassInverted = aMovedAllowedByMass ? 1 / aMass : 0
-  const bMassInverted = bMoveAllowedByMass ? 1 / bMass : 0
+  const aMassInverted = aMotionAllowedByMass ? 1 / aMass : 0
+  const bMassInverted = bMotionAllowedByMass ? 1 / bMass : 0
   const massInvertedSum = aMassInverted + bMassInverted
   if (a.debugCollisionResolution || b.debugCollisionResolution) {
     a.debugCollisionResolution = false
@@ -290,7 +290,7 @@ const inertiaFromGameObject = (gameObject) => {
 }
 
 const circleToInertia = ({ mass, radius, inertiaCoef }) => {
-  if (!moveAllowedFromMass(mass)) {
+  if (!motionAllowedFromMass(mass)) {
     return 0
   }
 
@@ -300,7 +300,7 @@ const circleToInertia = ({ mass, radius, inertiaCoef }) => {
 }
 
 const rectangleToInertia = ({ mass, width, height, inertiaCoef }) => {
-  if (!moveAllowedFromMass(mass)) {
+  if (!motionAllowedFromMass(mass)) {
     return 0
   }
 

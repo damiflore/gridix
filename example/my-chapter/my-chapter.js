@@ -9,7 +9,11 @@ ou au moin de petit fichier html pour tester des cas concrets
 */
 
 // import { drawCollisionInfo } from "./draw/draw.js"
-import { updateGameObjectPosition, updateGameObjectVelocity } from "./physic/physic.movement.js"
+import {
+  motionAllowedFromMass,
+  updateGameObjectPosition,
+  updateGameObjectVelocity,
+} from "./physic/physic.motion.js"
 import { updatePhysicForArcadeGame } from "./physic/physic.js"
 import { PHYSIC_CONSTANTS } from "./physic/physic.constants.js"
 import { gameObjectFromPoint } from "./game/game.js"
@@ -210,10 +214,12 @@ const gameEngine = createGameEngine({
         },
         "excite": () => {
           gameObjects.forEach((gameObject) => {
-            updateGameObjectVelocity(gameObject, {
-              x: Math.random() * 500 - 250,
-              y: Math.random() * 500 - 250,
-            })
+            if (motionAllowedFromMass(gameObject)) {
+              updateGameObjectVelocity(gameObject, {
+                x: Math.random() * 500 - 250,
+                y: Math.random() * 500 - 250,
+              })
+            }
           })
         },
         "reset": () => {

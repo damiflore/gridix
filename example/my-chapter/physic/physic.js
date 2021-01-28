@@ -1,13 +1,11 @@
-import { handleMovement } from "./physic.movement.js"
+import { handleMotion } from "./physic.motion.js"
 import { handleCollision } from "./physic.collision.js"
-
-// renommer movement en motion
 
 export const updatePhysicForArcadeGame = ({
   gameObjects,
   timePerFrame,
   // time,
-  movement = true,
+  motion = true,
   collisionCallback = () => {},
   collisionPositionResolution = true,
   collisionVelocityImpact = true,
@@ -51,8 +49,8 @@ export const updatePhysicForArcadeGame = ({
 }) => {
   const moves = []
 
-  if (movement) {
-    handleMovement({
+  if (motion) {
+    handleMotion({
       gameObjects,
       timePerFrame,
       moveCallback: (gameObject, from, to) => {
