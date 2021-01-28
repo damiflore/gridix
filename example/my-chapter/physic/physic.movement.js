@@ -4,7 +4,7 @@ import { limitNumberPrecision } from "../math/limitNumberPrecision.js"
 
 const limitVelocityPrecision = limitNumberPrecision(4)
 
-export const handleMovement = ({ gameObjects, secondsPerFrame, moveCallback }) => {
+export const handleMovement = ({ gameObjects, timePerFrame, moveCallback }) => {
   gameObjects.forEach((gameObject) => {
     if (!gameObject.rigid) {
       return
@@ -35,13 +35,13 @@ export const handleMovement = ({ gameObjects, secondsPerFrame, moveCallback }) =
     const velocityAngle = gameObject.velocityAngle
     const frictionAmbientCoef = 1 - gameObject.frictionAmbient
     const velocityXAfterApplicationOfForces = limitVelocityPrecision(
-      (velocityX + forceX * secondsPerFrame) * frictionAmbientCoef,
+      (velocityX + forceX * timePerFrame) * frictionAmbientCoef,
     )
     const velocityYAfterApplicationOfForces = limitVelocityPrecision(
-      (velocityY + forceY * secondsPerFrame) * frictionAmbientCoef,
+      (velocityY + forceY * timePerFrame) * frictionAmbientCoef,
     )
     const velocityAngleAfterApplicationOfForces = limitVelocityPrecision(
-      (velocityAngle + forceAngle * secondsPerFrame) * frictionAmbientCoef,
+      (velocityAngle + forceAngle * timePerFrame) * frictionAmbientCoef,
     )
 
     // update velocity
@@ -51,13 +51,13 @@ export const handleMovement = ({ gameObjects, secondsPerFrame, moveCallback }) =
 
     const centerX = gameObject.centerX
     const centerXAfterApplicationOfVelocity =
-      centerX + velocityXAfterApplicationOfForces * secondsPerFrame
+      centerX + velocityXAfterApplicationOfForces * timePerFrame
     const centerY = gameObject.centerY
     const centerYAfterApplicationOfVelocity =
-      centerY + velocityYAfterApplicationOfForces * secondsPerFrame
+      centerY + velocityYAfterApplicationOfForces * timePerFrame
     const angle = gameObject.angle
     const angleAfterApplicationOfVelocity =
-      angle + velocityAngleAfterApplicationOfForces * secondsPerFrame
+      angle + velocityAngleAfterApplicationOfForces * timePerFrame
 
     if (
       centerX !== centerXAfterApplicationOfVelocity ||

@@ -39,7 +39,7 @@ gameInit({
 const collisionInfos = []
 const gameEngine = createGameEngine({
   framePerSecond: 60,
-  updateState: ({ secondsPerFrame, ellapsedSeconds }) => {
+  updateState: ({ timePerFrame, time }) => {
     gameObjects.forEach((gameObject) => {
       gameObject.updateState(gameObject)
     })
@@ -47,8 +47,8 @@ const gameEngine = createGameEngine({
     collisionInfos.length = 0
     updatePhysicForArcadeGame({
       gameObjects,
-      secondsPerFrame,
-      ellapsedSeconds,
+      timePerFrame,
+      time,
       collisionCallback: ({ collisionInfo }) => {
         collisionInfos.push(collisionInfo)
       },

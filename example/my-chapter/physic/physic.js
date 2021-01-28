@@ -1,13 +1,12 @@
 import { handleMovement } from "./physic.movement.js"
 import { handleCollision } from "./physic.collision.js"
 
-// renommer seconds en time
 // renommer movement en motion
 
 export const updatePhysicForArcadeGame = ({
   gameObjects,
-  secondsPerFrame,
-  // ellapsedSeconds,
+  timePerFrame,
+  // time,
   movement = true,
   collisionCallback = () => {},
   collisionPositionResolution = true,
@@ -55,7 +54,7 @@ export const updatePhysicForArcadeGame = ({
   if (movement) {
     handleMovement({
       gameObjects,
-      secondsPerFrame,
+      timePerFrame,
       moveCallback: (gameObject, from, to) => {
         moves.push({ gameObject, from, to })
       },
