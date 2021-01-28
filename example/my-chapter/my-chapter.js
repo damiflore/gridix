@@ -17,7 +17,8 @@ import {
 import { updatePhysicForArcadeGame } from "./physic/physic.js"
 import { PHYSIC_CONSTANTS } from "./physic/physic.constants.js"
 import { gameObjectFromPoint } from "./game/game.js"
-import { gameInit } from "./gameInit.js"
+// import { demoCool } from "./demo-cool.js"
+import { demoBloc } from "./demo-bloc.js"
 import { updateDevtool } from "./devtool.js"
 import { createGameEngine } from "./engine/engine.js"
 import { drawCollisionInfo } from "./draw/draw.js"
@@ -34,7 +35,7 @@ const context = canvas.getContext("2d")
 const gameObjects = []
 let gameObjectSelectedIndex = 0
 
-gameInit({
+demoBloc({
   width,
   height,
   gameObjects,
@@ -65,8 +66,13 @@ const gameEngine = createGameEngine({
     context.clearRect(0, 0, width, height)
     context.strokeStyle = "blue"
     gameObjects.forEach((gameObject, index) => {
-      gameObject.strokeStyle = "blue"
-      gameObject.fillStyle = gameObjectSelectedIndex === index ? "violet" : undefined
+      if (gameObjectSelectedIndex === index) {
+        gameObject.strokeStyle = "orange"
+        gameObject.lineWidth = 4
+      } else {
+        gameObject.strokeStyle = undefined
+        gameObject.lineWidth = 1
+      }
       gameObject.alpha = gameObject.sleeping ? 0.5 : 1
 
       gameObject.updateDraw(gameObject, context)

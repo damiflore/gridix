@@ -2,7 +2,7 @@ import { rectangleToTopLeftCorner } from "../geometry/rectangle.js"
 import { circleToStartPoint } from "../geometry/circle.js"
 
 export const drawRectangle = (
-  { centerX, centerY, width, height, angle, strokeStyle, fillStyle, alpha },
+  { centerX, centerY, width, height, angle, strokeStyle, fillStyle, lineWidth, alpha },
   context,
 ) => {
   const topLeftCorner = rectangleToTopLeftCorner({
@@ -21,6 +21,7 @@ export const drawRectangle = (
   context.closePath()
 
   context.globalAlpha = alpha
+  context.lineWidth = lineWidth
   if (strokeStyle) {
     context.strokeStyle = strokeStyle
     context.stroke()

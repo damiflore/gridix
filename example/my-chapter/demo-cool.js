@@ -1,6 +1,6 @@
 import { createRectangle, createCircle } from "./game/shape.js"
 
-export const gameInit = ({ gameObjects, width, height, worldBounds = true }) => {
+export const demoCool = ({ gameObjects, width, height, worldBounds = true }) => {
   if (worldBounds) {
     addWorldBounds({ gameObjects, width, height })
   }
