@@ -1,7 +1,24 @@
 /**
 TODO
 
-- la carte avec des carrés et le héro
+- introduire react qui servira de devtool pour le canvas
+cette interface react fera 2 choses:
+
+lorsqu'elle se lance elle met le jeu en pause
+on peut ensuite controler le jeu pause/play
+et les interaction change du jeu de base
+-> click sélectionne le game object en desous du clic et permet
+d'inspecter son état
+on aura aussi un raccourci pour avancer 1 frame par une frame
+(sans avoir les 30 tours, vraiment une seule)
+
+lorsque l'interface se ferme le jeu reprend normalement
+
+cette interface servira aussi a modifier une carte et permettre
+de la sauvegarder en JSON va savoir ou
+(ptet qu'un petit serveur local qui écrit dans un fichier ça semble opportun)
+
+pour le moment on ne pourra travailler que sur une carte a la fois
 
 - plein de unit tests ou on teste le moteur physique (voir comment faire)
 ou au moin de petit fichier html pour tester des cas concrets

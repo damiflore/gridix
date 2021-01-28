@@ -1,7 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import { createRectangle } from "./game/shape.js"
 import { trackKeyboardKeydown } from "../../src/interaction/keyboard.js"
-import { motionAllowedFromMass } from "./physic/physic.motion.js"
 // import { getDistanceBetweenVectors } from "./geometry/vector.js"
 
 export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => {
@@ -31,7 +30,44 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
       name: "baril",
       centerX: column * cellSize + cellSize / 2,
       centerY: row * cellSize + cellSize / 2,
+      updateState: (baril) => {
+        // uniquement si la vélocié est suffisament faible
+        // et non null (on veut pas toucher si sleeping ou ne bouge plus)
+        // juste faciliter le fait qu'un baril s'arrette cell perfect (pile dans une cellule)
+        const { velocityX, velocityY } = baril
+        const velocity = velocityX * velocityX + velocityY * velocityY
+        if (velocity > 10 || velocity === 0) {
+          return
+        }
+
+        const { centerX, centerY } = baril
+        const closestCellCenter = closestCellCenterFromPoint(
+          { x: centerX, y: centerY },
+          { width, height, cellSize },
+        )
+        const centerToCellCenterXDiff = centerX - closestCellCenter.x
+        const centerToCellCenterYDiff = centerY - closestCellCenter.y
+        const force = 50
+
+        if (
+          (centerToCellCenterXDiff < 0 && velocityX >= 0) ||
+          (centerToCellCenterXDiff > 0 && velocityX <= 0)
+        ) {
+          if (Math.abs(centerToCellCenterXDiff) > 0.1 && velocityX !== 0) {
+            baril.velocityX -= centerToCellCenterXDiff * force
+          }
+        }
+        if (
+          (centerToCellCenterYDiff < 0 && velocityY >= 0) ||
+          (centerToCellCenterYDiff > 0 && velocityY <= 0)
+        ) {
+          if (Math.abs(centerToCellCenterYDiff) > 0.1 && velocityY !== 0) {
+            baril.velocityY -= centerToCellCenterYDiff * force
+          }
+        }
+      },
       angleLocked: true,
+      sleeping: true,
       width: cellSize,
       height: cellSize,
       mass: 2,
@@ -60,7 +96,7 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
   addWall({ column: 1, row: 0 })
   addWall({ column: 1, row: 1 })
   addBaril({ column: 1, row: 2 })
-  // addBaril({ column: 2, row: 2 })
+  addBaril({ column: 2, row: 2 })
   addWall({ column: 1, row: 3 })
 
   const downKey = trackKeyboardKeydown({
@@ -79,66 +115,20 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
     code: "ArrowRight",
     node: document,
   })
-  const keyboardForce = 2500
+  const keyboardForce = 250
   gameObjects.push({
     name: "keyboard-navigation",
     updateState: () => {
-      // ptet on fera avec vélocité et pas force ?
-      hero.forceX = leftKey.isDown ? -keyboardForce : rightKey.isDown ? keyboardForce : hero.forceX
-      hero.forceY = upKey.isDown ? -keyboardForce : downKey.isDown ? keyboardForce : hero.forceY
-    },
-  })
-
-  gameObjects.push({
-    name: "world-grid-magnetism",
-    updateState: () => {
-      gameObjects.forEach((gameObject) => {
-        if (!motionAllowedFromMass(gameObject.mass)) {
-          return
-        }
-        if (gameObject.name !== "baril") {
-          return
-        }
-
-        // uniquement si la vélocié est suffisament faible
-        const { velocityX, velocityY } = gameObject
-        const velocity = velocityX * velocityX + velocityY * velocityY
-        if (velocity > 10) {
-          return
-        }
-
-        const { centerX, centerY } = gameObject
-        const closestCellCenter = closestCellCenterFromPoint(
-          { x: centerX, y: centerY },
-          { width, height, cellSize },
-        )
-        const centerToCellCenterXDiff = centerX - closestCellCenter.x
-        const centerToCellCenterYDiff = centerY - closestCellCenter.y
-        const force = 50
-        // const distance = getDistanceBetweenVectors({ x: centerX, y: centerY }, closestCellCenter)
-        // const force = distance ? 500 / distance : 0
-        // now we know the force we still need to know how much it represent on x and y
-        // il faut répartir cette force sur x et y
-        // en fonction de leur éloignement
-        // pour cela je crois qu'il fau tutiliser le produit scalaire ?
-
-        if (
-          (centerToCellCenterXDiff < 0 && velocityX >= 0) ||
-          (centerToCellCenterXDiff > 0 && velocityX <= 0)
-        ) {
-          if (Math.abs(centerToCellCenterXDiff) > 0.1) {
-            gameObject.velocityX += -centerToCellCenterXDiff * force
-          }
-        }
-        if (
-          (centerToCellCenterYDiff < 0 && velocityY >= 0) ||
-          (centerToCellCenterYDiff > 0 && velocityY <= 0)
-        ) {
-          if (Math.abs(centerToCellCenterYDiff) > 0.1) {
-            gameObject.velocityY += -centerToCellCenterYDiff * force
-          }
-        }
-      })
+      hero.velocityX = leftKey.isDown
+        ? -keyboardForce
+        : rightKey.isDown
+        ? keyboardForce
+        : hero.velocityX
+      hero.velocityY = upKey.isDown
+        ? -keyboardForce
+        : downKey.isDown
+        ? keyboardForce
+        : hero.velocityY
     },
   })
 }

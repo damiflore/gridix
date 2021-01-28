@@ -11,13 +11,15 @@ import {
   updateGameObjectPosition,
 } from "./physic.motion.js"
 
+const positionResolutionCoef = 1
+
 export const handleCollision = ({
   gameObjects,
   collisionCallback,
   collisionPositionResolution,
   collisionVelocityImpact,
 }) => {
-  let collisionIterations = 1
+  let collisionIterations = 5
   while (collisionIterations--) {
     iterateOnCollision({
       gameObjects,
@@ -130,9 +132,8 @@ const adjustPositionToSolveCollision = (
   { aMassInverted, bMassInverted, massInvertedSum, collisionInfo },
 ) => {
   const { collisionDepth, collisionNormalX, collisionNormalY } = collisionInfo
-  const correctionRatio = 1
   const correctionTotal = collisionDepth / massInvertedSum
-  const correction = correctionTotal * correctionRatio
+  const correction = correctionTotal * positionResolutionCoef
   const aPositionXCorrection = a.centerX + collisionNormalX * correction * aMassInverted * -1
   const aPositionYCorrection = a.centerY + collisionNormalY * correction * aMassInverted * -1
   updateGameObjectPosition(a, {
