@@ -1,6 +1,9 @@
 import { handleMovement } from "./physic.movement.js"
 import { handleCollision } from "./physic.collision.js"
 
+// renommer seconds en time
+// renommer movement en motion
+
 export const updatePhysicForArcadeGame = ({
   gameObjects,
   secondsPerFrame,
@@ -9,13 +12,6 @@ export const updatePhysicForArcadeGame = ({
   collisionCallback = () => {},
   collisionPositionResolution = true,
   collisionVelocityImpact = true,
-
-  // pour bounce threshold
-  // this is the right keywords for the bounce issue: "rigid body bounce ground"
-  // https://forum.unity.com/threads/bouncy-character-when-landed-on-ground.408821/
-  // c'est surement une solution aussi: bounceThreshold
-  // https://github.com/MassiveHeights/Black/blob/e4967f19cbdfe42b3612981c810ac499ad34b154/src/physics/arcade/pairs/Pair.js#L51
-
   // pour sleeping qui se comporte un peu mieux
   // if an object is resting on the floor and the object
   // does not move beyond a minimal distance in about two seconds,
@@ -40,12 +36,19 @@ export const updatePhysicForArcadeGame = ({
   // only a velocity update can awake that object, happens when:
   // - an other moving object collides it (and update its velocity)
   // - something else mutates the object velocity
-  sleepEnabled = true,
-  sleepVelocityCeil = 0.1,
-  sleepVelocityAngleCeil = 0.1,
-  // sleepMoveCeil = 0.01,
-  // sleepRotationCeil = 0.01,
-  sleepFrameFloor = 5,
+  sleepEnabled = false,
+  // when move (x+y+angle) is less than sleepMotionThreshold
+  // we consider object as static/motionless
+  // when this happen for more than sleepStartSeconds
+  // object is put to sleep
+  sleepMotionThreshold = 0.1,
+  sleepStartDuration = 2,
+
+  // pour bounce threshold
+  // this is the right keywords for the bounce issue: "rigid body bounce ground"
+  // https://forum.unity.com/threads/bouncy-character-when-landed-on-ground.408821/
+  // c'est surement une solution aussi: bounceThreshold
+  // https://github.com/MassiveHeights/Black/blob/e4967f19cbdfe42b3612981c810ac499ad34b154/src/physics/arcade/pairs/Pair.js#L51
 }) => {
   const moves = []
 
@@ -69,9 +72,8 @@ export const updatePhysicForArcadeGame = ({
     handleSleep({
       moves,
       gameObjects,
-      sleepVelocityAngleCeil,
-      sleepVelocityCeil,
-      sleepFrameFloor,
+      sleepMotionThreshold,
+      sleepStartDuration,
     })
   }
 }
