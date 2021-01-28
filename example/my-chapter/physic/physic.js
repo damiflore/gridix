@@ -9,6 +9,11 @@ export const updatePhysicForArcadeGame = ({
   timePerFrame,
   time,
   motion = true,
+  // TODO: movecallback is "useless" as it is.
+  // we should add something called "move tracker"
+  // that is tracking object moves in the game and capable to notify some logic when
+  // objects are moved (it would check after collision resolution no?)
+  // et sleeping pourrait réutiliser ce concept
   // beware it's move before collision resolution
   // so not really useful, ideally callback should be called after collision resolution
   moveCallback = () => {},

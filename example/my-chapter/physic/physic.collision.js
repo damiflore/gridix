@@ -4,7 +4,7 @@ import {
   normalizeVector,
   getVectorialProduct,
 } from "../geometry/vector.js"
-import { getCollisionInfo } from "../collision/collisionInfo.js"
+import { forEachCollidingPairs } from "../collision/collision.js"
 import {
   motionAllowedFromMass,
   updateGameObjectVelocity,
@@ -21,70 +21,38 @@ export const handleCollision = ({
 }) => {
   let collisionIterations = 5
   while (collisionIterations--) {
-    iterateOnCollision({
+    forEachCollidingPairs({
       gameObjects,
-      collisionPositionResolution,
-      collisionVelocityImpact,
-      collisionCallback,
+      // iterate only on rigid
+      // non static, non sleeping pairs
+      canCollidePredicate: (a, b) => {
+        if (!a.rigid || !b.rigid) {
+          return false
+        }
+
+        const aIsStatic = a.sleeping || !motionAllowedFromMass(a.mass)
+        const bIsStatic = b.sleeping || !motionAllowedFromMass(b.mass)
+        if (aIsStatic && bIsStatic) {
+          return false
+        }
+
+        return true
+      },
+      pairCollisionCallback: (a, b, collisionInfo) => {
+        collisionCallback({
+          a,
+          b,
+          collisionInfo,
+        })
+        resolveCollision({
+          a,
+          b,
+          collisionInfo,
+          collisionPositionResolution,
+          collisionVelocityImpact,
+        })
+      },
     })
-  }
-}
-
-const iterateOnCollision = ({
-  gameObjects,
-  collisionPositionResolution,
-  collisionVelocityImpact,
-  collisionCallback,
-}) => {
-  forEachPairs(gameObjects, (a, b) => {
-    if (!a.rigid || !b.rigid) {
-      return
-    }
-
-    const aIsStatic = a.sleeping || !motionAllowedFromMass(a.mass)
-    const bIsStatic = b.sleeping || !motionAllowedFromMass(b.mass)
-    if (aIsStatic && bIsStatic) {
-      return
-    }
-
-    const collisionInfo = getCollisionInfo(a, b)
-    if (!collisionInfo) {
-      return
-    }
-
-    if (a.debugCollisionDetection || b.debugCollisionDetection) {
-      a.debugCollisionDetection = false
-      b.debugCollisionDetection = false
-      // eslint-disable-next-line no-debugger
-      debugger
-    }
-
-    collisionCallback({
-      a,
-      b,
-      collisionInfo,
-    })
-    resolveCollision({
-      a,
-      b,
-      collisionInfo,
-      collisionPositionResolution,
-      collisionVelocityImpact,
-    })
-  })
-}
-
-const forEachPairs = (array, callback) => {
-  let i = 0
-  while (i < array.length) {
-    const value = array[i]
-    i++
-    let j = i
-    while (j < array.length) {
-      const otherValue = array[j]
-      j++
-      callback(value, otherValue)
-    }
   }
 }
 

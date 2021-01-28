@@ -113,6 +113,35 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
     gameObjects.push(baril)
   }
 
+  const addIce = ({ row, column }) => {
+    // something enters the ice area -> frictionAmbient goes super low
+    const ice = createRectangle({
+      name: "ice",
+      // rigid: true,
+      centerX: column * cellSize + cellSize / 2,
+      centerY: row * cellSize + cellSize / 2,
+      width: cellSize,
+      height: cellSize,
+      fillStyle: "lightblue",
+
+      // comment faire ça ?
+      // il faudrait une callback de collision
+      // + dire qu'on est pas rigide mais qu'on peut collide
+      // + etre notifié lorsqu'une collision se termine
+      // hors cela on a pas
+      areaEffect: (gameObject) => {
+        const frictionAmbientPrevious = gameObject.frictionAmbient
+        gameObject.frictionAmbient = 0.02
+        return () => {
+          gameObject.frictionAmbient = frictionAmbientPrevious
+        }
+      },
+    })
+    gameObjects.push(ice)
+  }
+
+  // const addSpeedwalkRight = () => {}
+
   const hero = createRectangle({
     name: "hero",
     centerX: cellSize / 2,
@@ -133,6 +162,11 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
   addBaril({ column: 2, row: 2 })
   addBaril({ column: 4, row: 3 })
   addWall({ column: 1, row: 3 })
+
+  addIce({ column: 0, row: 5 })
+  addIce({ column: 1, row: 5 })
+  addIce({ column: 2, row: 5 })
+  addIce({ column: 0, row: 6 })
 
   const downKey = trackKeyboardKeydown({
     code: "ArrowDown",
@@ -168,6 +202,7 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
   })
 }
 
+// https://github.com/MassiveHeights/Black-Donuts/blob/f8aab3baba364b7f1d5e71f177639086299acb52/js/objects/board.js#L180
 const closestCellCenterFromPoint = ({ x, y }, { cellSize }) => {
   const closestColumn = Math.floor(x / cellSize)
   const closestRow = Math.floor(y / cellSize)

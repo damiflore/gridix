@@ -59,6 +59,7 @@ demoBloc({
 })
 
 const collisionInfos = []
+// const areaWeakMap = new WeakMap()
 const gameEngine = createGameEngine({
   framePerSecond: 60,
   updateState: ({ timePerFrame, time }) => {
@@ -68,6 +69,11 @@ const gameEngine = createGameEngine({
         updateState(gameObject)
       }
     })
+
+    // faire un truc qui implémente le concept de area
+    // lorsqu'un objet a une hitbox + un areaEffect on apelle cela sur tous les objets
+    // dans la zone d'effet
+    // lorsqu'un objet quitte la zone on apelle la fonction cleanup
 
     collisionInfos.length = 0
     updatePhysicForArcadeGame({
@@ -79,6 +85,13 @@ const gameEngine = createGameEngine({
       },
       collisionPositionResolution: true,
       collisionVelocityImpact: true,
+    })
+
+    gameObjects.forEach((gameObject) => {
+      const { areaEffect } = gameObject
+      if (areaEffect) {
+        // cherche tous les objets dans la zone de cet objet
+      }
     })
   },
 
