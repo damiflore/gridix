@@ -67,6 +67,7 @@ const gameEngine = createGameEngine({
     gameObjects.forEach((gameObject, index) => {
       gameObject.strokeStyle = "blue"
       gameObject.fillStyle = gameObjectSelectedIndex === index ? "violet" : undefined
+      gameObject.alpha = gameObject.sleeping ? 0.5 : 1
 
       gameObject.updateDraw(gameObject, context)
     })
