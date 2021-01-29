@@ -118,26 +118,38 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
     const ice = createRectangle({
       name: "ice",
       // rigid: true,
-      centerX: column * cellSize + cellSize / 2,
-      centerY: row * cellSize + cellSize / 2,
-      width: cellSize,
-      height: cellSize,
-      fillStyle: "lightblue",
-
-      // comment faire ça ?
-      // il faudrait une callback de collision
-      // + dire qu'on est pas rigide mais qu'on peut collide
-      // + etre notifié lorsqu'une collision se termine
-      // hors cela on a pas
-      areaEffect: (gameObject) => {
+      hitbox: true,
+      areaEffect: (_, gameObject) => {
         const frictionAmbientPrevious = gameObject.frictionAmbient
         gameObject.frictionAmbient = 0.02
         return () => {
           gameObject.frictionAmbient = frictionAmbientPrevious
         }
       },
+      centerX: column * cellSize + cellSize / 2,
+      centerY: row * cellSize + cellSize / 2,
+      width: cellSize,
+      height: cellSize,
+      fillStyle: "lightblue",
     })
     gameObjects.push(ice)
+  }
+
+  const addHero = ({ row, column }) => {
+    const hero = createRectangle({
+      name: "hero",
+      centerX: column * cellSize + cellSize / 2,
+      centerY: row * cellSize + cellSize / 2,
+      angleLocked: true,
+      width: 32,
+      height: 32,
+      fillStyle: "red",
+      rigid: true,
+      friction: 0.01,
+      frictionAmbient: 0.2,
+    })
+    gameObjects.push(hero)
+    return hero
   }
 
   // const addSpeedwalkRight = () => {}
@@ -149,24 +161,13 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
   addBaril({ column: 4, row: 3 })
   addWall({ column: 1, row: 3 })
 
+  // addIce({ column: 0, row: 0 })
   addIce({ column: 0, row: 5 })
   addIce({ column: 1, row: 5 })
   addIce({ column: 2, row: 5 })
   addIce({ column: 0, row: 6 })
 
-  const hero = createRectangle({
-    name: "hero",
-    centerX: cellSize / 2,
-    centerY: cellSize / 2,
-    angleLocked: true,
-    width: 32,
-    height: 32,
-    fillStyle: "red",
-    rigid: true,
-    friction: 0.01,
-    frictionAmbient: 0.2,
-  })
-  gameObjects.push(hero)
+  const hero = addHero({ column: 0, row: 0 })
 
   const downKey = trackKeyboardKeydown({
     code: "ArrowDown",
@@ -184,17 +185,45 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
     code: "ArrowRight",
     node: document,
   })
-  const keyboardForce = 250
+  const keyboardVelocity = 2500
   gameObjects.push({
     name: "keyboard-navigation",
     updateState: () => {
-      const forceXFromKeyboard = keyboardForce * keyToCoef(leftKey, rightKey)
-      const forceYFromKeyboard = keyboardForce * keyToCoef(upKey, downKey)
+      // https://docs.unity3d.com/ScriptReference/Rigidbody2D.AddForce.html
+      // https://gamedev.stackexchange.com/a/169844
+      // void AccelerateTowards(Vector2 targetVelocity, float maxAccel, float maxDecel) {
+      //     // Compute desired velocity change.
+      //     var velocity = body.velocity;
+      //     var deltaV = targetVelocity - velocity;
+
+      //     // Convert our velocity change to a desired acceleration,
+      //     // aiming to complete the change in a single time step.
+
+      //     // (For best consistency, call this in FixedUpdate,
+      //     //  and deltaTime will automatically give fixedDeltaTime)
+      //     var accel = deltaV / Time.deltaTime;
+
+      //     // Choose an acceleration limit depending on whether we're
+      //     // accelerating further in a similar direction, or braking.
+      //     var limit = Dot(deltaV, velocity) > 0f ? maxAccel : maxDecel;
+
+      //     // Enforce our acceleration limit, so we never exceed it.
+      //     var force = body.mass * Vector2.ClampMagnitude(accel, limit);
+
+      //     // Apply the computed force to our body.
+      //     body.AddForce(force, ForceMode2D.Force);
+      // }
+      const { velocityX, velocityY } = hero
+      const velocityXDiff = keyboardVelocity - velocityX
+      const velocityYDiff = keyboardVelocity - velocityY
+
+      const forceXFromKeyboard = velocityXDiff * keyToCoef(leftKey, rightKey)
+      const forceYFromKeyboard = velocityYDiff * keyToCoef(upKey, downKey)
       if (forceXFromKeyboard) {
-        hero.velocityX = forceXFromKeyboard
+        hero.forceX = forceXFromKeyboard
       }
       if (forceYFromKeyboard) {
-        hero.velocityY = forceYFromKeyboard
+        hero.forceY = forceYFromKeyboard
       }
     },
   })

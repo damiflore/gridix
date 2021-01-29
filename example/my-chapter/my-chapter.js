@@ -1,3 +1,4 @@
+/* eslint-disable import/max-dependencies */
 /**
 TODO
 
@@ -35,6 +36,8 @@ import { updatePhysicForArcadeGame } from "./physic/physic.js"
 import { PHYSIC_CONSTANTS } from "./physic/physic.constants.js"
 import { gameObjectFromPoint } from "./game/game.js"
 // import { demoCool } from "./demo-cool.js"
+// import { forEachCollidingPairs } from "./collision/collision.js"
+import { getCollisionInfo } from "./collision/collisionInfo.js"
 import { demoBloc } from "./demo-bloc.js"
 import { updateDevtool } from "./devtool.js"
 import { createGameEngine } from "./engine/engine.js"
@@ -58,8 +61,74 @@ demoBloc({
   gameObjects,
 })
 
+const createContactTracker = () => {
+  let previousContacts = null
+
+  const cleanupWeakMap = new WeakMap()
+
+  const update = (gameObject, gameObjects, effect) => {
+    // ça risque d'etre couteux
+    const currentContacts = getContactInfo(gameObject, gameObjects)
+
+    let lost
+    let found
+    if (previousContacts) {
+      lost = previousContacts.filter(
+        (contactPrevious) => !currentContacts.includes(contactPrevious),
+      )
+      found = currentContacts.filter((contact) => !previousContacts.includes(contact))
+    } else {
+      lost = []
+      found = currentContacts
+    }
+    previousContacts = currentContacts
+
+    // chaque nouveau contact on apelle un truc dessus
+    found.forEach((contactFound) => {
+      const effectReturnValue = effect(contactFound)
+      if (effectReturnValue) {
+        cleanupWeakMap.set(contactFound, effectReturnValue)
+      }
+    })
+    lost.forEach((contactLost) => {
+      const cleanup = cleanupWeakMap.get(contactLost)
+      if (cleanup) {
+        cleanup()
+        cleanupWeakMap.delete(contactLost)
+      }
+    })
+  }
+
+  return {
+    update,
+  }
+}
+
+const getContactInfo = (gameObject, gameObjects) => {
+  if (!gameObject.hitbox) {
+    return []
+  }
+
+  const contacts = []
+  gameObjects.forEach((gameObjectCandidate) => {
+    if (gameObjectCandidate === gameObject) {
+      return
+    }
+    if (!gameObjectCandidate.hitbox && !gameObjectCandidate.rigid) {
+      return
+    }
+
+    const collisionInfo = getCollisionInfo(gameObject, gameObjectCandidate)
+    if (!collisionInfo) {
+      return
+    }
+
+    contacts.push(gameObjectCandidate)
+  })
+  return contacts
+}
+
 const collisionInfos = []
-// const areaWeakMap = new WeakMap()
 const gameEngine = createGameEngine({
   framePerSecond: 60,
   updateState: ({ timePerFrame, time }) => {
@@ -90,7 +159,11 @@ const gameEngine = createGameEngine({
     gameObjects.forEach((gameObject) => {
       const { areaEffect } = gameObject
       if (areaEffect) {
-        // cherche tous les objets dans la zone de cet objet
+        const contactTracker =
+          gameObject.contactTracker || (gameObject.contactTracker = createContactTracker())
+        contactTracker.update(gameObject, gameObjects, (contact) => {
+          return areaEffect(gameObject, contact)
+        })
       }
     })
   },
@@ -142,15 +215,18 @@ const gameEngine = createGameEngine({
         "game-object-selected-angle": gameObjectSelected
           ? gameObjectSelected.angle.toPrecision(3)
           : "",
-        "game-object-selected-velocity-x": gameObjectSelected
-          ? gameObjectSelected.velocityX.toPrecision(3)
-          : "",
-        "game-object-selected-velocity-y": gameObjectSelected
-          ? gameObjectSelected.velocityY.toPrecision(3)
-          : "",
-        "game-object-selected-velocity-angle": gameObjectSelected
-          ? gameObjectSelected.velocityAngle.toPrecision(3)
-          : "",
+        "game-object-selected-velocity-x":
+          gameObjectSelected && gameObjectSelected.rigid
+            ? gameObjectSelected.velocityX.toPrecision(3)
+            : "",
+        "game-object-selected-velocity-y":
+          gameObjectSelected && gameObjectSelected.rigid
+            ? gameObjectSelected.velocityY.toPrecision(3)
+            : "",
+        "game-object-selected-velocity-angle":
+          gameObjectSelected && gameObjectSelected.rigid
+            ? gameObjectSelected.velocityAngle.toPrecision(3)
+            : "",
         "game-object-selected-mass": gameObjectSelected ? gameObjectSelected.mass : "",
         "game-object-selected-restitution": gameObjectSelected
           ? gameObjectSelected.restitution

@@ -13,6 +13,9 @@ export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
     const velocityX = gameObject.velocityX
     const velocityY = gameObject.velocityY
     const velocityAngle = gameObject.velocityAngle
+    // I think force should be an array
+    // so that many forces can be applied to a gameObject
+    // and once we have applied all the forces we know where that object is going
     const forceX = gameObject.forceX
     const forceY = gameObject.forceY
     const forceAngle = gameObject.forceAngle
@@ -45,10 +48,8 @@ export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
     const frictionAmbientCoef = 1 - gameObject.frictionAmbient
     const velocityXAfterApplicationOfForces =
       (velocityX + forceX * timePerFrame) * frictionAmbientCoef
-
     const velocityYAfterApplicationOfForces =
       (velocityY + forceY * timePerFrame) * frictionAmbientCoef
-
     const velocityAngleAfterApplicationOfForces = gameObject.angleLocked
       ? 0
       : (velocityAngle + forceAngle * timePerFrame) * frictionAmbientCoef
