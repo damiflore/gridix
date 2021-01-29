@@ -58,34 +58,17 @@ demoBloc({
 })
 
 const createContactTracker = () => {
-  let previousContacts = null
-
+  let previousContacts = []
   const cleanupWeakMap = new WeakMap()
 
   const update = (gameObject, gameObjects, effect) => {
     // ça risque d'etre couteux
     const currentContacts = getContactInfo(gameObject, gameObjects)
-
-    let lost
-    let found
-    if (previousContacts) {
-      lost = previousContacts.filter(
-        (contactPrevious) => !currentContacts.includes(contactPrevious),
-      )
-      found = currentContacts.filter((contact) => !previousContacts.includes(contact))
-    } else {
-      lost = []
-      found = currentContacts
-    }
-    previousContacts = currentContacts
-
-    // chaque nouveau contact on apelle un truc dessus
-    found.forEach((contactFound) => {
-      const effectReturnValue = effect(contactFound)
-      if (effectReturnValue) {
-        cleanupWeakMap.set(contactFound, effectReturnValue)
-      }
-    })
+    const lost = previousContacts.filter(
+      (contactPrevious) => !currentContacts.includes(contactPrevious),
+    )
+    // be sure to clean up first so that object is in the proper state
+    // before applying new contact effects
     lost.forEach((contactLost) => {
       const cleanup = cleanupWeakMap.get(contactLost)
       if (cleanup) {
@@ -93,6 +76,14 @@ const createContactTracker = () => {
         cleanupWeakMap.delete(contactLost)
       }
     })
+    currentContacts.forEach((contact) => {
+      const effectReturnValue = effect(contact)
+      if (effectReturnValue) {
+        cleanupWeakMap.set(contact, effectReturnValue)
+      }
+    })
+
+    previousContacts = currentContacts
   }
 
   return {

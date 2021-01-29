@@ -120,10 +120,13 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
       // rigid: true,
       hitbox: true,
       areaEffect: (_, gameObject) => {
-        const frictionAmbientPrevious = gameObject.frictionAmbient
-        gameObject.frictionAmbient = 0.02
+        gameObject.frictionAmbient = 0.05
         return () => {
-          gameObject.frictionAmbient = frictionAmbientPrevious
+          // TODO
+          // 0.2 est hardcodé parce que sinon un autre bloc de glace pourrait
+          // tenter de lire la valeur actuelle et voir celle appliqué par le bloc
+          // de glace voisin
+          gameObject.frictionAmbient = 0.2
         }
       },
       centerX: column * cellSize + cellSize / 2,
@@ -168,6 +171,8 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
   addIce({ column: 3, row: 8 })
   addIce({ column: 4, row: 8 })
   addIce({ column: 5, row: 8 })
+  addIce({ column: 6, row: 7 })
+  addIce({ column: 6, row: 8 })
 
   const hero = addHero({ column: 0, row: 0 })
 
@@ -194,12 +199,16 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
       // https://docs.unity3d.com/ScriptReference/Rigidbody2D.AddForce.html
       // https://gamedev.stackexchange.com/a/169844
 
+      // Quand on change de direction, celui ci est instantané.
+      // Ca pose un souci qui devient évident lorsque la friction est faible:
+      // Le héros bouge d'un seul coup dans l'autre direction, il est impossible de
+      // controller l'endroit ou on veut s'arreter
+      // On s'en rend compte en allant sur la glace.
       const keyXCoef = keyToCoef(leftKey, rightKey)
       if (keyXCoef) {
         const { velocityX } = hero
         const keyVelocity = keyboardVelocity * keyXCoef
         const velocityXDiff = keyVelocity - velocityX
-        // const forceXFromKey = velocityXDiff * keyXCoef
         const forceXFromKey = (velocityXDiff * hero.mass) / timePerFrame
         hero.forces.push({ x: forceXFromKey })
       }
@@ -209,7 +218,6 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
         const { velocityY } = hero
         const keyVelocity = keyboardVelocity * keyYCoef
         const velocityYDiff = keyVelocity - velocityY
-        // const forceYFromKey = velocityYDiff *
         const forceYFromKey = (velocityYDiff * hero.mass) / timePerFrame
         hero.forces.push({ y: forceYFromKey })
       }
