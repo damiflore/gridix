@@ -142,6 +142,18 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
 
   // const addSpeedwalkRight = () => {}
 
+  addWall({ column: 1, row: 0 })
+  addWall({ column: 1, row: 1 })
+  addBaril({ column: 1, row: 2 })
+  addBaril({ column: 2, row: 2 })
+  addBaril({ column: 4, row: 3 })
+  addWall({ column: 1, row: 3 })
+
+  addIce({ column: 0, row: 5 })
+  addIce({ column: 1, row: 5 })
+  addIce({ column: 2, row: 5 })
+  addIce({ column: 0, row: 6 })
+
   const hero = createRectangle({
     name: "hero",
     centerX: cellSize / 2,
@@ -155,18 +167,6 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
     frictionAmbient: 0.2,
   })
   gameObjects.push(hero)
-
-  addWall({ column: 1, row: 0 })
-  addWall({ column: 1, row: 1 })
-  addBaril({ column: 1, row: 2 })
-  addBaril({ column: 2, row: 2 })
-  addBaril({ column: 4, row: 3 })
-  addWall({ column: 1, row: 3 })
-
-  addIce({ column: 0, row: 5 })
-  addIce({ column: 1, row: 5 })
-  addIce({ column: 2, row: 5 })
-  addIce({ column: 0, row: 6 })
 
   const downKey = trackKeyboardKeydown({
     code: "ArrowDown",
@@ -188,18 +188,36 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
   gameObjects.push({
     name: "keyboard-navigation",
     updateState: () => {
-      hero.velocityX = leftKey.isDown
-        ? -keyboardForce
-        : rightKey.isDown
-        ? keyboardForce
-        : hero.velocityX
-      hero.velocityY = upKey.isDown
-        ? -keyboardForce
-        : downKey.isDown
-        ? keyboardForce
-        : hero.velocityY
+      const forceXFromKeyboard = keyboardForce * keyToCoef(leftKey, rightKey)
+      const forceYFromKeyboard = keyboardForce * keyToCoef(upKey, downKey)
+      if (forceXFromKeyboard) {
+        hero.velocityX = forceXFromKeyboard
+      }
+      if (forceYFromKeyboard) {
+        hero.velocityY = forceYFromKeyboard
+      }
     },
   })
+}
+
+const keyToCoef = (firstKey, secondKey) => {
+  if (firstKey.isDown && secondKey.isDown) {
+    if (firstKey.downTimeStamp > secondKey.downTimeStamp) {
+      return -1
+    }
+
+    return 1
+  }
+
+  if (firstKey.isDown) {
+    return -1
+  }
+
+  if (secondKey.isDown) {
+    return 1
+  }
+
+  return 0
 }
 
 // https://github.com/MassiveHeights/Black-Donuts/blob/f8aab3baba364b7f1d5e71f177639086299acb52/js/objects/board.js#L180

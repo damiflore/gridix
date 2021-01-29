@@ -3,6 +3,8 @@ import { addDOMEventListener } from "src/helper/dom.js"
 export const trackKeyboardKeydown = ({ node, code, onpress = () => {}, onrelease = () => {} }) => {
   const key = {
     isDown: false,
+    downTimeStamp: 0,
+    upTimeStamp: 0,
   }
 
   const removeKeydownListener = addDOMEventListener(node, "keydown", (keydownEvent) => {
@@ -12,6 +14,7 @@ export const trackKeyboardKeydown = ({ node, code, onpress = () => {}, onrelease
     keydownEvent.preventDefault()
     if (!key.isDown) {
       key.isDown = true
+      key.downTimeStamp = keydownEvent.timeStamp
       onpress()
     }
   })
@@ -23,6 +26,7 @@ export const trackKeyboardKeydown = ({ node, code, onpress = () => {}, onrelease
     keyupEvent.preventDefault()
     if (key.isDown) {
       key.isDown = false
+      key.upTimeStamp = keyupEvent.timeStamp
       onrelease()
     }
   })
