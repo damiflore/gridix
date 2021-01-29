@@ -40,8 +40,8 @@ import { createGameEngine } from "./engine/engine.js"
 import { drawCollisionInfo } from "./draw/draw.js"
 import { registerPageLifecyle } from "./page/page-lifecyle.js"
 
-const width = 32 * 7
-const height = 32 * 7
+const width = 32 * 10
+const height = 32 * 10
 const canvas = document.createElement("canvas")
 canvas.height = height
 canvas.width = width
@@ -131,7 +131,7 @@ const gameEngine = createGameEngine({
     gameObjects.forEach((gameObject) => {
       const { updateState } = gameObject
       if (updateState) {
-        updateState(gameObject)
+        updateState(gameObject, { timePerFrame, time })
       }
     })
 

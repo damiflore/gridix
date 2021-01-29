@@ -35,6 +35,10 @@ export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
     }
 
     // normalement c'est mass et acceleration la force, la je fait rien de tout ça
+    // et aussi, l'application d'une force par le clavier
+    // semble augmener la vélocité non stop (ah bah oui c'est normal en fait)
+    // donc le clavier ne doit appliquer une force que pour obtenir
+    // une vélocité particuliere?
     let forceXTotal = 0
     let forceYTotal = 0
     let forceAngleTotal = 0
@@ -43,21 +47,24 @@ export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
       forceYTotal += y
       forceAngleTotal += angle
     })
-
     // forces are punctual by default
     // if there is a constant force dragging object to the bottom (gravity)
     // it must be reapplied every update
     // this can be implement doing PHYSIC_CONSTANTS.forceYAmbient = 20
     forces.length = 0
 
+    const accelerationX = forceXTotal / gameObject.mass
+    const accelerationY = forceYTotal / gameObject.mass
+    const accelerationAngle = forceAngleTotal / gameObject.mass
+
     const frictionAmbientCoef = 1 - gameObject.frictionAmbient
     const velocityXAfterApplicationOfForces =
-      (velocityX + forceXTotal * timePerFrame) * frictionAmbientCoef
+      (velocityX + accelerationX * timePerFrame) * frictionAmbientCoef
     const velocityYAfterApplicationOfForces =
-      (velocityY + forceYTotal * timePerFrame) * frictionAmbientCoef
+      (velocityY + accelerationY * timePerFrame) * frictionAmbientCoef
     const velocityAngleAfterApplicationOfForces = gameObject.angleLocked
       ? 0
-      : (velocityAngle + forceAngleTotal * timePerFrame) * frictionAmbientCoef
+      : (velocityAngle + accelerationAngle * timePerFrame) * frictionAmbientCoef
 
     // update velocity
     gameObject.velocityX = velocityXAfterApplicationOfForces

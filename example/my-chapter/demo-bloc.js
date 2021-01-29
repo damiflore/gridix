@@ -162,10 +162,12 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
   addWall({ column: 1, row: 3 })
 
   // addIce({ column: 0, row: 0 })
-  addIce({ column: 0, row: 5 })
-  addIce({ column: 1, row: 5 })
-  addIce({ column: 2, row: 5 })
-  addIce({ column: 0, row: 6 })
+  addIce({ column: 3, row: 7 })
+  addIce({ column: 4, row: 7 })
+  addIce({ column: 5, row: 7 })
+  addIce({ column: 3, row: 8 })
+  addIce({ column: 4, row: 8 })
+  addIce({ column: 5, row: 8 })
 
   const hero = addHero({ column: 0, row: 0 })
 
@@ -185,45 +187,31 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
     code: "ArrowRight",
     node: document,
   })
-  const keyboardVelocity = 2500
+  const keyboardVelocity = 200
   gameObjects.push({
     name: "keyboard-navigation",
-    updateState: () => {
+    updateState: (_, { timePerFrame }) => {
       // https://docs.unity3d.com/ScriptReference/Rigidbody2D.AddForce.html
       // https://gamedev.stackexchange.com/a/169844
-      // void AccelerateTowards(Vector2 targetVelocity, float maxAccel, float maxDecel) {
-      //     // Compute desired velocity change.
-      //     var velocity = body.velocity;
-      //     var deltaV = targetVelocity - velocity;
 
-      //     // Convert our velocity change to a desired acceleration,
-      //     // aiming to complete the change in a single time step.
-
-      //     // (For best consistency, call this in FixedUpdate,
-      //     //  and deltaTime will automatically give fixedDeltaTime)
-      //     var accel = deltaV / Time.deltaTime;
-
-      //     // Choose an acceleration limit depending on whether we're
-      //     // accelerating further in a similar direction, or braking.
-      //     var limit = Dot(deltaV, velocity) > 0f ? maxAccel : maxDecel;
-
-      //     // Enforce our acceleration limit, so we never exceed it.
-      //     var force = body.mass * Vector2.ClampMagnitude(accel, limit);
-
-      //     // Apply the computed force to our body.
-      //     body.AddForce(force, ForceMode2D.Force);
-      // }
-      const { velocityX, velocityY } = hero
-      const velocityXDiff = keyboardVelocity - velocityX
-      const velocityYDiff = keyboardVelocity - velocityY
-
-      const forceXFromKeyboard = velocityXDiff * keyToCoef(leftKey, rightKey)
-      const forceYFromKeyboard = velocityYDiff * keyToCoef(upKey, downKey)
-      if (forceXFromKeyboard) {
-        hero.forces.push({ x: forceXFromKeyboard })
+      const keyXCoef = keyToCoef(leftKey, rightKey)
+      if (keyXCoef) {
+        const { velocityX } = hero
+        const keyVelocity = keyboardVelocity * keyXCoef
+        const velocityXDiff = keyVelocity - velocityX
+        // const forceXFromKey = velocityXDiff * keyXCoef
+        const forceXFromKey = (velocityXDiff * hero.mass) / timePerFrame
+        hero.forces.push({ x: forceXFromKey })
       }
-      if (forceYFromKeyboard) {
-        hero.forces.push({ y: forceYFromKeyboard })
+
+      const keyYCoef = keyToCoef(upKey, downKey)
+      if (keyYCoef) {
+        const { velocityY } = hero
+        const keyVelocity = keyboardVelocity * keyYCoef
+        const velocityYDiff = keyVelocity - velocityY
+        // const forceYFromKey = velocityYDiff *
+        const forceYFromKey = (velocityYDiff * hero.mass) / timePerFrame
+        hero.forces.push({ y: forceYFromKey })
       }
     },
   })
