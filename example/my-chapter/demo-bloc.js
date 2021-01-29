@@ -220,10 +220,10 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
       const forceXFromKeyboard = velocityXDiff * keyToCoef(leftKey, rightKey)
       const forceYFromKeyboard = velocityYDiff * keyToCoef(upKey, downKey)
       if (forceXFromKeyboard) {
-        hero.forceX = forceXFromKeyboard
+        hero.forces.push({ x: forceXFromKeyboard })
       }
       if (forceYFromKeyboard) {
-        hero.forceY = forceYFromKeyboard
+        hero.forces.push({ y: forceYFromKeyboard })
       }
     },
   })

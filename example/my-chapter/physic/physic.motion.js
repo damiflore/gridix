@@ -16,19 +16,20 @@ export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
     // I think force should be an array
     // so that many forces can be applied to a gameObject
     // and once we have applied all the forces we know where that object is going
-    const forceX = gameObject.forceX
-    const forceY = gameObject.forceY
-    const forceAngle = gameObject.forceAngle
+    const { forces } = gameObject
     const motionAllowedByMass = motionAllowedFromMass(gameObject.mass)
     if (!motionAllowedByMass) {
-      if (velocityX || velocityY || velocityAngle || forceX || forceY || forceAngle) {
+      if (forces.length > 0) {
         if (import.meta.dev) {
-          console.warn(
-            `found forces on object unable of motion, all force and velocity forced to zero`,
-          )
+          warnForcesIgnored(gameObject)
+        }
+        forces.length = 0
+      }
+      if (velocityX || velocityY || velocityAngle) {
+        if (import.meta.dev) {
+          warnVelocityIgnored(gameObject)
         }
         gameObject.velocityX = gameObject.velocityY = gameObject.velocityAngle = 0
-        gameObject.forceX = gameObject.forceY = gameObject.forceAngle = 0
       }
       return
     }
@@ -37,22 +38,30 @@ export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
       return
     }
 
+    // normalement c'est mass et acceleration la force, la je fait rien de tout ça
+    let forceXTotal = 0
+    let forceYTotal = 0
+    let forceAngleTotal = 0
+    forces.forEach(({ x = 0, y = 0, angle = 0 }) => {
+      forceXTotal += x
+      forceYTotal += y
+      forceAngleTotal += angle
+    })
+
     // forces are punctual by default
     // if there is a constant force dragging object to the bottom (gravity)
     // it must be reapplied every update
     // this can be implement doing PHYSIC_CONSTANTS.forceYAmbient = 20
-    gameObject.forceX = 0
-    gameObject.forceY = 0
-    gameObject.forceAngle = 0
+    forces.length = 0
 
     const frictionAmbientCoef = 1 - gameObject.frictionAmbient
     const velocityXAfterApplicationOfForces =
-      (velocityX + forceX * timePerFrame) * frictionAmbientCoef
+      (velocityX + forceXTotal * timePerFrame) * frictionAmbientCoef
     const velocityYAfterApplicationOfForces =
-      (velocityY + forceY * timePerFrame) * frictionAmbientCoef
+      (velocityY + forceYTotal * timePerFrame) * frictionAmbientCoef
     const velocityAngleAfterApplicationOfForces = gameObject.angleLocked
       ? 0
-      : (velocityAngle + forceAngle * timePerFrame) * frictionAmbientCoef
+      : (velocityAngle + forceAngleTotal * timePerFrame) * frictionAmbientCoef
 
     // update velocity
     gameObject.velocityX = velocityXAfterApplicationOfForces
@@ -95,33 +104,6 @@ export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
   })
 }
 
-export const updateGameObjectPosition = (
-  gameObject,
-  { x = gameObject.centerX, y = gameObject.centerY, angle = gameObject.angle },
-) => {
-  gameObject.centerX = x
-  gameObject.centerY = y
-  gameObject.angle = angle
-}
-
-export const updateGameObjectVelocity = (
-  gameObject,
-  { x = gameObject.velocityX, y = gameObject.velocityY, angle = gameObject.velocityAngle },
-) => {
-  gameObject.velocityX = x
-  gameObject.velocityY = y
-  gameObject.velocityAngle = angle
-}
-
-export const updateGameObjectForce = (
-  gameObject,
-  { x = gameObject.forceX, y = gameObject.forceY, angle = gameObject.forceAngle },
-) => {
-  gameObject.forceX = x
-  gameObject.forceY = y
-  gameObject.forceAngle = angle
-}
-
 export const motionAllowedFromMass = (mass) => {
   // object with a negative mass would move to -Infinity
   if (mass < 0) {
@@ -139,4 +121,20 @@ export const motionAllowedFromMass = (mass) => {
   }
 
   return true
+}
+
+const warnForcesIgnored = (gameObject) => {
+  console.warn(`found forces on object unable of motion, all forces ignored.
+--- game object name ---
+${gameObject.name}
+--- forces ---
+${JSON.stringify(gameObject.forces, null, "  ")}`)
+}
+
+const warnVelocityIgnored = (gameObject) => {
+  console.warn(
+    `found velocity on object unable of motion, all velocity forced to zero.
+--- game object name ---
+${gameObject.name}`,
+  )
 }

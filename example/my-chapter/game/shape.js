@@ -1,11 +1,11 @@
 import { drawRectangle, drawCircle } from "../draw/draw.js"
-import { RigidBody } from "../physic/rigid-body.js"
+import { createRigidBody } from "../physic/rigid-body.js"
 import { GameObject } from "./gameObject.js"
 
 export const createCircle = ({ rigid = false, angle = 0, ...rest } = {}) => {
   return {
     ...CIRCLE_PROPS,
-    ...(rigid ? RigidBody : {}),
+    ...(rigid ? createRigidBody() : {}),
     angle,
     ...rest,
   }
@@ -21,7 +21,7 @@ const CIRCLE_PROPS = {
 export const createRectangle = ({ rigid = false, angle = 0, ...rest } = {}) => {
   return {
     ...RECTANGLE_PROPS,
-    ...(rigid ? RigidBody : {}),
+    ...(rigid ? createRigidBody() : {}),
     angle,
     ...rest,
   }

@@ -136,12 +136,12 @@ const updateSleepingState = (
       return
     }
 
-    const { forceX, forceY, forceAngle } = gameObject
-    const force = forceX * forceX + forceY * forceY + forceAngle * forceAngle
-    if (force > 0.1) {
-      gameObject.sleeping = false
-      return
-    }
+    // const { forceX, forceY, forceAngle } = gameObject
+    // const force = forceX * forceX + forceY * forceY + forceAngle * forceAngle
+    // if (force > 0.1) {
+    //   gameObject.sleeping = false
+    //   return
+    // }
   }
 
   // not moving enough

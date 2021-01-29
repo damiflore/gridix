@@ -5,11 +5,7 @@ import {
   getVectorialProduct,
 } from "../geometry/vector.js"
 import { forEachCollidingPairs } from "../collision/collision.js"
-import {
-  motionAllowedFromMass,
-  updateGameObjectVelocity,
-  updateGameObjectPosition,
-} from "./physic.motion.js"
+import { motionAllowedFromMass } from "./physic.motion.js"
 
 const positionResolutionCoef = 1
 
@@ -104,16 +100,13 @@ const adjustPositionToSolveCollision = (
   const correction = correctionTotal * positionResolutionCoef
   const aPositionXCorrection = a.centerX + collisionNormalX * correction * aMassInverted * -1
   const aPositionYCorrection = a.centerY + collisionNormalY * correction * aMassInverted * -1
-  updateGameObjectPosition(a, {
-    x: aPositionXCorrection,
-    y: aPositionYCorrection,
-  })
+  a.centerX = aPositionXCorrection
+  a.centerY = aPositionYCorrection
+
   const bPositionXCorrection = b.centerX + collisionNormalX * correction * bMassInverted
   const bPositionYCorrection = b.centerY + collisionNormalY * correction * bMassInverted
-  updateGameObjectPosition(b, {
-    x: bPositionXCorrection,
-    y: bPositionYCorrection,
-  })
+  b.centerX = bPositionXCorrection
+  b.centerY = bPositionYCorrection
 }
 
 // min relative velocity between bodies to trigge the velocity impact
@@ -244,16 +237,13 @@ const applyCollisionImpactOnVelocity = (
   const bVelocityAngleAfterTangentImpulse =
     bVelocityAngleAfterNormalImpulse + bCollisionTangentProduct * tangentImpulseScale * bInertia
 
-  updateGameObjectVelocity(a, {
-    x: aVelocityXAfterTangentImpulse,
-    y: aVelocityYAfterTangentImpulse,
-    angle: aVelocityAngleAfterTangentImpulse,
-  })
-  updateGameObjectVelocity(b, {
-    x: bVelocityXAfterTangentImpulse,
-    y: bVelocityYAfterTangentImpulse,
-    angle: bVelocityAngleAfterTangentImpulse,
-  })
+  a.velocityX = aVelocityXAfterTangentImpulse
+  a.velocityY = aVelocityYAfterTangentImpulse
+  a.velocityAngle = aVelocityAngleAfterTangentImpulse
+
+  b.velocityX = bVelocityXAfterTangentImpulse
+  b.velocityY = bVelocityYAfterTangentImpulse
+  b.velocityAngle = bVelocityAngleAfterTangentImpulse
 }
 
 const inertiaFromGameObject = (gameObject) => {

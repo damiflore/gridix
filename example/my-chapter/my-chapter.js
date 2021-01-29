@@ -27,11 +27,7 @@ ou au moin de petit fichier html pour tester des cas concrets
 */
 
 // import { drawCollisionInfo } from "./draw/draw.js"
-import {
-  motionAllowedFromMass,
-  updateGameObjectPosition,
-  updateGameObjectVelocity,
-} from "./physic/physic.motion.js"
+import { motionAllowedFromMass } from "./physic/physic.motion.js"
 import { updatePhysicForArcadeGame } from "./physic/physic.js"
 import { PHYSIC_CONSTANTS } from "./physic/physic.constants.js"
 import { gameObjectFromPoint } from "./game/game.js"
@@ -259,32 +255,32 @@ const gameEngine = createGameEngine({
 
         "move-left": () => {
           if (gameObjectSelected) {
-            updateGameObjectPosition(gameObjectSelected, { x: gameObjectSelected.centerX - 10 })
+            gameObjectSelected.centerX -= 10
           }
         },
         "move-right": () => {
           if (gameObjectSelected) {
-            updateGameObjectPosition(gameObjectSelected, { x: gameObjectSelected.centerX + 10 })
+            gameObjectSelected.centerX += 10
           }
         },
         "move-up": () => {
           if (gameObjectSelected) {
-            updateGameObjectPosition(gameObjectSelected, { y: gameObjectSelected.centerY - 10 })
+            gameObjectSelected.centerY -= 10
           }
         },
         "move-down": () => {
           if (gameObjectSelected) {
-            updateGameObjectPosition(gameObjectSelected, { y: gameObjectSelected.centerY + 10 })
+            gameObjectSelected.centerY += 10
           }
         },
         "rotate-decrease": () => {
           if (gameObjectSelected) {
-            updateGameObjectPosition(gameObjectSelected, { angle: gameObjectSelected.angle - 0.1 })
+            gameObjectSelected.angle -= 0.1
           }
         },
         "rotate-increase": () => {
           if (gameObjectSelected) {
-            updateGameObjectPosition(gameObjectSelected, { angle: gameObjectSelected.angle + 0.1 })
+            gameObjectSelected.angle += 0.1
           }
         },
         "velocity-x-decrease": () => {
@@ -336,10 +332,8 @@ const gameEngine = createGameEngine({
         "excite": () => {
           gameObjects.forEach((gameObject) => {
             if (motionAllowedFromMass(gameObject.mass)) {
-              updateGameObjectVelocity(gameObject, {
-                x: Math.random() * 500 - 250,
-                y: Math.random() * 500 - 250,
-              })
+              gameObject.velocityX = Math.random() * 500 - 250
+              gameObject.velocityY = Math.random() * 500 - 250
             }
           })
         },
