@@ -104,7 +104,7 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
       sleeping: true,
       width: cellSize,
       height: cellSize,
-      mass: 2,
+      mass: 1,
       rigid: true,
       fillStyle: "brown",
       friction: 0.2,
@@ -138,6 +138,25 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
     gameObjects.push(ice)
   }
 
+  const addSideWalkTop = ({ row, column }) => {
+    const sidewalk = createRectangle({
+      name: "sidewalk-top",
+      // rigid: true,
+      hitbox: true,
+      areaEffect: (sidewalk, gameObject) => {
+        const sidewalkForce = { origin: sidewalk, y: -600 }
+        gameObject.forces.push(sidewalkForce)
+        return () => {}
+      },
+      centerX: column * cellSize + cellSize / 2,
+      centerY: row * cellSize + cellSize / 2,
+      width: cellSize,
+      height: cellSize,
+      fillStyle: "lightgreen",
+    })
+    gameObjects.push(sidewalk)
+  }
+
   const addHero = ({ row, column }) => {
     const hero = createRectangle({
       name: "hero",
@@ -157,11 +176,15 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
 
   // const addSpeedwalkRight = () => {}
 
+  addSideWalkTop({ column: 5, row: 1 })
+  addSideWalkTop({ column: 5, row: 2 })
+  addSideWalkTop({ column: 5, row: 3 })
+
   addWall({ column: 1, row: 0 })
   addWall({ column: 1, row: 1 })
   addBaril({ column: 1, row: 2 })
   addBaril({ column: 2, row: 2 })
-  addBaril({ column: 4, row: 3 })
+  addBaril({ column: 5, row: 3 })
   addWall({ column: 1, row: 3 })
 
   // addIce({ column: 0, row: 0 })

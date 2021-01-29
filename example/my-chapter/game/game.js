@@ -2,8 +2,9 @@ import { pointHitCircle } from "../collision/pointHitCircle.js"
 import { pointHitRectangle } from "../collision/pointHitRectangle.js"
 
 export const gameObjectFromPoint = (gameObjects, point) => {
+  const gameObjectsAtPoint = gameObjectsFromPoint(gameObjects, point)
   // ideally get the once with highest z-index
-  return gameObjectsFromPoint(gameObjects, point)[0]
+  return gameObjectsAtPoint[gameObjectsAtPoint.length - 1]
 }
 
 export const gameObjectsFromPoint = (gameObjects, point) => {
