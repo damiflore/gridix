@@ -223,6 +223,9 @@ const gameEngine = createGameEngine({
           gameObjectSelected && gameObjectSelected.rigid
             ? gameObjectSelected.velocityAngle.toPrecision(3)
             : "",
+        "game-object-selected-friction-ambient": gameObjectSelected
+          ? gameObjectSelected.frictionAmbient
+          : "",
         "game-object-selected-mass": gameObjectSelected ? gameObjectSelected.mass : "",
         "game-object-selected-restitution": gameObjectSelected
           ? gameObjectSelected.restitution

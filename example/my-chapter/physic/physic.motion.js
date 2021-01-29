@@ -34,10 +34,6 @@ export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
       return
     }
 
-    if (gameObject.sleeping) {
-      return
-    }
-
     // normalement c'est mass et acceleration la force, la je fait rien de tout ça
     let forceXTotal = 0
     let forceYTotal = 0
@@ -67,6 +63,10 @@ export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
     gameObject.velocityX = velocityXAfterApplicationOfForces
     gameObject.velocityY = velocityYAfterApplicationOfForces
     gameObject.velocityAngle = velocityAngleAfterApplicationOfForces
+
+    if (gameObject.sleeping) {
+      return
+    }
 
     const centerX = gameObject.centerX
     const centerXAfterApplicationOfVelocity =
