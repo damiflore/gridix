@@ -13,7 +13,7 @@ export const createCircle = ({ rigid = false, angle = 0, ...rest } = {}) => {
 const CIRCLE_PROPS = {
   ...GameObject,
   shape: "circle",
-  updateDraw: drawCircle,
+  draw: drawCircle,
   radius: 0,
   rigid: false,
 }
@@ -29,7 +29,7 @@ export const createRectangle = ({ rigid = false, angle = 0, ...rest } = {}) => {
 const RECTANGLE_PROPS = {
   ...GameObject,
   shape: "rectangle",
-  updateDraw: drawRectangle,
+  draw: drawRectangle,
   width: 0,
   height: 0,
   rigid: false,

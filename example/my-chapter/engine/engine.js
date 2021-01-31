@@ -1,64 +1,81 @@
 export const createGameEngine = ({
   framePerSecond = 60,
-  maxUpdatesPerFrame = 30,
-  updateState = () => {},
-  updateDraw = () => {},
+  maxUpdatePerFrame = 30,
+  update = () => {},
+  draw = () => {},
 }) => {
   let previousMs
   let frame
-  let started = false
+  let looping = false
   let paused = false
 
   const gameEngine = {
     framePerSecond,
-    maxUpdatesPerFrame,
+    maxUpdatePerFrame,
+  }
+
+  const stepInfo = {
     time: 0,
-    timePerFrame: undefined,
-    frameCount: 0,
+    timePerFrame: 0,
+    framePerSecondEstimation: 0,
+    memoryUsed: null,
+    memoryLimit: null,
+    // frameCount: 0,
+  }
+
+  const step = () => {
+    // reread them in case they got updated from outside
+    const { framePerSecond, maxUpdatePerFrame } = gameEngine
+    const timePerFrame = 1 / framePerSecond
+    stepInfo.timePerFrame = timePerFrame
+
+    const msPerFrame = timePerFrame * 1000
+    // stepInfo.frameCount++
+
+    const currentMs = Date.now()
+    // when it is called for the first time,
+    // or after resumeGameLoop() or nextGameStep()
+    // previousMs is undefined and running update once is what we want
+    const ellapsedMs = previousMs ? currentMs - previousMs : msPerFrame
+    previousMs = currentMs
+
+    const updateIdealCount = Math.floor(ellapsedMs / msPerFrame)
+    let updateCount
+    if (updateIdealCount > maxUpdatePerFrame) {
+      console.warn(
+        `too many updates to perform, only ${maxUpdatePerFrame} out of ${updateIdealCount} iterations will be done`,
+      )
+      updateCount = maxUpdatePerFrame
+    } else {
+      updateCount = updateIdealCount
+    }
+    stepInfo.framePerSecondEstimation = Math.round(1000 / ellapsedMs)
+    stepInfo.memoryUsed = Math.round(window.performance.memory.usedJSHeapSize / 1048576)
+    stepInfo.memoryLimit = window.performance.memory.jsHeapSizeLimit / 1048576
+    while (updateCount--) {
+      stepInfo.time += timePerFrame
+      update(stepInfo)
+    }
+    draw(stepInfo)
   }
 
   const gameLoop = () => {
-    if (!started) {
+    if (!looping) {
       return
     }
     frame = requestAnimationFrame(gameLoop)
     if (paused) {
       return
     }
+    step()
+  }
 
-    // reread them in case they got updated from outside
-    const { framePerSecond, maxUpdatesPerFrame } = gameEngine
-    const timePerFrame = 1 / framePerSecond
-    const frameCount = gameEngine.frameCount + 1
-    const msPerFrame = timePerFrame * 1000
-
-    gameEngine.frameCount = frameCount
-    gameEngine.timePerFrame = timePerFrame
-
-    const currentMs = Date.now()
-    // when it has never been called, previousMs is undefined
-    // in that case run it once
-    const ellapsedMs = previousMs ? currentMs - previousMs : msPerFrame
-    previousMs = currentMs
-
-    const updateIdealCount = Math.floor(ellapsedMs / msPerFrame)
-    let updateCount
-    if (updateIdealCount > maxUpdatesPerFrame) {
-      console.warn(
-        `too many updates to perform, only ${maxUpdatesPerFrame} out of ${updateIdealCount} iterations will be done`,
-      )
-      updateCount = maxUpdatesPerFrame
-    } else {
-      updateCount = updateIdealCount
+  const startGameLoop = () => {
+    if (looping) {
+      return
     }
-    gameEngine.framePerSecondEstimation = Math.round(1000 / ellapsedMs)
-    gameEngine.memoryUsed = Math.round(window.performance.memory.usedJSHeapSize / 1048576)
-    gameEngine.memoryLimit = window.performance.memory.jsHeapSizeLimit / 1048576
-    while (updateCount--) {
-      gameEngine.time += timePerFrame
-      updateState(gameEngine)
-    }
-    updateDraw(gameEngine)
+    looping = true
+    gameLoop()
   }
 
   const pauseGameLoop = () => {
@@ -76,19 +93,16 @@ export const createGameEngine = ({
     previousMs = undefined
   }
 
-  const startGameLoop = () => {
-    if (started) {
-      return
-    }
-    started = true
-    gameLoop()
+  const nextGameStep = () => {
+    previousMs = undefined
+    step()
   }
 
   const stopGameLoop = () => {
-    if (!started) {
+    if (!looping) {
       return
     }
-    started = false
+    looping = false
     window.cancelAnimationFrame(frame)
     previousMs = undefined
   }
@@ -97,6 +111,7 @@ export const createGameEngine = ({
     startGameLoop,
     pauseGameLoop,
     resumeGameLoop,
+    nextGameStep,
     stopGameLoop,
   })
 

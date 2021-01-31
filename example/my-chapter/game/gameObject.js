@@ -1,7 +1,7 @@
 export const GameObject = {
   name: "anonymous",
 
-  updateState: () => {},
+  update: () => {},
 
-  updateDraw: () => {},
+  draw: () => {},
 }

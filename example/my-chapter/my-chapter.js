@@ -118,11 +118,11 @@ const getContactInfo = (gameObject, gameObjects) => {
 const collisionInfos = []
 const gameEngine = createGameEngine({
   framePerSecond: 60,
-  updateState: ({ timePerFrame, time }) => {
+  update: ({ timePerFrame, time }) => {
     gameObjects.forEach((gameObject) => {
-      const { updateState } = gameObject
-      if (updateState) {
-        updateState(gameObject, { timePerFrame, time })
+      const { update } = gameObject
+      if (update) {
+        update(gameObject, { timePerFrame, time })
       }
     })
 
@@ -155,12 +155,12 @@ const gameEngine = createGameEngine({
     })
   },
 
-  updateDraw: ({ framePerSecondEstimation, memoryUsed, memoryLimit }) => {
+  draw: ({ framePerSecondEstimation, memoryUsed, memoryLimit }) => {
     context.clearRect(0, 0, width, height)
     context.strokeStyle = "blue"
     gameObjects.forEach((gameObject, index) => {
-      const { updateDraw } = gameObject
-      if (!updateDraw) {
+      const { draw } = gameObject
+      if (!draw) {
         return
       }
 
@@ -173,7 +173,7 @@ const gameEngine = createGameEngine({
       }
       gameObject.alpha = gameObject.sleeping ? 0.5 : 1
 
-      gameObject.updateDraw(gameObject, context)
+      gameObject.draw(gameObject, context)
     })
 
     collisionInfos.forEach((collisionInfo) => {

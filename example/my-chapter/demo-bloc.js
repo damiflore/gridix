@@ -30,7 +30,7 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
       name: "baril",
       centerX: column * cellSize + cellSize / 2,
       centerY: row * cellSize + cellSize / 2,
-      updateState: (baril) => {
+      update: (baril) => {
         // the goal here is to facilitate a moving baril to stop
         // exactly on a cell.
         // sleeping baril -> do nothing
@@ -218,7 +218,7 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
   const keyboardVelocity = 200
   gameObjects.push({
     name: "keyboard-navigation",
-    updateState: (_, { timePerFrame }) => {
+    update: (_, { timePerFrame }) => {
       // https://docs.unity3d.com/ScriptReference/Rigidbody2D.AddForce.html
       // https://gamedev.stackexchange.com/a/169844
 
