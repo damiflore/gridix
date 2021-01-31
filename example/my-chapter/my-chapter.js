@@ -225,6 +225,19 @@ const gameEngine = createGameEngine({
       },
 
       onClicks: {
+        "play": () => {
+          gameEngine.startGameLoop()
+        },
+        "pause": () => {
+          gameEngine.pauseGameLoop()
+        },
+        "resume": () => {
+          gameEngine.resumeGameLoop()
+        },
+        "step": () => {
+          gameEngine.pauseGameLoop()
+        },
+
         "debug-collision-detection": () => {
           if (gameObjectSelected) {
             gameObjectSelected.debugCollisionDetection = true

@@ -28,7 +28,12 @@
         }
       </style>
 
-      <p>Number of game objects: <span id="game-objects-length"></span></p>
+      <p>
+        <button name="play">Play</button>
+        <button name="pause">Pause</button>
+        <button name="resume">Resume</button>
+        <button name="step">Step</button>
+      </p>
 
       <p>
         <button name="excite">Excite all objects</button>
@@ -110,6 +115,8 @@
 
       <details>
         <summary>Performances</summary>
+        <p>Number of game objects: <span id="game-objects-length"></span></p>
+
         <p>Frame per second: <span id="frame-per-second"></span></p>
         <p>
           Memory heap size: <span id="js-heap-size-used"></span>/<span
