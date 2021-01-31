@@ -4,6 +4,57 @@ import { trackKeyboardKeydown } from "../../src/interaction/keyboard.js"
 // import { getDistanceBetweenVectors } from "./geometry/vector.js"
 
 export const demoBloc = ({ world, width, height }) => {
+  let hero
+
+  // put keyboard first so that sidewalk will be able to add/substract force from keyboard impulse
+  const downKey = trackKeyboardKeydown({
+    code: "ArrowDown",
+    node: document,
+  })
+  const upKey = trackKeyboardKeydown({
+    code: "ArrowUp",
+    node: document,
+  })
+  const leftKey = trackKeyboardKeydown({
+    code: "ArrowLeft",
+    node: document,
+  })
+  const rightKey = trackKeyboardKeydown({
+    code: "ArrowRight",
+    node: document,
+  })
+  const keyboardVelocity = 200
+  world.addGameObject({
+    name: "keyboard-navigation",
+    update: (_, { timePerFrame }) => {
+      // https://docs.unity3d.com/ScriptReference/Rigidbody2D.AddForce.html
+      // https://gamedev.stackexchange.com/a/169844
+
+      // Quand on change de direction, celui ci est instantané.
+      // Ca pose un souci qui devient évident lorsque la friction est faible:
+      // Le héros bouge d'un seul coup dans l'autre direction, il est impossible de
+      // controller l'endroit ou on veut s'arreter
+      // On s'en rend compte en allant sur la glace.
+      const keyXCoef = keyToCoef(leftKey, rightKey)
+      if (keyXCoef) {
+        const { velocityX } = hero
+        const keyVelocity = keyboardVelocity * keyXCoef
+        const velocityXDiff = keyVelocity - velocityX
+        const forceXFromKey = (velocityXDiff * hero.mass) / timePerFrame
+        hero.forces.push({ x: forceXFromKey })
+      }
+
+      const keyYCoef = keyToCoef(upKey, downKey)
+      if (keyYCoef) {
+        const { velocityY } = hero
+        const keyVelocity = keyboardVelocity * keyYCoef
+        const velocityYDiff = keyVelocity - velocityY
+        const forceYFromKey = (velocityYDiff * hero.mass) / timePerFrame
+        hero.forces.push({ y: forceYFromKey })
+      }
+    },
+  })
+
   const cellSize = 32
 
   const addWall = ({ column, row }) => {
@@ -185,55 +236,7 @@ export const demoBloc = ({ world, width, height }) => {
   addIce({ column: 6, row: 7 })
   addIce({ column: 6, row: 8 })
 
-  const hero = addHero({ column: 0, row: 0 })
-
-  const downKey = trackKeyboardKeydown({
-    code: "ArrowDown",
-    node: document,
-  })
-  const upKey = trackKeyboardKeydown({
-    code: "ArrowUp",
-    node: document,
-  })
-  const leftKey = trackKeyboardKeydown({
-    code: "ArrowLeft",
-    node: document,
-  })
-  const rightKey = trackKeyboardKeydown({
-    code: "ArrowRight",
-    node: document,
-  })
-  const keyboardVelocity = 200
-  world.addGameObject({
-    name: "keyboard-navigation",
-    update: (_, { timePerFrame }) => {
-      // https://docs.unity3d.com/ScriptReference/Rigidbody2D.AddForce.html
-      // https://gamedev.stackexchange.com/a/169844
-
-      // Quand on change de direction, celui ci est instantané.
-      // Ca pose un souci qui devient évident lorsque la friction est faible:
-      // Le héros bouge d'un seul coup dans l'autre direction, il est impossible de
-      // controller l'endroit ou on veut s'arreter
-      // On s'en rend compte en allant sur la glace.
-      const keyXCoef = keyToCoef(leftKey, rightKey)
-      if (keyXCoef) {
-        const { velocityX } = hero
-        const keyVelocity = keyboardVelocity * keyXCoef
-        const velocityXDiff = keyVelocity - velocityX
-        const forceXFromKey = (velocityXDiff * hero.mass) / timePerFrame
-        hero.forces.push({ x: forceXFromKey })
-      }
-
-      const keyYCoef = keyToCoef(upKey, downKey)
-      if (keyYCoef) {
-        const { velocityY } = hero
-        const keyVelocity = keyboardVelocity * keyYCoef
-        const velocityYDiff = keyVelocity - velocityY
-        const forceYFromKey = (velocityYDiff * hero.mass) / timePerFrame
-        hero.forces.push({ y: forceYFromKey })
-      }
-    },
-  })
+  hero = addHero({ column: 0, row: 0 })
 }
 
 const keyToCoef = (firstKey, secondKey) => {

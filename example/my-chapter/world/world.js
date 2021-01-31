@@ -53,7 +53,9 @@ export const createWorld = () => {
       ? gameObjectWithFrictionAndHighestIntersectionRatio.frictionGround
       : 0.2
 
-    gameObject.frictionAmbient = frictionAmbient
+    return {
+      frictionAmbient,
+    }
   }
 
   const updateGameObjectStateFromPosition = (gameObject) => {

@@ -2,6 +2,24 @@
 /**
 TODO
 
+- "fixer" le déplacement sur la glace: pouvoir mieux controler le mouvement
+meme si cela doit rester délicat. Le souci avec le comportement actuelle est que la force
+est appliqué indépendament de la direction actuelle (et ptet trop brusquement)
+
+- reimplement areaEffect or at least something capable to implement the sidewalk
+is it sufficient that each time an object is moved it check what is under it
+to know if it should be accelerated?
+sounds like it's the job of the sidewalk
+but in that case sidewalk would have to iterate all the game objects
+-> it can cost a lot to have this
+it could be improved somehow ?
+
+le sidewalk pourrait itérer que sur les objet ayant bougé ce tour ci.
+(info qu'on a pas pour le moment, on a juste une moveCallback qu'on
+ne connait qu'apres l'update de la physique)
+
+ça fait moins d'objet a check mais ça reste ptet trop
+
 - introduire react qui servira de devtool pour le canvas
 cette interface react fera 2 choses:
 
