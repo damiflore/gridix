@@ -2,10 +2,10 @@ import { motionAllowedFromMass } from "./physic.motion.js"
 
 export const handleSleep = ({
   gameObjects,
+  stepInfo,
   sleepMoveThreshold,
   sleepVelocityThreshold,
   sleepStartDuration,
-  time,
 }) => {
   gameObjects.forEach((gameObject) => {
     const { centerX, centerY, angle } = gameObject
@@ -25,13 +25,13 @@ export const handleSleep = ({
     const moveY = centerY - centerYPrev
     const moveAngle = angle - anglePrev
     updateSleepingState(gameObject, {
+      stepInfo,
       moveX,
       moveY,
       moveAngle,
       sleepMoveThreshold,
       sleepVelocityThreshold,
       sleepStartDuration,
-      time,
     })
   })
 }
@@ -59,14 +59,17 @@ const updateSleepingState = (
   }
 
   if (gameObject.sleeping) {
-    // this object is certainly about to move because velocity
-    // is high enough, ensure it is awake
+    // this object velocity increasede enough for some reason
+    // -> awake it
     const velocity = quantifyVelocity(gameObject)
     const velocityBelowSleepThreshold = velocity < sleepVelocityThreshold
     if (!velocityBelowSleepThreshold) {
       gameObject.sleeping = false
       return
     }
+
+    // this object receive new forces since it was put to sleep
+    // -> awake it
 
     // const { forceX, forceY, forceAngle } = gameObject
     // const force = forceX * forceX + forceY * forceY + forceAngle * forceAngle
@@ -76,7 +79,7 @@ const updateSleepingState = (
     // }
   }
 
-  // not moving enough
+  // at this point object is not moving enough
   if (gameObject.sleeping) {
     // already sleeping
     return
@@ -89,8 +92,9 @@ const updateSleepingState = (
     return
   }
 
-  // put object to sleep
-  // we also reset velocity to ensure it won't try to move again (due to gravity)
+  // at this point object is not noving enough since at least sleepStartDuration
+  // -> put object to sleep
+  // -> we also reset velocity to ensure it won't try to move again (due to gravity)
   // because in the last sleepStartDuration it had negligible impact
   // on its position, its unlikely to ever change
   gameObject.sleeping = true

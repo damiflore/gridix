@@ -118,11 +118,11 @@ const getContactInfo = (gameObject, gameObjects) => {
 const collisionInfos = []
 const gameEngine = createGameEngine({
   framePerSecond: 60,
-  update: ({ timePerFrame, time }) => {
+  update: (stepInfo) => {
     gameObjects.forEach((gameObject) => {
       const { update } = gameObject
       if (update) {
-        update(gameObject, { timePerFrame, time })
+        update(gameObject, stepInfo)
       }
     })
 
@@ -134,8 +134,7 @@ const gameEngine = createGameEngine({
     collisionInfos.length = 0
     updatePhysicForArcadeGame({
       gameObjects,
-      timePerFrame,
-      time,
+      stepInfo,
       collisionCallback: ({ collisionInfo }) => {
         collisionInfos.push(collisionInfo)
       },

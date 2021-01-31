@@ -4,7 +4,9 @@
 
 // const limitVelocityPrecision = limitNumberPrecision(4)
 
-export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
+export const handleMotion = ({ gameObjects, stepInfo }) => {
+  const { timePerFrame } = stepInfo
+  const positionUpdates = []
   gameObjects.forEach((gameObject) => {
     if (!gameObject.rigid) {
       return
@@ -13,9 +15,6 @@ export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
     const velocityX = gameObject.velocityX
     const velocityY = gameObject.velocityY
     const velocityAngle = gameObject.velocityAngle
-    // I think force should be an array
-    // so that many forces can be applied to a gameObject
-    // and once we have applied all the forces we know where that object is going
     const { forces } = gameObject
     const motionAllowedByMass = motionAllowedFromMass(gameObject.mass)
     if (!motionAllowedByMass) {
@@ -31,6 +30,10 @@ export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
         }
         gameObject.velocityX = gameObject.velocityY = gameObject.velocityAngle = 0
       }
+      return
+    }
+
+    if (gameObject.sleeping) {
       return
     }
 
@@ -71,10 +74,6 @@ export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
     gameObject.velocityY = velocityYAfterApplicationOfForces
     gameObject.velocityAngle = velocityAngleAfterApplicationOfForces
 
-    if (gameObject.sleeping) {
-      return
-    }
-
     const centerX = gameObject.centerX
     const centerXAfterApplicationOfVelocity =
       centerX + velocityXAfterApplicationOfForces * timePerFrame
@@ -85,30 +84,34 @@ export const handleMotion = ({ gameObjects, timePerFrame, moveCallback }) => {
     const angleAfterApplicationOfVelocity =
       angle + velocityAngleAfterApplicationOfForces * timePerFrame
 
+    // no move
     if (
-      centerX !== centerXAfterApplicationOfVelocity ||
-      centerY !== centerYAfterApplicationOfVelocity ||
-      angle !== angleAfterApplicationOfVelocity
+      centerX === centerXAfterApplicationOfVelocity &&
+      centerY === centerYAfterApplicationOfVelocity &&
+      angle === angleAfterApplicationOfVelocity
     ) {
-      gameObject.centerX = centerXAfterApplicationOfVelocity
-      gameObject.centerY = centerYAfterApplicationOfVelocity
-      gameObject.angle = angleAfterApplicationOfVelocity
-
-      moveCallback(
-        gameObject,
-        {
-          centerX,
-          centerY,
-          angle,
-        },
-        {
-          centerX: centerXAfterApplicationOfVelocity,
-          centerY: centerYAfterApplicationOfVelocity,
-          angle: angleAfterApplicationOfVelocity,
-        },
-      )
+      return
     }
+
+    gameObject.centerX = centerXAfterApplicationOfVelocity
+    gameObject.centerY = centerYAfterApplicationOfVelocity
+    gameObject.angle = angleAfterApplicationOfVelocity
+    positionUpdates.push({
+      gameObject,
+      from: {
+        centerX,
+        centerY,
+        angle,
+      },
+      to: {
+        centerX: centerXAfterApplicationOfVelocity,
+        centerY: centerYAfterApplicationOfVelocity,
+        angle: angleAfterApplicationOfVelocity,
+      },
+    })
   })
+
+  return positionUpdates
 }
 
 export const motionAllowedFromMass = (mass) => {

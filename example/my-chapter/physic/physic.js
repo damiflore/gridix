@@ -2,23 +2,14 @@ import { handleMotion } from "./physic.motion.js"
 import { handleCollision } from "./physic.collision.js"
 import { handleSleep } from "./physic.sleep.js"
 
-// maybe rename time into gameTime ?
+// maybe rename stepInfo.time into stepInfo.gameTime ?
 
 const PHYSIC_UPDATE_MAX_DURATION = 10
 
 export const updatePhysicForArcadeGame = ({
   gameObjects,
-  timePerFrame,
-  time,
-  motion = true,
-  // TODO: movecallback is "useless" as it is.
-  // we should add something called "move tracker"
-  // that is tracking object moves in the game and capable to notify some logic when
-  // objects are moved (it would check after collision resolution no?)
-  // et sleeping pourrait réutiliser ce concept
-  // beware it's move before collision resolution
-  // so not really useful, ideally callback should be called after collision resolution
-  moveCallback = () => {},
+  stepInfo,
+  // moveCallback = () => {},
 
   collisionCallback = () => {},
   collisionPositionResolution = true,
@@ -30,7 +21,7 @@ export const updatePhysicForArcadeGame = ({
   // then the physics calculations are disabled
   // -> https://en.wikipedia.org/wiki/Physics_engine
   // https://gamedev.stackexchange.com/questions/114925/in-a-2d-physics-engine-how-do-i-avoid-useless-collision-resolutions-when-object
-  sleepEnabled = true,
+  // sleepEnabled = true,
   // when move (x+y+angle) is less than sleepMoveThreshold
   // we consider object as static/motionless
   // when this happen for more than sleepStartSeconds
@@ -48,29 +39,23 @@ export const updatePhysicForArcadeGame = ({
 }) => {
   const startMs = Date.now()
 
-  if (motion) {
-    handleMotion({
-      gameObjects,
-      timePerFrame,
-      moveCallback,
-    })
-  }
+  handleMotion({
+    gameObjects,
+    stepInfo,
+  })
   handleCollision({
     gameObjects,
     collisionCallback,
     collisionPositionResolution,
     collisionVelocityImpact,
   })
-
-  if (sleepEnabled) {
-    handleSleep({
-      gameObjects,
-      sleepMoveThreshold,
-      sleepVelocityThreshold,
-      sleepStartDuration,
-      time,
-    })
-  }
+  handleSleep({
+    gameObjects,
+    stepInfo,
+    sleepMoveThreshold,
+    sleepVelocityThreshold,
+    sleepStartDuration,
+  })
 
   const endMs = Date.now()
   const duration = endMs - startMs
