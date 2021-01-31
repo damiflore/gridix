@@ -1,12 +1,19 @@
-import { motionAllowedFromMass } from "./physic.motion.js"
+import { motionAllowedFromMass, getTotalForces } from "./physic.motion.js"
 
 export const handleSleep = ({
   world,
   stepInfo,
   sleepMoveThreshold,
+  sleepForceThreshold,
   sleepVelocityThreshold,
   sleepStartDuration,
+  moveCallback,
 }) => {
+  // je pense on veut une premiere chose qui est de track qui bouge
+  // avec prev/next
+  // et un deuxieme qui est de stocker une valeur lorsqu'il s'est endormi
+  // sauf que sleep réutilise le concept de prev/next sur la position
+
   world.forEachGameObject((gameObject) => {
     const { centerX, centerY, angle } = gameObject
     const { centerXPrev, centerYPrev, anglePrev } = gameObject
@@ -30,8 +37,10 @@ export const handleSleep = ({
       moveY,
       moveAngle,
       sleepMoveThreshold,
+      sleepForceThreshold,
       sleepVelocityThreshold,
       sleepStartDuration,
+      moveCallback,
     })
   })
 }
@@ -44,8 +53,10 @@ const updateSleepingState = (
     moveY,
     moveAngle,
     sleepMoveThreshold,
+    sleepForceThreshold,
     sleepVelocityThreshold,
     sleepStartDuration,
+    moveCallback,
   },
 ) => {
   if (!gameObject.rigid) {
@@ -56,59 +67,106 @@ const updateSleepingState = (
     return
   }
 
-  const move = quantifyMove(gameObject, { moveX, moveY, moveAngle })
-  const moveBelowSleepThreshold = move < sleepMoveThreshold
-
-  // this object is moving enough to be considered awake
-  if (!moveBelowSleepThreshold) {
-    gameObject.lastNotableMoveTime = stepInfo.time
-    gameObject.sleeping = false
-    return
-  }
-
   if (gameObject.sleeping) {
-    // this object velocity increasede enough for some reason
-    // -> awake it
-    const velocity = quantifyVelocity(gameObject)
-    const velocityBelowSleepThreshold = velocity < sleepVelocityThreshold
-    if (!velocityBelowSleepThreshold) {
+    if (
+      shouldAwake(gameObject, {
+        sleepMoveThreshold,
+        sleepForceThreshold,
+        sleepVelocityThreshold,
+      })
+    ) {
+      gameObject.lastNotableMotionTime = stepInfo.time
       gameObject.sleeping = false
-      return
+      moveCallback(gameObject)
     }
-
-    // this object receive new forces since it was put to sleep
-    // -> awake it
-
-    // const { forceX, forceY, forceAngle } = gameObject
-    // const force = forceX * forceX + forceY * forceY + forceAngle * forceAngle
-    // if (forc) {
-    //   gameObject.sleeping = false
-    //   return
-    // }
-  }
-
-  // at this point object is not moving enough
-  if (gameObject.sleeping) {
-    // already sleeping
     return
   }
 
-  // since how long object is not moving?
-  const lastNotableMoveTime = gameObject.lastNotableMoveTime
-  const timeSinceLastNotableMove = stepInfo.time - lastNotableMoveTime
-  if (timeSinceLastNotableMove < sleepStartDuration) {
+  const move = quantifyMove(gameObject, { moveX, moveY, moveAngle })
+  // it's moving enough
+  if (move > sleepMoveThreshold) {
+    gameObject.lastNotableMotionTime = stepInfo.time
+    moveCallback(gameObject)
+    return
+  }
+
+  // not moving enough, since how long?
+  const lastNotableMotionTime = gameObject.lastNotableMotionTime
+  const timeSinceLastNotableMotion = stepInfo.time - lastNotableMotionTime
+  if (timeSinceLastNotableMotion < sleepStartDuration) {
+    // not since enough time
     return
   }
 
   // at this point object is not noving enough since at least sleepStartDuration
   // -> put object to sleep
-  // -> we also reset velocity to ensure it won't try to move again (due to gravity)
-  // because in the last sleepStartDuration it had negligible impact
-  // on its position, its unlikely to ever change
-  gameObject.sleeping = true
-  gameObject.velocityX = 0
-  gameObject.velocityY = 0
-  gameObject.velocityAngle = 0
+  Object.assign(gameObject, {
+    sleeping: true,
+    forceXWhenSleepStarted: 0,
+    forceYWhenSleepStarted: 0,
+    forceAngleWhenSleepStarted: 0,
+    velocityXWhenSleepStarted: gameObject.velocityX,
+    velocityYWhenSleepStarted: gameObject.velocityY,
+    velocityAngleWhenSleepStarted: gameObject.velocityAngle,
+  })
+}
+
+const shouldAwake = (
+  gameObject,
+  { moveX, moveY, moveAngle, sleepMoveThreshold, sleepVelocityThreshold, sleepForceThreshold },
+) => {
+  const move = quantifyMove(gameObject, { moveX, moveY, moveAngle })
+  if (move > sleepMoveThreshold) {
+    return true
+  }
+
+  const { velocityX, velocityXWhenSleepStarted } = gameObject
+  const velocityXSinceSleeping = Math.abs(velocityXWhenSleepStarted - velocityX)
+  if (velocityXSinceSleeping > sleepVelocityThreshold) {
+    // this object velocityX increased enough for some reason
+    return true
+  }
+
+  const { velocityY, velocityYWhenSleepStarted } = gameObject
+  const velocityYSinceSleeping = Math.abs(velocityYWhenSleepStarted - velocityY)
+  if (velocityYSinceSleeping > sleepVelocityThreshold) {
+    // this object velocityY increased enough for some reason
+    return true
+  }
+
+  const { velocityAngle, velocityAngleWhenSleepStarted } = gameObject
+  const velocityAngleSinceSleeping = Math.abs(velocityAngleWhenSleepStarted - velocityAngle)
+  if (velocityAngleSinceSleeping > sleepVelocityThreshold) {
+    // this object velocityAngle increased enough for some reason
+    // -> awake it
+    return true
+  }
+
+  const forceTotal = getTotalForces(gameObject.forces)
+  const { forceXWhenSleepStarted } = gameObject
+  const forceXSinceSleeping = Math.abs(forceXWhenSleepStarted - forceTotal.x)
+  if (forceXSinceSleeping > sleepForceThreshold) {
+    // this object force x increased enough for some reason
+    // -> awake it
+    return true
+  }
+
+  const { forceYWhenSleepStarted } = gameObject
+  const forceYSinceSleeping = Math.abs(forceYWhenSleepStarted - forceTotal.y)
+  if (forceYSinceSleeping > sleepForceThreshold) {
+    // this object force y increased enough for some reason
+    // -> awake it
+    return true
+  }
+
+  const { forceAngleWhenSleepStarted } = gameObject
+  const forceAngleSinceSleeping = Math.abs(forceAngleWhenSleepStarted - forceTotal.angle)
+  if (forceAngleSinceSleeping > sleepForceThreshold) {
+    // this object force angle increased enough for some reason
+    return true
+  }
+
+  return false
 }
 
 const quantifyMove = (gameObject, { moveX, moveY, moveAngle }) => {
@@ -125,25 +183,6 @@ const quantifyMove = (gameObject, { moveX, moveY, moveAngle }) => {
       // not a super approximation, we should take into acount the dimension
       const moveFromAngle = moveAngle * moveAngle
       total += moveFromAngle
-    }
-  }
-
-  return total
-}
-
-const quantifyVelocity = ({ shape, velocityX, velocityY, velocityAngle }) => {
-  let total = 0
-
-  const velocityFromXAndY = velocityX * velocityX + velocityY * velocityY
-  total += velocityFromXAndY
-
-  if (velocityAngle) {
-    if (shape === "circle") {
-      // nothing todo: rotating a circle does not impact its position
-    }
-    if (shape === "rectangle") {
-      const velocityFromAngle = velocityAngle * velocityAngle
-      total += velocityFromAngle
     }
   }
 

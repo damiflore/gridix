@@ -9,12 +9,6 @@ const PHYSIC_UPDATE_MAX_DURATION = 15
 export const updatePhysicForArcadeGame = ({
   world,
   stepInfo,
-  // moveCallback = () => {},
-
-  // deriveStateFromPosition = (gameObject, { gameObjects }) => {
-  //   // here we compute frictionAmbient
-  // },
-
   collisionCallback = () => {},
   collisionPositionResolution = true,
   collisionVelocityImpact = true,
@@ -31,8 +25,10 @@ export const updatePhysicForArcadeGame = ({
   // when this happen for more than sleepStartSeconds
   // object is put to sleep
   sleepMoveThreshold = 0.1,
+  sleepForceThreshold = 1,
   sleepVelocityThreshold = 0.1,
   sleepStartDuration = 2,
+  moveCallback = () => {},
 
   // pour bounce threshold
   // this is the right keywords for the bounce issue: "rigid body bounce ground"
@@ -57,8 +53,10 @@ export const updatePhysicForArcadeGame = ({
     world,
     stepInfo,
     sleepMoveThreshold,
+    sleepForceThreshold,
     sleepVelocityThreshold,
     sleepStartDuration,
+    moveCallback,
   })
 
   const endMs = Date.now()

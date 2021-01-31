@@ -42,23 +42,16 @@ export const handleMotion = ({ world, stepInfo }) => {
     // semble augmener la vélocité non stop (ah bah oui c'est normal en fait)
     // donc le clavier ne doit appliquer une force que pour obtenir
     // une vélocité particuliere?
-    let forceXTotal = 0
-    let forceYTotal = 0
-    let forceAngleTotal = 0
-    forces.forEach(({ x = 0, y = 0, angle = 0 }) => {
-      forceXTotal += x
-      forceYTotal += y
-      forceAngleTotal += angle
-    })
+    const forceTotal = getTotalForces(forces)
     // forces are punctual by default
     // if there is a constant force dragging object to the bottom (gravity)
     // it must be reapplied every update
     // this can be implement doing PHYSIC_CONSTANTS.forceYAmbient = 20
     forces.length = 0
 
-    const accelerationX = forceXTotal / gameObject.mass
-    const accelerationY = forceYTotal / gameObject.mass
-    const accelerationAngle = forceAngleTotal / gameObject.mass
+    const accelerationX = forceTotal.x / gameObject.mass
+    const accelerationY = forceTotal.y / gameObject.mass
+    const accelerationAngle = forceTotal.angle / gameObject.mass
 
     const frictionAmbientCoef = 1 - gameObject.frictionAmbient
     const velocityXAfterApplicationOfForces =
@@ -112,6 +105,22 @@ export const handleMotion = ({ world, stepInfo }) => {
   })
 
   return positionUpdates
+}
+
+export const getTotalForces = (forces) => {
+  let forceXTotal = 0
+  let forceYTotal = 0
+  let forceAngleTotal = 0
+  forces.forEach(({ x = 0, y = 0, angle = 0 }) => {
+    forceXTotal += x
+    forceYTotal += y
+    forceAngleTotal += angle
+  })
+  return {
+    x: forceXTotal,
+    y: forceYTotal,
+    angle: forceAngleTotal,
+  }
 }
 
 export const motionAllowedFromMass = (mass) => {

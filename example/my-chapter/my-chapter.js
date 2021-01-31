@@ -61,7 +61,7 @@ const gameEngine = createGameEngine({
   },
 
   draw: (stepInfo) => {
-    world.draw(stepInfo)
+    world.draw(stepInfo, context)
 
     const { framePerSecondEstimation, memoryUsed, memoryLimit } = stepInfo
 

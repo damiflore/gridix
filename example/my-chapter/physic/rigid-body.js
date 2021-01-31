@@ -2,10 +2,20 @@ export const createRigidBody = () => {
   return {
     rigid: true,
     sleeping: false,
-    lastNotableMoveTime: 0,
+    lastNotableMotionTime: 0,
     centerXPrev: undefined,
     centerYPrev: undefined,
     anglePrev: undefined,
+    forceXWhenSleepStarted: 0,
+    forceYWhenSleepStarted: 0,
+    forceAngleWhenSleepStarted: 0,
+    velocityXWhenSleepStarted: 0,
+    velocityYWhenSleepStarted: 0,
+    velocityAngleWhenSleepStarted: 0,
+    // centerXWhenSleepStarted: 0,
+    // centerYWhenSleepStarted: 0,
+    // angleWhenSleepStarted: 0,
+
     debugCollisionResolution: false,
     debugCollisionDetection: false,
 
