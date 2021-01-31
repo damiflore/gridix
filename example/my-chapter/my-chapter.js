@@ -28,7 +28,6 @@ ou au moin de petit fichier html pour tester des cas concrets
 
 // import { drawCollisionInfo } from "./draw/draw.js"
 import { motionAllowedFromMass } from "./physic/physic.motion.js"
-import { updatePhysicForArcadeGame } from "./physic/physic.js"
 import { PHYSIC_CONSTANTS } from "./physic/physic.constants.js"
 import { createWorld, addBoundsToWorld } from "./world/world.js"
 // import { demoCool } from "./demo-cool.js"
@@ -36,7 +35,6 @@ import { createWorld, addBoundsToWorld } from "./world/world.js"
 import { demoBloc } from "./demo-bloc.js"
 import { updateDevtool } from "./devtool.js"
 import { createGameEngine } from "./engine/engine.js"
-import { drawCollisionInfo } from "./draw/draw.js"
 import { registerPageLifecyle } from "./page/page-lifecyle.js"
 
 const width = 32 * 10
@@ -48,7 +46,6 @@ document.querySelector("#container").appendChild(canvas)
 
 const context = canvas.getContext("2d")
 let gameObjectSelected = null
-
 const world = createWorld()
 addBoundsToWorld(world, { width, height })
 demoBloc({
@@ -57,35 +54,15 @@ demoBloc({
   height,
 })
 
-const collisionInfos = []
 const gameEngine = createGameEngine({
   framePerSecond: 60,
   update: (stepInfo) => {
-    world.forEachGameObject((gameObject) => {
-      const { update } = gameObject
-      if (update) {
-        update(gameObject, stepInfo)
-      }
-    })
-
-    // faire un truc qui implémente le concept de area
-    // lorsqu'un objet a une hitbox + un areaEffect on apelle cela sur tous les objets
-    // dans la zone d'effet
-    // lorsqu'un objet quitte la zone on apelle la fonction cleanup
-
-    collisionInfos.length = 0
-    updatePhysicForArcadeGame({
-      world,
-      stepInfo,
-      collisionCallback: ({ collisionInfo }) => {
-        collisionInfos.push(collisionInfo)
-      },
-      collisionPositionResolution: true,
-      collisionVelocityImpact: true,
-    })
+    world.update(stepInfo)
   },
 
   draw: (stepInfo) => {
+    world.draw(stepInfo)
+
     const { framePerSecondEstimation, memoryUsed, memoryLimit } = stepInfo
 
     context.clearRect(0, 0, width, height)
@@ -106,10 +83,6 @@ const gameEngine = createGameEngine({
       gameObject.alpha = gameObject.sleeping ? 0.5 : 1
 
       gameObject.draw(gameObject, context)
-    })
-
-    collisionInfos.forEach((collisionInfo) => {
-      drawCollisionInfo(collisionInfo, context)
     })
 
     updateDevtool({
@@ -281,18 +254,6 @@ const gameEngine = createGameEngine({
 window.addEventListener("error", () => {
   gameEngine.stopGameLoop()
 })
-canvas.addEventListener("click", (clickEvent) => {
-  const clickPoint = {
-    x: clickEvent.offsetX,
-    y: clickEvent.offsetY,
-  }
-  const gameObjectUnderClick = world.gameObjectFromPoint(clickPoint)
-  if (gameObjectUnderClick) {
-    gameObjectSelected = gameObjectUnderClick
-  }
-})
-gameEngine.startGameLoop()
-
 registerPageLifecyle({
   active: () => {
     gameEngine.resumeGameLoop()
@@ -309,4 +270,16 @@ registerPageLifecyle({
   frozen: () => {
     gameEngine.pauseGameLoop()
   },
+})
+gameEngine.startGameLoop()
+
+canvas.addEventListener("click", (clickEvent) => {
+  const clickPoint = {
+    x: clickEvent.offsetX,
+    y: clickEvent.offsetY,
+  }
+  const gameObjectUnderClick = world.gameObjectFromPoint(clickPoint)
+  if (gameObjectUnderClick) {
+    gameObjectSelected = gameObjectUnderClick
+  }
 })

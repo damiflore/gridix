@@ -1,12 +1,62 @@
 import { pointHitCircle } from "../collision/pointHitCircle.js"
 import { pointHitRectangle } from "../collision/pointHitRectangle.js"
+import { updatePhysicForArcadeGame } from "../physic/physic.js"
+import { drawCollisionInfo } from "../draw/draw.js"
 import { createRectangle } from "./shape.js"
 
 export const createWorld = () => {
   const gameObjects = []
+  const collisionInfos = []
   const world = {}
 
+  const deriveStateFromPosition = () => {
+    // c'est ici qu'on va regarder si cet objet est sur un sol ayant une friction particuliere
+    // et si c'est le cas update la friction ambiente de cet objet
+  }
+
+  const updateGameObjectStateFromPosition = (gameObject) => {
+    const stateFromPosition = deriveStateFromPosition(gameObject)
+    if (stateFromPosition) {
+      Object.assign(gameObject, stateFromPosition)
+    }
+  }
+
+  const update = (stepInfo) => {
+    world.forEachGameObject((gameObject) => {
+      const { update } = gameObject
+      if (update) {
+        update(gameObject, stepInfo)
+      }
+    })
+
+    // faire un truc qui implémente le concept de area
+    // lorsqu'un objet a une hitbox + un areaEffect on apelle cela sur tous les objets
+    // dans la zone d'effet
+    // lorsqu'un objet quitte la zone on apelle la fonction cleanup
+
+    collisionInfos.length = 0
+    updatePhysicForArcadeGame({
+      world,
+      stepInfo,
+      collisionCallback: ({ collisionInfo }) => {
+        collisionInfos.push(collisionInfo)
+      },
+      moveCallback: (gameObject) => {
+        updateGameObjectStateFromPosition(gameObject)
+      },
+      collisionPositionResolution: true,
+      collisionVelocityImpact: true,
+    })
+  }
+
+  const draw = (stepInfo, context) => {
+    collisionInfos.forEach((collisionInfo) => {
+      drawCollisionInfo(collisionInfo, context)
+    })
+  }
+
   const addGameObject = (gameObject) => {
+    updateGameObjectStateFromPosition(gameObject)
     gameObjects.push(gameObject)
   }
 
@@ -38,6 +88,8 @@ export const createWorld = () => {
   const getGameObjects = () => gameObjects
 
   Object.assign(world, {
+    update,
+    draw,
     getGameObjects,
     addGameObject,
     countGameObjects,
