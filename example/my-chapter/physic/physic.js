@@ -3,7 +3,8 @@ import { handleCollision } from "./physic.collision.js"
 import { handleSleep } from "./physic.sleep.js"
 
 // maybe rename time into gameTime ?
-// put sleepEnabled sur rigid body (pouvoir le controller par rigidBody)
+
+const PHYSIC_UPDATE_MAX_DURATION = 10
 
 export const updatePhysicForArcadeGame = ({
   gameObjects,
@@ -22,6 +23,7 @@ export const updatePhysicForArcadeGame = ({
   collisionCallback = () => {},
   collisionPositionResolution = true,
   collisionVelocityImpact = true,
+  // TODO: put sleepEnabled sur rigid body (pouvoir le controller par rigidBody)
   // pour sleeping qui se comporte un peu mieux
   // if an object is resting on the floor and the object
   // does not move beyond a minimal distance in about two seconds,
@@ -44,6 +46,8 @@ export const updatePhysicForArcadeGame = ({
   // https://github.com/MassiveHeights/Black/blob/e4967f19cbdfe42b3612981c810ac499ad34b154/src/physics/arcade/pairs/Pair.js#L51
   // bounceThreshold = 1,
 }) => {
+  const startMs = Date.now()
+
   if (motion) {
     handleMotion({
       gameObjects,
@@ -66,5 +70,17 @@ export const updatePhysicForArcadeGame = ({
       sleepStartDuration,
       time,
     })
+  }
+
+  const endMs = Date.now()
+  const duration = endMs - startMs
+  if (duration > PHYSIC_UPDATE_MAX_DURATION) {
+    if (import.meta.dev) {
+      console.warn(
+        `physic update is too slow, took ${duration}ms (should be less than ${PHYSIC_UPDATE_MAX_DURATION})`,
+      )
+      // eslint-disable-next-line no-debugger
+      debugger
+    }
   }
 }
