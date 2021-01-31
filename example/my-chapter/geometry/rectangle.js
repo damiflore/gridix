@@ -50,3 +50,39 @@ export const rectangleToNormals = ({ centerX, centerY, width, height, angle }) =
   }
 }
 export const RECTANGLE_NORMAL_KEYS = ["topNormal", "rightNormal", "bottomNormal", "leftNormal"]
+
+export const getIntersectionRatioBetweenRectangles = (firstRectangle, secondRectangle) => {
+  const rectangleIntersection = getRectangleIntersection(firstRectangle, secondRectangle)
+  const firstArea = firstRectangle.width * firstRectangle.height
+  const intersectionArea = rectangleIntersection.width * rectangleIntersection.height
+  return intersectionArea / firstArea
+}
+
+const getRectangleIntersection = (firstRectangle, secondRectangle) => {
+  if (firstRectangle.angle || secondRectangle.angle) {
+    // it's possible but not supported for now
+    throw new Error("cannot be called on rotated rectangle")
+  }
+
+  const firstLeft = firstRectangle.centerX - firstRectangle.width / 2
+  const firstRight = firstLeft + firstRectangle.width
+  const firstTop = firstRectangle.centerY - firstRectangle.height / 2
+  const firstBottom = firstTop + firstRectangle.height
+  const secondLeft = secondRectangle.centerX - secondRectangle.width / 2
+  const secondRight = firstLeft + secondRectangle.width
+  const secondTop = secondRectangle.centerY - secondRectangle.height / 2
+  const secondBottom = firstTop + secondRectangle.height
+  const intersectionLeft = firstLeft < secondLeft ? secondLeft : firstLeft
+  const intersectionRight = firstRight < secondRight ? firstRight : secondRight
+  const intersectionTop = firstTop < secondTop ? secondTop : firstTop
+  const intersectionBottom = firstBottom < secondBottom ? firstBottom : secondBottom
+  const intersectionHeight = intersectionBottom - intersectionTop
+  const intersectionWidth = intersectionRight - intersectionLeft
+  const rectangleForIntersection = {
+    centerX: intersectionLeft + intersectionWidth / 2,
+    centerY: intersectionTop + intersectionHeight / 2,
+    width: intersectionWidth,
+    height: intersectionHeight,
+  }
+  return rectangleForIntersection
+}

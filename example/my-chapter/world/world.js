@@ -1,5 +1,7 @@
 import { pointHitCircle } from "../collision/pointHitCircle.js"
 import { pointHitRectangle } from "../collision/pointHitRectangle.js"
+import { getCollisionInfo } from "../collision/collisionInfo.js"
+import { getIntersectionRatioBetweenRectangles } from "../geometry/rectangle.js"
 import { updatePhysicForArcadeGame } from "../physic/physic.js"
 import { drawCollisionInfo } from "../draw/draw.js"
 import { createRectangle } from "./shape.js"
@@ -9,9 +11,49 @@ export const createWorld = () => {
   const collisionInfos = []
   const world = {}
 
-  const deriveStateFromPosition = () => {
-    // c'est ici qu'on va regarder si cet objet est sur un sol ayant une friction particuliere
-    // et si c'est le cas update la friction ambiente de cet objet
+  const deriveStateFromPosition = (gameObject) => {
+    let gameObjectWithFrictionAndHighestIntersectionRatio = null
+    const highestIntersectionRatio = 0
+    gameObjects.forEach((gameObjectCandidate) => {
+      if (gameObjectCandidate === gameObject) {
+        return
+      }
+      if (!gameObject.hitbox) {
+        return
+      }
+      if (!gameObjectCandidate.hitbox) {
+        return
+      }
+      const { frictionGround } = gameObjectCandidate
+      if (frictionGround === undefined) {
+        return
+      }
+      const collisionInfo = getCollisionInfo(gameObject, gameObjectCandidate)
+
+      if (!collisionInfo) {
+        return
+      }
+
+      // ideally we would choose the ground with highest intersection ratio
+      // with gameObject
+      const intersectionRatio = getIntersectionRatioBetweenRectangles(
+        gameObject,
+        gameObjectCandidate,
+      )
+      if (intersectionRatio > highestIntersectionRatio) {
+        gameObjectWithFrictionAndHighestIntersectionRatio = gameObjectCandidate
+      }
+    })
+
+    // the only "drawback" is the if hero stands on the ground
+    // but ground has no frictionGround set, then the first object with a frictionGround
+    // will be applied. It can be fixed by ensuring all ground objects
+    // got a frictionGround set
+    const frictionAmbient = gameObjectWithFrictionAndHighestIntersectionRatio
+      ? gameObjectWithFrictionAndHighestIntersectionRatio.frictionGround
+      : 0.2
+
+    gameObject.frictionAmbient = frictionAmbient
   }
 
   const updateGameObjectStateFromPosition = (gameObject) => {

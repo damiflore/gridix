@@ -1,6 +1,7 @@
 export const createRigidBody = () => {
   return {
     rigid: true,
+    hitbox: true,
     sleeping: false,
     lastNotableMotionTime: 0,
     centerXPrev: undefined,
