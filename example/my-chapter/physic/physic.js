@@ -4,12 +4,16 @@ import { handleSleep } from "./physic.sleep.js"
 
 // maybe rename stepInfo.time into stepInfo.gameTime ?
 
-const PHYSIC_UPDATE_MAX_DURATION = 10
+const PHYSIC_UPDATE_MAX_DURATION = 15
 
 export const updatePhysicForArcadeGame = ({
-  gameObjects,
+  world,
   stepInfo,
   // moveCallback = () => {},
+
+  // deriveStateFromPosition = (gameObject, { gameObjects }) => {
+  //   // here we compute frictionAmbient
+  // },
 
   collisionCallback = () => {},
   collisionPositionResolution = true,
@@ -40,17 +44,17 @@ export const updatePhysicForArcadeGame = ({
   const startMs = Date.now()
 
   handleMotion({
-    gameObjects,
+    world,
     stepInfo,
   })
   handleCollision({
-    gameObjects,
+    world,
     collisionCallback,
     collisionPositionResolution,
     collisionVelocityImpact,
   })
   handleSleep({
-    gameObjects,
+    world,
     stepInfo,
     sleepMoveThreshold,
     sleepVelocityThreshold,
@@ -65,7 +69,7 @@ export const updatePhysicForArcadeGame = ({
         `physic update is too slow, took ${duration}ms (should be less than ${PHYSIC_UPDATE_MAX_DURATION})`,
       )
       // eslint-disable-next-line no-debugger
-      debugger
+      // debugger
     }
   }
 }

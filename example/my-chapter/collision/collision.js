@@ -2,11 +2,11 @@ import { getCollisionInfo } from "../collision/collisionInfo.js"
 import { forEachPairs } from "../helper/pairs.js"
 
 export const forEachCollidingPairs = ({
-  gameObjects,
+  world,
   canCollidePredicate = () => true,
   pairCollisionCallback,
 }) => {
-  forEachPairs(gameObjects, (a, b) => {
+  forEachPairs(world.getGameObjects(), (a, b) => {
     if (canCollidePredicate(a, b)) {
       const collisionInfo = getCollisionInfo(a, b)
       if (collisionInfo) {

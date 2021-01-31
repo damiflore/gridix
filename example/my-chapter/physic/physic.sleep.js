@@ -1,13 +1,13 @@
 import { motionAllowedFromMass } from "./physic.motion.js"
 
 export const handleSleep = ({
-  gameObjects,
+  world,
   stepInfo,
   sleepMoveThreshold,
   sleepVelocityThreshold,
   sleepStartDuration,
 }) => {
-  gameObjects.forEach((gameObject) => {
+  world.forEachGameObject((gameObject) => {
     const { centerX, centerY, angle } = gameObject
     const { centerXPrev, centerYPrev, anglePrev } = gameObject
     // now we know the move for this object, store current position
@@ -38,7 +38,15 @@ export const handleSleep = ({
 
 const updateSleepingState = (
   gameObject,
-  { moveX, moveY, moveAngle, sleepMoveThreshold, sleepVelocityThreshold, sleepStartDuration, time },
+  {
+    stepInfo,
+    moveX,
+    moveY,
+    moveAngle,
+    sleepMoveThreshold,
+    sleepVelocityThreshold,
+    sleepStartDuration,
+  },
 ) => {
   if (!gameObject.rigid) {
     return
@@ -53,7 +61,7 @@ const updateSleepingState = (
 
   // this object is moving enough to be considered awake
   if (!moveBelowSleepThreshold) {
-    gameObject.lastNotableMoveTime = time
+    gameObject.lastNotableMoveTime = stepInfo.time
     gameObject.sleeping = false
     return
   }
@@ -85,9 +93,9 @@ const updateSleepingState = (
     return
   }
 
-  // should we put object to sleep ?
+  // since how long object is not moving?
   const lastNotableMoveTime = gameObject.lastNotableMoveTime
-  const timeSinceLastNotableMove = time - lastNotableMoveTime
+  const timeSinceLastNotableMove = stepInfo.time - lastNotableMoveTime
   if (timeSinceLastNotableMove < sleepStartDuration) {
     return
   }

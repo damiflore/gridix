@@ -1,13 +1,9 @@
 /* eslint-disable no-nested-ternary */
-import { createRectangle } from "./game/shape.js"
+import { createRectangle } from "./world/shape.js"
 import { trackKeyboardKeydown } from "../../src/interaction/keyboard.js"
 // import { getDistanceBetweenVectors } from "./geometry/vector.js"
 
-export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => {
-  if (worldBounds) {
-    addWorldBounds({ gameObjects, width, height })
-  }
-
+export const demoBloc = ({ world, width, height }) => {
   const cellSize = 32
 
   const addWall = ({ column, row }) => {
@@ -22,7 +18,7 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
       fillStyle: "black",
       friction: 0.2,
     })
-    gameObjects.push(wall)
+    world.addGameObject(wall)
   }
 
   const addBaril = ({ column, row }) => {
@@ -30,6 +26,7 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
       name: "baril",
       centerX: column * cellSize + cellSize / 2,
       centerY: row * cellSize + cellSize / 2,
+      // TODO: use force instead of velocity
       update: (baril) => {
         // the goal here is to facilitate a moving baril to stop
         // exactly on a cell.
@@ -110,7 +107,7 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
       friction: 0.2,
       frictionAmbient: 0.7,
     })
-    gameObjects.push(baril)
+    world.addGameObject(baril)
   }
 
   const addIce = ({ row, column }) => {
@@ -119,23 +116,14 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
       name: "ice",
       // rigid: true,
       hitbox: true,
-      areaEffect: (_, gameObject) => {
-        gameObject.frictionAmbient = 0.05
-        return () => {
-          // TODO
-          // 0.2 est hardcodé parce que sinon un autre bloc de glace pourrait
-          // tenter de lire la valeur actuelle et voir celle appliqué par le bloc
-          // de glace voisin
-          gameObject.frictionAmbient = 0.2
-        }
-      },
+      frictionGround: 0.05,
       centerX: column * cellSize + cellSize / 2,
       centerY: row * cellSize + cellSize / 2,
       width: cellSize,
       height: cellSize,
       fillStyle: "lightblue",
     })
-    gameObjects.push(ice)
+    world.addGameObject(ice)
   }
 
   const addSideWalkTop = ({ row, column }) => {
@@ -154,7 +142,7 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
       height: cellSize,
       fillStyle: "lightgreen",
     })
-    gameObjects.push(sidewalk)
+    world.addGameObject(sidewalk)
   }
 
   const addHero = ({ row, column }) => {
@@ -170,7 +158,7 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
       friction: 0.01,
       frictionAmbient: 0.2,
     })
-    gameObjects.push(hero)
+    world.addGameObject(hero)
     return hero
   }
 
@@ -216,7 +204,7 @@ export const demoBloc = ({ gameObjects, width, height, worldBounds = true }) => 
     node: document,
   })
   const keyboardVelocity = 200
-  gameObjects.push({
+  world.addGameObject({
     name: "keyboard-navigation",
     update: (_, { timePerFrame }) => {
       // https://docs.unity3d.com/ScriptReference/Rigidbody2D.AddForce.html
@@ -277,50 +265,4 @@ const closestCellCenterFromPoint = ({ x, y }, { cellSize }) => {
     x: closestColumn * cellSize + cellSize / 2,
     y: closestRow * cellSize + cellSize / 2,
   }
-}
-
-const addWorldBounds = ({ gameObjects, width, height }) => {
-  const worldBoundarySize = 32
-  const worldBoundaryProps = {
-    mass: Infinity,
-    // strokeStyle: undefined,
-    rigid: true,
-    restitution: 0,
-  }
-  const left = createRectangle({
-    name: "world-boundary-left",
-    centerX: -worldBoundarySize / 2,
-    centerY: height / 2,
-    width: worldBoundarySize,
-    height,
-    ...worldBoundaryProps,
-  })
-  gameObjects.push(left)
-  const top = createRectangle({
-    name: "world-boundary-top",
-    centerX: width / 2,
-    centerY: -worldBoundarySize / 2,
-    width: width + worldBoundarySize * 2,
-    height: worldBoundarySize,
-    ...worldBoundaryProps,
-  })
-  gameObjects.push(top)
-  const right = createRectangle({
-    name: "world-boundary-right",
-    centerX: width + worldBoundarySize / 2,
-    centerY: height / 2,
-    width: worldBoundarySize,
-    height,
-    ...worldBoundaryProps,
-  })
-  gameObjects.push(right)
-  const bottom = createRectangle({
-    name: "world-boundary-bottom",
-    centerX: width / 2,
-    centerY: height + worldBoundarySize / 2,
-    width: width + worldBoundarySize * 2,
-    height: worldBoundarySize,
-    ...worldBoundaryProps,
-  })
-  gameObjects.push(bottom)
 }

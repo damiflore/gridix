@@ -10,7 +10,7 @@ import { motionAllowedFromMass } from "./physic.motion.js"
 const positionResolutionCoef = 1
 
 export const handleCollision = ({
-  gameObjects,
+  world,
   collisionCallback,
   collisionPositionResolution,
   collisionVelocityImpact, // could be renamed collisionImpulse
@@ -18,7 +18,7 @@ export const handleCollision = ({
   let collisionIterations = 5
   while (collisionIterations--) {
     forEachCollidingPairs({
-      gameObjects,
+      world,
       // iterate only on rigid
       // non static, non sleeping pairs
       canCollidePredicate: (a, b) => {

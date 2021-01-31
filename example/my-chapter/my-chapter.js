@@ -30,10 +30,9 @@ ou au moin de petit fichier html pour tester des cas concrets
 import { motionAllowedFromMass } from "./physic/physic.motion.js"
 import { updatePhysicForArcadeGame } from "./physic/physic.js"
 import { PHYSIC_CONSTANTS } from "./physic/physic.constants.js"
-import { gameObjectFromPoint } from "./game/game.js"
+import { createWorld, addBoundsToWorld } from "./world/world.js"
 // import { demoCool } from "./demo-cool.js"
 // import { forEachCollidingPairs } from "./collision/collision.js"
-import { getCollisionInfo } from "./collision/collisionInfo.js"
 import { demoBloc } from "./demo-bloc.js"
 import { updateDevtool } from "./devtool.js"
 import { createGameEngine } from "./engine/engine.js"
@@ -48,78 +47,21 @@ canvas.width = width
 document.querySelector("#container").appendChild(canvas)
 
 const context = canvas.getContext("2d")
-const gameObjects = []
-let gameObjectSelectedIndex = 0
+let gameObjectSelected = null
 
+const world = createWorld()
+addBoundsToWorld(world, { width, height })
 demoBloc({
+  world,
   width,
   height,
-  gameObjects,
 })
-
-const createContactTracker = () => {
-  let previousContacts = []
-  const cleanupWeakMap = new WeakMap()
-
-  const update = (gameObject, gameObjects, effect) => {
-    // ça risque d'etre couteux
-    const currentContacts = getContactInfo(gameObject, gameObjects)
-    const lost = previousContacts.filter(
-      (contactPrevious) => !currentContacts.includes(contactPrevious),
-    )
-    // be sure to clean up first so that object is in the proper state
-    // before applying new contact effects
-    lost.forEach((contactLost) => {
-      const cleanup = cleanupWeakMap.get(contactLost)
-      if (cleanup) {
-        cleanup()
-        cleanupWeakMap.delete(contactLost)
-      }
-    })
-    currentContacts.forEach((contact) => {
-      const effectReturnValue = effect(contact)
-      if (effectReturnValue) {
-        cleanupWeakMap.set(contact, effectReturnValue)
-      }
-    })
-
-    previousContacts = currentContacts
-  }
-
-  return {
-    update,
-  }
-}
-
-const getContactInfo = (gameObject, gameObjects) => {
-  if (!gameObject.hitbox) {
-    return []
-  }
-
-  const contacts = []
-  gameObjects.forEach((gameObjectCandidate) => {
-    if (gameObjectCandidate === gameObject) {
-      return
-    }
-    if (!gameObjectCandidate.hitbox && !gameObjectCandidate.rigid) {
-      return
-    }
-
-    const collisionInfo = getCollisionInfo(gameObject, gameObjectCandidate)
-    if (!collisionInfo) {
-      return
-    }
-
-    contacts.push(gameObjectCandidate)
-  })
-  return contacts
-}
 
 const collisionInfos = []
 const gameEngine = createGameEngine({
   framePerSecond: 60,
   update: (stepInfo) => {
-    gameObjects.forEach((gameObject) => {
+    world.forEachGameObject((gameObject) => {
       const { update } = gameObject
       if (update) {
         update(gameObject, stepInfo)
@@ -133,7 +75,7 @@ const gameEngine = createGameEngine({
 
     collisionInfos.length = 0
     updatePhysicForArcadeGame({
-      gameObjects,
+      world,
       stepInfo,
       collisionCallback: ({ collisionInfo }) => {
         collisionInfos.push(collisionInfo)
@@ -141,29 +83,20 @@ const gameEngine = createGameEngine({
       collisionPositionResolution: true,
       collisionVelocityImpact: true,
     })
-
-    gameObjects.forEach((gameObject) => {
-      const { areaEffect } = gameObject
-      if (areaEffect) {
-        const contactTracker =
-          gameObject.contactTracker || (gameObject.contactTracker = createContactTracker())
-        contactTracker.update(gameObject, gameObjects, (contact) => {
-          return areaEffect(gameObject, contact)
-        })
-      }
-    })
   },
 
-  draw: ({ framePerSecondEstimation, memoryUsed, memoryLimit }) => {
+  draw: (stepInfo) => {
+    const { framePerSecondEstimation, memoryUsed, memoryLimit } = stepInfo
+
     context.clearRect(0, 0, width, height)
     context.strokeStyle = "blue"
-    gameObjects.forEach((gameObject, index) => {
+    world.forEachGameObject((gameObject) => {
       const { draw } = gameObject
       if (!draw) {
         return
       }
 
-      if (gameObjectSelectedIndex === index) {
+      if (gameObject === gameObjectSelected) {
         gameObject.strokeStyle = "orange"
         gameObject.lineWidth = 4
       } else {
@@ -179,15 +112,13 @@ const gameEngine = createGameEngine({
       drawCollisionInfo(collisionInfo, context)
     })
 
-    const gameObjectSelected =
-      gameObjectSelectedIndex === -1 ? null : gameObjects[gameObjectSelectedIndex]
     updateDevtool({
       textContents: {
         "frame-per-second": framePerSecondEstimation,
         "js-heap-size-used": memoryUsed,
         "js-heap-size-limit": memoryLimit,
 
-        "game-objects-length": gameObjects.length,
+        "game-objects-length": world.countGameObjects(),
         "game-object-selected-sleeping": gameObjectSelected
           ? String(gameObjectSelected.sleeping)
           : "",
@@ -336,16 +267,12 @@ const gameEngine = createGameEngine({
           PHYSIC_CONSTANTS.forceYAmbient = 0
         },
         "excite": () => {
-          gameObjects.forEach((gameObject) => {
+          world.forEachGameObject((gameObject) => {
             if (motionAllowedFromMass(gameObject.mass)) {
               gameObject.velocityX = Math.random() * 500 - 250
               gameObject.velocityY = Math.random() * 500 - 250
             }
           })
-        },
-        "reset": () => {
-          gameObjects.splice(5, gameObjects.length)
-          gameObjectSelectedIndex = 4
         },
       },
     })
@@ -359,9 +286,9 @@ canvas.addEventListener("click", (clickEvent) => {
     x: clickEvent.offsetX,
     y: clickEvent.offsetY,
   }
-  const gameObjectUnderClick = gameObjectFromPoint(gameObjects, clickPoint)
+  const gameObjectUnderClick = world.gameObjectFromPoint(clickPoint)
   if (gameObjectUnderClick) {
-    gameObjectSelectedIndex = gameObjects.indexOf(gameObjectUnderClick)
+    gameObjectSelected = gameObjectUnderClick
   }
 })
 gameEngine.startGameLoop()
@@ -383,5 +310,3 @@ registerPageLifecyle({
     gameEngine.pauseGameLoop()
   },
 })
-
-window.gameObjects = gameObjects

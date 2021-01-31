@@ -4,10 +4,10 @@
 
 // const limitVelocityPrecision = limitNumberPrecision(4)
 
-export const handleMotion = ({ gameObjects, stepInfo }) => {
+export const handleMotion = ({ world, stepInfo }) => {
   const { timePerFrame } = stepInfo
   const positionUpdates = []
-  gameObjects.forEach((gameObject) => {
+  world.forEachGameObject((gameObject) => {
     if (!gameObject.rigid) {
       return
     }
