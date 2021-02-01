@@ -146,10 +146,7 @@ export const demoBloc = () => {
             return
           }
           // velocity going the other way
-          if (cellCenterToCenterXDiff < 0 && velocityX > 0) {
-            return
-          }
-          if (cellCenterToCenterXDiff > 0 && velocityX < 0) {
+          if (!sameSign(cellCenterToCenterXDiff, velocityX)) {
             return
           }
           // no worthy adjustement on X required
@@ -157,7 +154,7 @@ export const demoBloc = () => {
             return
           }
 
-          baril.velocityX += cellCenterToCenterXDiff * force
+          baril.forces.push({ x: baril.mass * force * cellCenterToCenterXDiff })
           return
         }
 
@@ -165,10 +162,7 @@ export const demoBloc = () => {
         if (velocityY === 0) {
           return
         }
-        if (cellCenterToCenterYDiff < 0 && velocityY > 0) {
-          return
-        }
-        if (cellCenterToCenterYDiff > 0 && velocityY < 0) {
+        if (!sameSign(cellCenterToCenterYDiff, velocityY)) {
           return
         }
         // no worthy adjustement on Y required
@@ -176,7 +170,7 @@ export const demoBloc = () => {
           return
         }
 
-        baril.velocityY += cellCenterToCenterYDiff * force
+        baril.forces.push({ y: baril.mass * force * cellCenterToCenterYDiff })
       },
       angleLocked: true,
       sleeping: true,
