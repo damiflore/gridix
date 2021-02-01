@@ -9,17 +9,34 @@ export const closestCellCenterFromPoint = ({ x, y }, { cellSize }) => {
   }
 }
 
-export const centerXFromCell = ({ cellX, cellSize }) => {
+export const centerXFromCellX = (cellX, cellSize) => {
   return cellX * cellSize + cellSize / 2
 }
 
-export const centerYFromCell = ({ cellY, cellSize }) => {
+export const centerYFromCellY = (cellY, cellSize) => {
   return cellY * cellSize + cellSize / 2
 }
 
 export const centerPointFromCell = ({ cellX, cellY, cellSize }) => {
   return {
-    centerX: centerXFromCell({ cellX, cellSize }),
-    centerY: centerYFromCell({ cellY, cellSize }),
+    centerX: centerXFromCellX(cellX, cellSize),
+    centerY: centerYFromCellY(cellY, cellSize),
   }
+}
+
+export const cellXFromCellIndex = (cellIndex, world) => {
+  const cellXMax = world.width / world.cellSize
+  return cellIndex % cellXMax
+}
+
+export const cellYFromCellIndex = (cellIndex, world) => {
+  const cellXMax = world.width / world.cellSize
+  return Math.floor(cellIndex / cellXMax)
+}
+
+export const cellIndexFromCell = ({ cellX, cellY }, world) => {
+  const cellXMax = world.width / world.cellSize
+  const indexX = cellX
+  const indexY = cellY * cellXMax
+  return indexX + indexY
 }
