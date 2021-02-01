@@ -1,12 +1,10 @@
 import { pointHitCircle } from "../collision/pointHitCircle.js"
 import { pointHitRectangle } from "../collision/pointHitRectangle.js"
-import { getCollisionInfo } from "../collision/collisionInfo.js"
-import { getIntersectionRatioBetweenRectangles } from "../geometry/rectangle.js"
 import { updatePhysicForArcadeGame } from "../physic/physic.js"
 import { drawCollisionInfo } from "../draw/draw.js"
 import { createRectangle } from "./shape.js"
 
-export const createWorld = ({ width, height }) => {
+export const createWorld = ({ width, height, onGameObjectMove = () => {} }) => {
   const gameObjects = []
   const collisionInfos = []
   const world = { width, height }
@@ -15,60 +13,6 @@ export const createWorld = ({ width, height }) => {
   // aboveGrid
   // middleGrid
   // belowGrid
-
-  const deriveStateFromPosition = (gameObject) => {
-    let gameObjectWithFrictionAndHighestIntersectionRatio = null
-    const highestIntersectionRatio = 0
-    gameObjects.forEach((gameObjectCandidate) => {
-      if (gameObjectCandidate === gameObject) {
-        return
-      }
-      if (!gameObject.hitbox) {
-        return
-      }
-      if (!gameObjectCandidate.hitbox) {
-        return
-      }
-      const { frictionGround } = gameObjectCandidate
-      if (frictionGround === undefined) {
-        return
-      }
-      const collisionInfo = getCollisionInfo(gameObject, gameObjectCandidate)
-
-      if (!collisionInfo) {
-        return
-      }
-
-      // ideally we would choose the ground with highest intersection ratio
-      // with gameObject
-      const intersectionRatio = getIntersectionRatioBetweenRectangles(
-        gameObject,
-        gameObjectCandidate,
-      )
-      if (intersectionRatio > highestIntersectionRatio) {
-        gameObjectWithFrictionAndHighestIntersectionRatio = gameObjectCandidate
-      }
-    })
-
-    // the only "drawback" is the if hero stands on the ground
-    // but ground has no frictionGround set, then the first object with a frictionGround
-    // will be applied. It can be fixed by ensuring all ground objects
-    // got a frictionGround set
-    const frictionAmbient = gameObjectWithFrictionAndHighestIntersectionRatio
-      ? gameObjectWithFrictionAndHighestIntersectionRatio.frictionGround
-      : 0.2
-
-    return {
-      frictionAmbient,
-    }
-  }
-
-  const updateGameObjectStateFromPosition = (gameObject) => {
-    const stateFromPosition = deriveStateFromPosition(gameObject)
-    if (stateFromPosition) {
-      Object.assign(gameObject, stateFromPosition)
-    }
-  }
 
   const update = (stepInfo) => {
     world.forEachGameObject((gameObject) => {
@@ -91,7 +35,7 @@ export const createWorld = ({ width, height }) => {
         collisionInfos.push(collisionInfo)
       },
       moveCallback: (gameObject) => {
-        updateGameObjectStateFromPosition(gameObject)
+        onGameObjectMove(gameObject)
       },
       collisionPositionResolution: true,
       collisionVelocityImpact: true,
@@ -105,7 +49,7 @@ export const createWorld = ({ width, height }) => {
   }
 
   const addGameObject = (gameObject) => {
-    updateGameObjectStateFromPosition(gameObject)
+    onGameObjectMove(gameObject)
     gameObjects.push(gameObject)
   }
 

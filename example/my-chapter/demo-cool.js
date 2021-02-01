@@ -1,8 +1,13 @@
+import { createWorld, addBoundsToWorld } from "./world/world.js"
 import { motionAllowedFromMass } from "./physic/physic.motion.js"
-import { addBoundsToWorld } from "./world/world.js"
 import { createRectangle, createCircle } from "./world/shape.js"
 
-export const demoCool = ({ world }) => {
+export const demoCool = () => {
+  const world = createWorld({
+    width: 800,
+    height: 450,
+  })
+
   addBoundsToWorld(world)
 
   world.addGameObject({
@@ -102,4 +107,6 @@ export const demoCool = ({ world }) => {
       }),
     )
   }
+
+  return world
 }

@@ -47,7 +47,6 @@ ou au moin de petit fichier html pour tester des cas concrets
 // import { drawCollisionInfo } from "./draw/draw.js"
 import { motionAllowedFromMass } from "./physic/physic.motion.js"
 import { PHYSIC_CONSTANTS } from "./physic/physic.constants.js"
-import { createWorld } from "./world/world.js"
 // import { demoBloc } from "./demo-bloc.js"
 import { demoCool } from "./demo-cool.js"
 // import { forEachCollidingPairs } from "./collision/collision.js"
@@ -56,16 +55,11 @@ import { createGameEngine } from "./engine/engine.js"
 import { registerPageLifecyle } from "./page/page-lifecyle.js"
 
 let gameObjectSelected = null
-const world = createWorld({
-  cellXCount: 25,
-  cellYCount: 20,
-  cellSize: 32,
-})
-// demoBloc({ world })
-demoCool({ world })
+// const world = demoBloc()
+const world = demoCool()
 const canvas = document.createElement("canvas")
-canvas.width = 800
-canvas.height = 450
+canvas.width = world.width
+canvas.height = world.height
 document.querySelector("#container").appendChild(canvas)
 const context = canvas.getContext("2d")
 
