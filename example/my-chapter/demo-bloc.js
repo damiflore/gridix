@@ -57,12 +57,14 @@ export const demoBloc = () => {
       // https://docs.unity3d.com/ScriptReference/Rigidbody2D.AddForce.html
       // https://gamedev.stackexchange.com/a/169844
 
+      const whatever = hero.frictionAmbient === 0.2 ? keyboardVelocity : keyboardVelocity + 50
+
       let forceX = 0
       const keyXCoef = keyToCoef(leftKey, rightKey)
       if (keyXCoef) {
         const { velocityX } = hero
         const velocityCurrent = velocityX
-        const velocityDesired = keyboardVelocity * keyXCoef
+        const velocityDesired = whatever * keyXCoef
         const velocityDiff = velocityDesired - velocityCurrent
         const max = sameSign(velocityCurrent, keyXCoef) ? maxAccel : maxDecel
         const acceleration = clampMagnitude(velocityDiff / timePerFrame, max * hero.frictionAmbient)
@@ -74,7 +76,7 @@ export const demoBloc = () => {
       if (keyYCoef) {
         const { velocityY } = hero
         const velocityCurrent = velocityY
-        const velocityDesired = keyboardVelocity * keyYCoef
+        const velocityDesired = whatever * keyYCoef
         const velocityDiff = velocityDesired - velocityCurrent
         const max = sameSign(velocityCurrent, keyYCoef) ? maxAccel : maxDecel
         const acceleration = clampMagnitude(velocityDiff / timePerFrame, max * hero.frictionAmbient)
@@ -191,7 +193,7 @@ export const demoBloc = () => {
       name: "ice",
       // rigid: true,
       hitbox: true,
-      frictionGround: 0.05,
+      frictionGround: 0.02,
       centerX: centerXFromCellX(cellX, worldGrid),
       centerY: centerYFromCellY(cellY, worldGrid),
       width: cellSize,
