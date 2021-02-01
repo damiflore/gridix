@@ -160,10 +160,9 @@ export const createWorld = ({ cellXCount, cellYCount, cellSize }) => {
   return world
 }
 
-export const addBoundsToWorld = (world) => {
+export const addBoundsToWorld = (world, { worldBoundarySize = 32 } = {}) => {
   const { width, height } = world
 
-  const worldBoundarySize = 32
   const worldBoundaryProps = {
     mass: Infinity,
     // strokeStyle: undefined,
