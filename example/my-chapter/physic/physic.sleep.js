@@ -108,9 +108,9 @@ const updateSleepingState = (
   // -> put object to sleep
   Object.assign(gameObject, {
     sleeping: true,
-    forceXWhenSleepStarted: 0,
-    forceYWhenSleepStarted: 0,
-    forceAngleWhenSleepStarted: 0,
+    forceXWhenSleepStarted: gameObject.forceX,
+    forceYWhenSleepStarted: gameObject.forceY,
+    forceAngleWhenSleepStarted: gameObject.forceAngle,
     velocityXWhenSleepStarted: gameObject.velocityX,
     velocityYWhenSleepStarted: gameObject.velocityY,
     velocityAngleWhenSleepStarted: gameObject.velocityAngle,
@@ -148,25 +148,24 @@ const shouldAwake = (
     return true
   }
 
-  const forceTotal = getTotalForces(gameObject.forces)
-  const { forceXWhenSleepStarted } = gameObject
-  const forceXSinceSleeping = Math.abs(forceXWhenSleepStarted - forceTotal.x)
+  const { forceX, forceXWhenSleepStarted } = gameObject
+  const forceXSinceSleeping = Math.abs(forceXWhenSleepStarted - forceX)
   if (forceXSinceSleeping > sleepForceThreshold) {
     // this object force x increased enough for some reason
     // -> awake it
     return true
   }
 
-  const { forceYWhenSleepStarted } = gameObject
-  const forceYSinceSleeping = Math.abs(forceYWhenSleepStarted - forceTotal.y)
+  const { forceY, forceYWhenSleepStarted } = gameObject
+  const forceYSinceSleeping = Math.abs(forceYWhenSleepStarted - forceY)
   if (forceYSinceSleeping > sleepForceThreshold) {
     // this object force y increased enough for some reason
     // -> awake it
     return true
   }
 
-  const { forceAngleWhenSleepStarted } = gameObject
-  const forceAngleSinceSleeping = Math.abs(forceAngleWhenSleepStarted - forceTotal.angle)
+  const { forceAngle, forceAngleWhenSleepStarted } = gameObject
+  const forceAngleSinceSleeping = Math.abs(forceAngleWhenSleepStarted - forceAngle)
   if (forceAngleSinceSleeping > sleepForceThreshold) {
     // this object force angle increased enough for some reason
     return true

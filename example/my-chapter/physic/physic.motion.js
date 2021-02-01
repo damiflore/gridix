@@ -33,10 +33,6 @@ export const handleMotion = ({ world, stepInfo }) => {
       return
     }
 
-    if (gameObject.sleeping) {
-      return
-    }
-
     // normalement c'est mass et acceleration la force, la je fait rien de tout ça
     // et aussi, l'application d'une force par le clavier
     // semble augmener la vélocité non stop (ah bah oui c'est normal en fait)
@@ -47,6 +43,14 @@ export const handleMotion = ({ world, stepInfo }) => {
     // if there is a constant force dragging object to the bottom (gravity)
     // it must be reapplied every update
     forces.length = 0
+
+    gameObject.forceX = forceTotal.x
+    gameObject.forceY = forceTotal.y
+    gameObject.forceAngle = forceTotal.angle
+
+    if (gameObject.sleeping) {
+      return
+    }
 
     const accelerationX = forceTotal.x / gameObject.mass
     const accelerationY = forceTotal.y / gameObject.mass
