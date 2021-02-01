@@ -46,7 +46,6 @@ export const handleMotion = ({ world, stepInfo }) => {
     // forces are punctual by default
     // if there is a constant force dragging object to the bottom (gravity)
     // it must be reapplied every update
-    // this can be implement doing PHYSIC_CONSTANTS.forceYAmbient = 20
     forces.length = 0
 
     const accelerationX = forceTotal.x / gameObject.mass
@@ -68,14 +67,11 @@ export const handleMotion = ({ world, stepInfo }) => {
     gameObject.velocityAngle = velocityAngleAfterApplicationOfForces
 
     const centerX = gameObject.centerX
-    const centerXAfterApplicationOfVelocity =
-      centerX + velocityXAfterApplicationOfForces * timePerFrame
+    const centerXAfterApplicationOfVelocity = centerX + velocityXAfterApplicationOfForces
     const centerY = gameObject.centerY
-    const centerYAfterApplicationOfVelocity =
-      centerY + velocityYAfterApplicationOfForces * timePerFrame
+    const centerYAfterApplicationOfVelocity = centerY + velocityYAfterApplicationOfForces
     const angle = gameObject.angle
-    const angleAfterApplicationOfVelocity =
-      angle + velocityAngleAfterApplicationOfForces * timePerFrame
+    const angleAfterApplicationOfVelocity = angle + velocityAngleAfterApplicationOfForces
 
     // no move
     if (

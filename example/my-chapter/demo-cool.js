@@ -1,27 +1,39 @@
-import { createRectangle, createCircle } from "./game/shape.js"
-import { PHYSIC_CONSTANTS } from "./physic/physic.constants.js"
+import { motionAllowedFromMass } from "./physic/physic.motion.js"
+import { addBoundsToWorld } from "./world/world.js"
+import { createRectangle, createCircle } from "./world/shape.js"
 
-PHYSIC_CONSTANTS.forceYAmbient = 200
+export const demoCool = ({ world }) => {
+  addBoundsToWorld(world)
 
-export const demoCool = ({ gameObjects, width, height, worldBounds = true }) => {
-  if (worldBounds) {
-    addWorldBounds({ gameObjects, width, height })
-  }
-  gameObjects.push(
+  world.addGameObject({
+    name: "gravity",
+    update: () => {
+      world.forEachGameObject((gameObject) => {
+        if (gameObject.rigid && motionAllowedFromMass(gameObject.mass)) {
+          gameObject.forces.push({
+            y: 20 * gameObject.mass,
+          })
+        }
+      })
+    },
+  })
+
+  const rectangle = createRectangle({
+    strokeStyle: "blue",
+    centerX: 500,
+    centerY: 200,
+    width: 400,
+    height: 20,
+    mass: 0,
+    friction: 0.3,
+    restitution: 0,
+    angle: 2.8,
+    rigid: true,
+  })
+  world.addGameObject(rectangle)
+  world.addGameObject(
     createRectangle({
-      centerX: 500,
-      centerY: 200,
-      width: 400,
-      height: 20,
-      mass: 0,
-      friction: 0.3,
-      restitution: 0,
-      angle: 2.8,
-      rigid: true,
-    }),
-  )
-  gameObjects.push(
-    createRectangle({
+      strokeStyle: "blue",
       centerX: 200,
       centerY: 400,
       width: 400,
@@ -32,8 +44,9 @@ export const demoCool = ({ gameObjects, width, height, worldBounds = true }) => 
       rigid: true,
     }),
   )
-  gameObjects.push(
+  world.addGameObject(
     createRectangle({
+      strokeStyle: "blue",
       centerX: 100,
       centerY: 200,
       width: 200,
@@ -42,8 +55,9 @@ export const demoCool = ({ gameObjects, width, height, worldBounds = true }) => 
       rigid: true,
     }),
   )
-  gameObjects.push(
+  world.addGameObject(
     createRectangle({
+      strokeStyle: "blue",
       centerX: 10,
       centerY: 360,
       width: 20,
@@ -57,10 +71,11 @@ export const demoCool = ({ gameObjects, width, height, worldBounds = true }) => 
 
   let i = 10
   while (i--) {
-    gameObjects.push(
+    world.addGameObject(
       createRectangle({
-        centerX: Math.random() * width,
-        centerY: (Math.random() * height) / 2,
+        strokeStyle: "blue",
+        centerX: Math.random() * world.width,
+        centerY: (Math.random() * world.height) / 2,
         width: Math.random() * 50 + 10,
         height: Math.random() * 50 + 10,
         mass: Math.random() * 30,
@@ -72,10 +87,11 @@ export const demoCool = ({ gameObjects, width, height, worldBounds = true }) => 
         rigid: true,
       }),
     )
-    gameObjects.push(
+    world.addGameObject(
       createCircle({
-        centerX: Math.random() * width,
-        centerY: (Math.random() * height) / 2,
+        strokeStyle: "blue",
+        centerX: Math.random() * world.width,
+        centerY: (Math.random() * world.height) / 2,
         radius: Math.random() * 20 + 10,
         mass: Math.random() * 30,
         friction: Math.random(),
@@ -86,50 +102,4 @@ export const demoCool = ({ gameObjects, width, height, worldBounds = true }) => 
       }),
     )
   }
-}
-
-const addWorldBounds = ({ gameObjects, width, height }) => {
-  const worldBoundarySize = 30
-  const worldBoundaryProps = {
-    mass: Infinity,
-    // fillStyle: "green",
-    rigid: true,
-    // restitution: 0,
-  }
-  const left = createRectangle({
-    name: "world-boundary-left",
-    centerX: -worldBoundarySize / 2,
-    centerY: height / 2,
-    width: worldBoundarySize,
-    height: height - 2,
-    ...worldBoundaryProps,
-  })
-  gameObjects.push(left)
-  const top = createRectangle({
-    name: "world-boundary-top",
-    centerX: width / 2,
-    centerY: -worldBoundarySize / 2,
-    width,
-    height: worldBoundarySize,
-    ...worldBoundaryProps,
-  })
-  gameObjects.push(top)
-  const right = createRectangle({
-    name: "world-boundary-right",
-    centerX: width + worldBoundarySize / 2,
-    centerY: height / 2,
-    width: worldBoundarySize,
-    height: height - 2,
-    ...worldBoundaryProps,
-  })
-  gameObjects.push(right)
-  const bottom = createRectangle({
-    name: "world-boundary-bottom",
-    centerX: width / 2,
-    centerY: height + worldBoundarySize / 2,
-    width,
-    height: worldBoundarySize,
-    ...worldBoundaryProps,
-  })
-  gameObjects.push(bottom)
 }
