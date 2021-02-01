@@ -6,10 +6,19 @@ import { updatePhysicForArcadeGame } from "../physic/physic.js"
 import { drawCollisionInfo } from "../draw/draw.js"
 import { createRectangle } from "./shape.js"
 
-export const createWorld = () => {
+export const createWorld = ({ column, row, cellSize }) => {
   const gameObjects = []
   const collisionInfos = []
-  const world = {}
+  const world = {
+    width: column * cellSize,
+    height: row * cellSize,
+    cellSize,
+  }
+
+  // layers:
+  // aboveGrid
+  // middleGrid
+  // belowGrid
 
   const deriveStateFromPosition = (gameObject) => {
     let gameObjectWithFrictionAndHighestIntersectionRatio = null
@@ -146,7 +155,9 @@ export const createWorld = () => {
   return world
 }
 
-export const addBoundsToWorld = (world, { width, height }) => {
+export const addBoundsToWorld = (world) => {
+  const { width, height } = world
+
   const worldBoundarySize = 32
   const worldBoundaryProps = {
     mass: Infinity,

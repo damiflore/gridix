@@ -1,9 +1,10 @@
 /* eslint-disable no-nested-ternary */
 import { createRectangle } from "./world/shape.js"
 import { trackKeyboardKeydown } from "../../src/interaction/keyboard.js"
+import { closestCellCenterFromPoint, centerXFromCell, centerYFromCell } from "./geometry/grid.js"
 // import { getDistanceBetweenVectors } from "./geometry/vector.js"
 
-export const demoBloc = ({ world, width, height }) => {
+export const demoBloc = ({ world }) => {
   let hero
 
   // put keyboard first so that sidewalk will be able to add/substract force from keyboard impulse
@@ -55,12 +56,12 @@ export const demoBloc = ({ world, width, height }) => {
     },
   })
 
-  const cellSize = 32
+  const cellSize = world.cellSize
 
-  const addWall = ({ column, row }) => {
+  const addWall = ({ cellX, cellY }) => {
     const wall = createRectangle({
-      centerX: column * cellSize + cellSize / 2,
-      centerY: row * cellSize + cellSize / 2,
+      centerX: centerXFromCell({ cellX, cellSize }),
+      centerY: centerYFromCell({ cellY, cellSize }),
       angleLocked: true,
       width: cellSize,
       height: cellSize,
@@ -72,11 +73,11 @@ export const demoBloc = ({ world, width, height }) => {
     world.addGameObject(wall)
   }
 
-  const addBaril = ({ column, row }) => {
+  const addBaril = ({ cellX, cellY }) => {
     const baril = createRectangle({
       name: "baril",
-      centerX: column * cellSize + cellSize / 2,
-      centerY: row * cellSize + cellSize / 2,
+      centerX: centerXFromCell({ cellX, cellSize }),
+      centerY: centerYFromCell({ cellY, cellSize }),
       // TODO: use force instead of velocity
       update: (baril) => {
         // the goal here is to facilitate a moving baril to stop
@@ -106,7 +107,7 @@ export const demoBloc = ({ world, width, height }) => {
         const { centerX, centerY } = baril
         const closestCellCenter = closestCellCenterFromPoint(
           { x: centerX, y: centerY },
-          { width, height, cellSize },
+          { cellSize },
         )
         const cellCenterToCenterXDiff = closestCellCenter.x - centerX
 
@@ -161,15 +162,15 @@ export const demoBloc = ({ world, width, height }) => {
     world.addGameObject(baril)
   }
 
-  const addIce = ({ row, column }) => {
+  const addIce = ({ cellX, cellY }) => {
     // something enters the ice area -> frictionAmbient goes super low
     const ice = createRectangle({
       name: "ice",
       // rigid: true,
       hitbox: true,
       frictionGround: 0.05,
-      centerX: column * cellSize + cellSize / 2,
-      centerY: row * cellSize + cellSize / 2,
+      centerX: centerXFromCell({ cellX, cellSize }),
+      centerY: centerYFromCell({ cellY, cellSize }),
       width: cellSize,
       height: cellSize,
       fillStyle: "lightblue",
@@ -177,7 +178,7 @@ export const demoBloc = ({ world, width, height }) => {
     world.addGameObject(ice)
   }
 
-  const addSideWalkTop = ({ row, column }) => {
+  const addSideWalkTop = ({ cellX, cellY }) => {
     const sidewalk = createRectangle({
       name: "sidewalk-top",
       // rigid: true,
@@ -187,8 +188,8 @@ export const demoBloc = ({ world, width, height }) => {
         gameObject.forces.push(sidewalkForce)
         return () => {}
       },
-      centerX: column * cellSize + cellSize / 2,
-      centerY: row * cellSize + cellSize / 2,
+      centerX: centerXFromCell({ cellX, cellSize }),
+      centerY: centerYFromCell({ cellY, cellSize }),
       width: cellSize,
       height: cellSize,
       fillStyle: "lightgreen",
@@ -196,11 +197,11 @@ export const demoBloc = ({ world, width, height }) => {
     world.addGameObject(sidewalk)
   }
 
-  const addHero = ({ row, column }) => {
+  const addHero = ({ cellX, cellY }) => {
     const hero = createRectangle({
       name: "hero",
-      centerX: column * cellSize + cellSize / 2,
-      centerY: row * cellSize + cellSize / 2,
+      centerX: centerXFromCell({ cellX, cellSize }),
+      centerY: centerYFromCell({ cellY, cellSize }),
       angleLocked: true,
       width: 32,
       height: 32,
@@ -215,28 +216,28 @@ export const demoBloc = ({ world, width, height }) => {
 
   // const addSpeedwalkRight = () => {}
 
-  addSideWalkTop({ column: 5, row: 1 })
-  addSideWalkTop({ column: 5, row: 2 })
-  addSideWalkTop({ column: 5, row: 3 })
+  addSideWalkTop({ cellX: 5, cellY: 1 })
+  addSideWalkTop({ cellX: 5, cellY: 2 })
+  addSideWalkTop({ cellX: 5, cellY: 3 })
 
-  addWall({ column: 1, row: 0 })
-  addWall({ column: 1, row: 1 })
-  addBaril({ column: 1, row: 2 })
-  addBaril({ column: 2, row: 2 })
-  addBaril({ column: 5, row: 3 })
-  addWall({ column: 1, row: 3 })
+  addWall({ cellX: 1, cellY: 0 })
+  addWall({ cellX: 1, cellY: 1 })
+  addBaril({ cellX: 1, cellY: 2 })
+  addBaril({ cellX: 2, cellY: 2 })
+  addBaril({ cellX: 5, cellY: 3 })
+  addWall({ cellX: 1, cellY: 3 })
 
-  // addIce({ column: 0, row: 0 })
-  addIce({ column: 3, row: 7 })
-  addIce({ column: 4, row: 7 })
-  addIce({ column: 5, row: 7 })
-  addIce({ column: 3, row: 8 })
-  addIce({ column: 4, row: 8 })
-  addIce({ column: 5, row: 8 })
-  addIce({ column: 6, row: 7 })
-  addIce({ column: 6, row: 8 })
+  // addIce({ cellX: 0, cellY: 0 })
+  addIce({ cellX: 3, cellY: 7 })
+  addIce({ cellX: 4, cellY: 7 })
+  addIce({ cellX: 5, cellY: 7 })
+  addIce({ cellX: 3, cellY: 8 })
+  addIce({ cellX: 4, cellY: 8 })
+  addIce({ cellX: 5, cellY: 8 })
+  addIce({ cellX: 6, cellY: 7 })
+  addIce({ cellX: 6, cellY: 8 })
 
-  hero = addHero({ column: 0, row: 0 })
+  hero = addHero({ cellX: 0, cellY: 0 })
 }
 
 const keyToCoef = (firstKey, secondKey) => {
@@ -257,15 +258,4 @@ const keyToCoef = (firstKey, secondKey) => {
   }
 
   return 0
-}
-
-// https://github.com/MassiveHeights/Black-Donuts/blob/f8aab3baba364b7f1d5e71f177639086299acb52/js/objects/board.js#L180
-const closestCellCenterFromPoint = ({ x, y }, { cellSize }) => {
-  const closestColumn = Math.floor(x / cellSize)
-  const closestRow = Math.floor(y / cellSize)
-
-  return {
-    x: closestColumn * cellSize + cellSize / 2,
-    y: closestRow * cellSize + cellSize / 2,
-  }
 }

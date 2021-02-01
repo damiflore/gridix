@@ -55,22 +55,19 @@ import { updateDevtool } from "./devtool.js"
 import { createGameEngine } from "./engine/engine.js"
 import { registerPageLifecyle } from "./page/page-lifecyle.js"
 
-const width = 32 * 10
-const height = 32 * 10
-const canvas = document.createElement("canvas")
-canvas.height = height
-canvas.width = width
-document.querySelector("#container").appendChild(canvas)
-
-const context = canvas.getContext("2d")
 let gameObjectSelected = null
-const world = createWorld()
-addBoundsToWorld(world, { width, height })
-demoBloc({
-  world,
-  width,
-  height,
+const world = createWorld({
+  row: 10,
+  column: 10,
+  cellSize: 32,
 })
+addBoundsToWorld(world)
+demoBloc({ world })
+const canvas = document.createElement("canvas")
+canvas.width = world.width
+canvas.height = world.height
+document.querySelector("#container").appendChild(canvas)
+const context = canvas.getContext("2d")
 
 const gameEngine = createGameEngine({
   framePerSecond: 60,
@@ -83,7 +80,7 @@ const gameEngine = createGameEngine({
 
     const { framePerSecondEstimation, memoryUsed, memoryLimit } = stepInfo
 
-    context.clearRect(0, 0, width, height)
+    context.clearRect(0, 0, world.width, world.height)
     context.strokeStyle = "blue"
     world.forEachGameObject((gameObject) => {
       const { draw } = gameObject
