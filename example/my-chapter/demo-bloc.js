@@ -1,10 +1,13 @@
 /* eslint-disable no-nested-ternary */
 import { createRectangle } from "./world/shape.js"
+import { addBoundsToWorld } from "./world/world.js"
 import { trackKeyboardKeydown } from "../../src/interaction/keyboard.js"
 import { closestCellCenterFromPoint, centerXFromCellX, centerYFromCellY } from "./geometry/grid.js"
 // import { getDistanceBetweenVectors } from "./geometry/vector.js"
 
 export const demoBloc = ({ world }) => {
+  addBoundsToWorld(world)
+
   let hero
 
   const { cellSize } = world.grid
