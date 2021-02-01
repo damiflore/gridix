@@ -50,7 +50,7 @@ export const createRigidBody = () => {
     // 1: object sends back all the energy of the collision
     restitution: 0.2,
 
-    inertiaCoef: 0.08,
+    rotationInertiaCoef: 0.1,
 
     velocityX: 0,
     velocityY: 0,

@@ -174,8 +174,8 @@ const applyCollisionImpactOnVelocity = (
     return
   }
 
-  const aInertia = inertiaFromGameObject(a)
-  const bInertia = inertiaFromGameObject(b)
+  const aRotationInertia = rotationInertiaFromGameObject(a)
+  const bRotationInertia = rotationInertiaFromGameObject(b)
 
   // normal impulse
   const restitutionForImpact = Math.min(a.restitution, b.restitution)
@@ -184,8 +184,8 @@ const applyCollisionImpactOnVelocity = (
   const impulseStart = -(1 + restitutionForImpact)
   const normalImpulseDivider =
     massInvertedSum +
-    aCollisionNormalProduct * aCollisionNormalProduct * aInertia +
-    bCollisionNormalProduct * bCollisionNormalProduct * bInertia
+    aCollisionNormalProduct * aCollisionNormalProduct * aRotationInertia +
+    bCollisionNormalProduct * bCollisionNormalProduct * bRotationInertia
   const normalImpulseScale = (impulseStart * velocityRelativeToNormal) / normalImpulseDivider
   const normalImpulseX = collisionNormalX * normalImpulseScale
   const normalImpulseY = collisionNormalY * normalImpulseScale
@@ -194,9 +194,9 @@ const applyCollisionImpactOnVelocity = (
   const bVelocityXAfterNormalImpulse = bVelocityX + normalImpulseX * bMassInverted
   const bVelocityYAfterNormalImpulse = bVelocityY + normalImpulseY * bMassInverted
   const aVelocityAngleAfterNormalImpulse =
-    aVelocityAngle - aCollisionNormalProduct * normalImpulseScale * aInertia
+    aVelocityAngle - aCollisionNormalProduct * normalImpulseScale * aRotationInertia
   const bVelocityAngleAfterNormalImpulse =
-    bVelocityAngle + bCollisionNormalProduct * normalImpulseScale * bInertia
+    bVelocityAngle + bCollisionNormalProduct * normalImpulseScale * bRotationInertia
 
   // tangent impulse
   const tangent = scaleVector(
@@ -214,8 +214,8 @@ const applyCollisionImpactOnVelocity = (
   const bCollisionTangentProduct = getVectorialProduct(bCollisionCenterDiff, tangent)
   const tangentImpulseDivider =
     massInvertedSum +
-    aCollisionTangentProduct * aCollisionTangentProduct * aInertia +
-    bCollisionTangentProduct * bCollisionTangentProduct * bInertia
+    aCollisionTangentProduct * aCollisionTangentProduct * aRotationInertia +
+    bCollisionTangentProduct * bCollisionTangentProduct * bRotationInertia
   const frictionForImpact = Math.min(a.friction, b.friction)
   const tangentImpulseScale = Math.min(
     (impulseStart * velocityRelativeToTangent * frictionForImpact) / tangentImpulseDivider,
@@ -233,9 +233,11 @@ const applyCollisionImpactOnVelocity = (
   const bVelocityYAfterTangentImpulse =
     bVelocityYAfterNormalImpulse + tangentImpulseY * bMassInverted
   const aVelocityAngleAfterTangentImpulse =
-    aVelocityAngleAfterNormalImpulse - aCollisionTangentProduct * tangentImpulseScale * aInertia
+    aVelocityAngleAfterNormalImpulse -
+    aCollisionTangentProduct * tangentImpulseScale * aRotationInertia
   const bVelocityAngleAfterTangentImpulse =
-    bVelocityAngleAfterNormalImpulse + bCollisionTangentProduct * tangentImpulseScale * bInertia
+    bVelocityAngleAfterNormalImpulse +
+    bCollisionTangentProduct * tangentImpulseScale * bRotationInertia
 
   a.velocityX = aVelocityXAfterTangentImpulse
   a.velocityY = aVelocityYAfterTangentImpulse
@@ -246,34 +248,39 @@ const applyCollisionImpactOnVelocity = (
   b.velocityAngle = bVelocityAngleAfterTangentImpulse
 }
 
-const inertiaFromGameObject = (gameObject) => {
+const rotationInertiaFromGameObject = (gameObject) => {
   if (gameObject.shape === "circle") {
-    return circleToInertia(gameObject)
+    return rotationInertiaFromCircle(gameObject)
   }
 
   if (gameObject.shape === "rectangle") {
-    return rectangleToInertia(gameObject)
+    return rotationInertiaFromRectangle(gameObject)
   }
 
   return 0
 }
 
-const circleToInertia = ({ mass, radius, inertiaCoef }) => {
+const rotationInertiaFromCircle = ({ mass, radius, rotationInertiaCoef }) => {
   if (!motionAllowedFromMass(mass)) {
     return 0
   }
 
-  const area = radius * radius
-  const massTotal = mass * area
-  return massTotal * inertiaCoef
+  const diameter = radius * radius
+  const massByDiameter = mass * diameter
+  const inertiaForCircle = massByDiameter * rotationInertiaCoef
+
+  return inertiaForCircle
 }
 
-const rectangleToInertia = ({ mass, width, height, inertiaCoef }) => {
+const rotationInertiaFromRectangle = ({ mass, width, height, rotationInertiaCoef }) => {
   if (!motionAllowedFromMass(mass)) {
     return 0
   }
 
-  const area = width * width + height * height
-  const massTotal = mass * area
-  return 1 / (massTotal * inertiaCoef)
+  const perimeter = width * width + height * height
+  const massByPerimeter = mass * perimeter
+  const intertiaForRectangle = 1 / (massByPerimeter * rotationInertiaCoef)
+  // const intertiaForRectangle = massByPerimeter * rotationInertiaCoef
+
+  return intertiaForRectangle
 }
