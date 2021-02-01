@@ -7,6 +7,8 @@ import { closestCellCenterFromPoint, centerXFromCellX, centerYFromCellY } from "
 export const demoBloc = ({ world }) => {
   let hero
 
+  const { cellSize } = world.grid
+
   // put keyboard first so that sidewalk will be able to add/substract force from keyboard impulse
   const downKey = trackKeyboardKeydown({
     code: "ArrowDown",
@@ -56,12 +58,10 @@ export const demoBloc = ({ world }) => {
     },
   })
 
-  const cellSize = world.cellSize
-
   const addWall = ({ cellX, cellY }) => {
     const wall = createRectangle({
-      centerX: centerXFromCellX(cellX, cellSize),
-      centerY: centerYFromCellY(cellY, cellSize),
+      centerX: centerXFromCellX(cellX, world.grid),
+      centerY: centerYFromCellY(cellY, world.grid),
       angleLocked: true,
       width: cellSize,
       height: cellSize,
@@ -76,8 +76,8 @@ export const demoBloc = ({ world }) => {
   const addBaril = ({ cellX, cellY }) => {
     const baril = createRectangle({
       name: "baril",
-      centerX: centerXFromCellX(cellX, cellSize),
-      centerY: centerYFromCellY(cellY, cellSize),
+      centerX: centerXFromCellX(cellX, world.grid),
+      centerY: centerYFromCellY(cellY, world.grid),
       // TODO: use force instead of velocity
       update: (baril) => {
         // the goal here is to facilitate a moving baril to stop
@@ -169,8 +169,8 @@ export const demoBloc = ({ world }) => {
       // rigid: true,
       hitbox: true,
       frictionGround: 0.05,
-      centerX: centerXFromCellX(cellX, cellSize),
-      centerY: centerYFromCellY(cellY, cellSize),
+      centerX: centerXFromCellX(cellX, world.grid),
+      centerY: centerYFromCellY(cellY, world.grid),
       width: cellSize,
       height: cellSize,
       fillStyle: "lightblue",
@@ -188,8 +188,8 @@ export const demoBloc = ({ world }) => {
         gameObject.forces.push(sidewalkForce)
         return () => {}
       },
-      centerX: centerXFromCellX(cellX, cellSize),
-      centerY: centerYFromCellY(cellY, cellSize),
+      centerX: centerXFromCellX(cellX, world.grid),
+      centerY: centerYFromCellY(cellY, world.grid),
       width: cellSize,
       height: cellSize,
       fillStyle: "lightgreen",
@@ -200,8 +200,8 @@ export const demoBloc = ({ world }) => {
   const addHero = ({ cellX, cellY }) => {
     const hero = createRectangle({
       name: "hero",
-      centerX: centerXFromCellX(cellX, cellSize),
-      centerY: centerYFromCellY(cellY, cellSize),
+      centerX: centerXFromCellX(cellX, world.grid),
+      centerY: centerYFromCellY(cellY, world.grid),
       angleLocked: true,
       width: 32,
       height: 32,

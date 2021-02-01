@@ -6,13 +6,18 @@ import { updatePhysicForArcadeGame } from "../physic/physic.js"
 import { drawCollisionInfo } from "../draw/draw.js"
 import { createRectangle } from "./shape.js"
 
-export const createWorld = ({ column, row, cellSize }) => {
+export const createWorld = ({ cellXCount, cellYCount, cellSize }) => {
   const gameObjects = []
   const collisionInfos = []
-  const world = {
-    width: column * cellSize,
-    height: row * cellSize,
+  const grid = {
+    cellXCount,
+    cellYCount,
     cellSize,
+  }
+  const world = {
+    width: cellXCount * cellSize,
+    height: cellYCount * cellSize,
+    grid,
   }
 
   // layers:

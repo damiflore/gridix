@@ -57,8 +57,8 @@ import { registerPageLifecyle } from "./page/page-lifecyle.js"
 
 let gameObjectSelected = null
 const world = createWorld({
-  row: 10,
-  column: 10,
+  cellXCount: 10,
+  cellYCount: 10,
   cellSize: 32,
 })
 addBoundsToWorld(world)

@@ -2,41 +2,49 @@
 export const closestCellCenterFromPoint = ({ x, y }, { cellSize }) => {
   const closestColumn = Math.floor(x / cellSize)
   const closestRow = Math.floor(y / cellSize)
-
-  return {
+  const closestCellCenter = {
     x: closestColumn * cellSize + cellSize / 2,
     y: closestRow * cellSize + cellSize / 2,
   }
+
+  return closestCellCenter
 }
 
-export const centerXFromCellX = (cellX, cellSize) => {
-  return cellX * cellSize + cellSize / 2
+export const centerXFromCellX = (cellX, { cellSize }) => {
+  const centerX = cellX * cellSize + cellSize / 2
+
+  return centerX
 }
 
-export const centerYFromCellY = (cellY, cellSize) => {
-  return cellY * cellSize + cellSize / 2
+export const centerYFromCellY = (cellY, { cellSize }) => {
+  const centerY = cellY * cellSize + cellSize / 2
+
+  return centerY
 }
 
-export const centerPointFromCell = ({ cellX, cellY, cellSize }) => {
-  return {
-    centerX: centerXFromCellX(cellX, cellSize),
-    centerY: centerYFromCellY(cellY, cellSize),
+export const centerPointFromCell = ({ cellX, cellY }, grid) => {
+  const centerPoint = {
+    centerX: centerXFromCellX(cellX, grid),
+    centerY: centerYFromCellY(cellY, grid),
   }
+
+  return centerPoint
 }
 
-export const cellXFromCellIndex = (cellIndex, world) => {
-  const cellXMax = world.width / world.cellSize
-  return cellIndex % cellXMax
+export const cellXFromCellIndex = (cellIndex, { cellXCount }) => {
+  const cellX = cellIndex % cellXCount
+
+  return cellX
 }
 
-export const cellYFromCellIndex = (cellIndex, world) => {
-  const cellXMax = world.width / world.cellSize
-  return Math.floor(cellIndex / cellXMax)
+export const cellYFromCellIndex = (cellIndex, { cellXCount }) => {
+  const cellY = Math.floor(cellIndex / cellXCount)
+
+  return cellY
 }
 
-export const cellIndexFromCell = ({ cellX, cellY }, world) => {
-  const cellXMax = world.width / world.cellSize
-  const indexX = cellX
-  const indexY = cellY * cellXMax
-  return indexX + indexY
+export const cellIndexFromCell = ({ cellX, cellY }, { cellXCount }) => {
+  const cellIndex = cellX + cellY * cellXCount
+
+  return cellIndex
 }
