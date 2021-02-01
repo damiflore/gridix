@@ -50,15 +50,17 @@ export const handleMotion = ({ world, stepInfo }) => {
 
     const forceDivider = mass
     const frictionAmbientCoef = 1 - gameObject.frictionAmbient
-    const accelerationX = (forceTotal.x / forceDivider) * frictionAmbientCoef
-    const accelerationY = (forceTotal.y / forceDivider) * frictionAmbientCoef
-    const accelerationAngle = (forceTotal.angle / forceDivider) * frictionAmbientCoef
+    const accelerationX = forceTotal.x / forceDivider
+    const accelerationY = forceTotal.y / forceDivider
+    const accelerationAngle = forceTotal.angle / forceDivider
 
-    const velocityXAfterApplicationOfForces = velocityX + accelerationX * timePerFrame
-    const velocityYAfterApplicationOfForces = velocityY + accelerationY * timePerFrame
+    const velocityXAfterApplicationOfForces =
+      (velocityX + accelerationX * timePerFrame) * frictionAmbientCoef
+    const velocityYAfterApplicationOfForces =
+      (velocityY + accelerationY * timePerFrame) * frictionAmbientCoef
     const velocityAngleAfterApplicationOfForces = gameObject.angleLocked
       ? 0
-      : velocityAngle + accelerationAngle * timePerFrame
+      : (velocityAngle + accelerationAngle * timePerFrame) * frictionAmbientCoef
 
     // update velocity
     gameObject.velocityX = velocityXAfterApplicationOfForces
