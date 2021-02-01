@@ -73,10 +73,17 @@ const updateSleepingState = (
     debugger
   }
 
+  const moveIsNotable = !getMoveIsNegligible({
+    moveX,
+    moveY,
+    moveAngle,
+    sleepMoveThreshold,
+  })
+
   if (gameObject.sleeping) {
     if (
+      moveIsNotable ||
       shouldAwake(gameObject, {
-        sleepMoveThreshold,
         sleepForceThreshold,
         sleepVelocityThreshold,
       })
@@ -88,9 +95,8 @@ const updateSleepingState = (
     return
   }
 
-  const move = quantifyMove(gameObject, { moveX, moveY, moveAngle })
   // it's moving enough
-  if (move > sleepMoveThreshold) {
+  if (moveIsNotable) {
     gameObject.lastNotableMotionTime = stepInfo.time
     moveCallback(gameObject)
     return
@@ -117,15 +123,23 @@ const updateSleepingState = (
   })
 }
 
-const shouldAwake = (
-  gameObject,
-  { moveX, moveY, moveAngle, sleepMoveThreshold, sleepVelocityThreshold, sleepForceThreshold },
-) => {
-  const move = quantifyMove(gameObject, { moveX, moveY, moveAngle })
-  if (move > sleepMoveThreshold) {
-    return true
+const getMoveIsNegligible = ({ moveX, moveY, moveAngle, sleepMoveThreshold }) => {
+  if (Math.abs(moveX) > sleepMoveThreshold) {
+    return false
   }
 
+  if (Math.abs(moveY) > sleepMoveThreshold) {
+    return false
+  }
+
+  if (Math.abs(moveAngle) > sleepMoveThreshold) {
+    return false
+  }
+
+  return true
+}
+
+const shouldAwake = (gameObject, { sleepVelocityThreshold, sleepForceThreshold }) => {
   const { velocityX, velocityXWhenSleepStarted } = gameObject
   const velocityXSinceSleeping = Math.abs(velocityXWhenSleepStarted - velocityX)
   if (velocityXSinceSleeping > sleepVelocityThreshold) {
@@ -172,24 +186,4 @@ const shouldAwake = (
   }
 
   return false
-}
-
-const quantifyMove = (gameObject, { moveX, moveY, moveAngle }) => {
-  let total = 0
-
-  const moveFromXAndY = Math.sqrt(moveX * moveX + moveY * moveY)
-  total += moveFromXAndY
-
-  if (moveAngle) {
-    if (gameObject.shape === "circle") {
-      // nothing todo: rotating a circle does not impact its position
-    }
-    if (gameObject.shape === "rectangle") {
-      // not a super approximation, we should take into acount the dimension
-      const moveFromAngle = moveAngle * moveAngle
-      total += moveFromAngle
-    }
-  }
-
-  return total
 }
