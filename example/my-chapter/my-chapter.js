@@ -46,17 +46,18 @@ ou au moin de petit fichier html pour tester des cas concrets
 
 // import { drawCollisionInfo } from "./draw/draw.js"
 import { motionAllowedFromMass } from "./physic/physic.motion.js"
-import { PHYSIC_CONSTANTS } from "./physic/physic.constants.js"
-// import { demoBloc } from "./demo-bloc.js"
+import { demoBloc } from "./demo-bloc.js"
 import { demoCool } from "./demo-cool.js"
 // import { forEachCollidingPairs } from "./collision/collision.js"
 import { updateDevtool } from "./devtool.js"
 import { createGameEngine } from "./engine/engine.js"
 import { registerPageLifecyle } from "./page/page-lifecyle.js"
 
+const demoPhysic = false
+
 let gameObjectSelected = null
-// const world = demoBloc()
-const world = demoCool()
+const world = demoPhysic ? demoCool() : demoBloc()
+// const world = demoCool()
 const canvas = document.createElement("canvas")
 canvas.width = world.width
 canvas.height = world.height
@@ -171,6 +172,11 @@ const gameEngine = createGameEngine({
             gameObjectSelected.sleeping = true
           }
         },
+        "debug-sleep": () => {
+          if (gameObjectSelected) {
+            gameObjectSelected.debugSleep = true
+          }
+        },
 
         "move-left": () => {
           if (gameObjectSelected) {
@@ -243,10 +249,10 @@ const gameEngine = createGameEngine({
           }
         },
         "gravity-enable": () => {
-          PHYSIC_CONSTANTS.forceYAmbient = 200
+          world.gravity = true
         },
         "gravity-disable": () => {
-          PHYSIC_CONSTANTS.forceYAmbient = 0
+          world.gravity = false
         },
         "excite": () => {
           world.forEachGameObject((gameObject) => {

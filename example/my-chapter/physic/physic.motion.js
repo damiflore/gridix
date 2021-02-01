@@ -12,11 +12,8 @@ export const handleMotion = ({ world, stepInfo }) => {
       return
     }
 
-    const velocityX = gameObject.velocityX
-    const velocityY = gameObject.velocityY
-    const velocityAngle = gameObject.velocityAngle
-    const { forces } = gameObject
-    const motionAllowedByMass = motionAllowedFromMass(gameObject.mass)
+    const { mass, velocityX, velocityY, velocityAngle, forces } = gameObject
+    const motionAllowedByMass = motionAllowedFromMass(mass)
     if (!motionAllowedByMass) {
       if (forces.length > 0) {
         if (import.meta.dev) {
@@ -33,10 +30,6 @@ export const handleMotion = ({ world, stepInfo }) => {
       return
     }
 
-    if (gameObject.sleeping) {
-      return
-    }
-
     // normalement c'est mass et acceleration la force, la je fait rien de tout ça
     // et aussi, l'application d'une force par le clavier
     // semble augmener la vélocité non stop (ah bah oui c'est normal en fait)
@@ -47,12 +40,20 @@ export const handleMotion = ({ world, stepInfo }) => {
     // if there is a constant force dragging object to the bottom (gravity)
     // it must be reapplied every update
     forces.length = 0
+    gameObject.forceX = forceTotal.x
+    gameObject.forceY = forceTotal.y
+    gameObject.forceAngle = forceTotal.angle
 
-    const accelerationX = forceTotal.x / gameObject.mass
-    const accelerationY = forceTotal.y / gameObject.mass
-    const accelerationAngle = forceTotal.angle / gameObject.mass
+    if (gameObject.sleeping) {
+      return
+    }
 
+    const forceDivider = mass
     const frictionAmbientCoef = 1 - gameObject.frictionAmbient
+    const accelerationX = forceTotal.x / forceDivider
+    const accelerationY = forceTotal.y / forceDivider
+    const accelerationAngle = forceTotal.angle / forceDivider
+
     const velocityXAfterApplicationOfForces =
       (velocityX + accelerationX * timePerFrame) * frictionAmbientCoef
     const velocityYAfterApplicationOfForces =
@@ -66,12 +67,13 @@ export const handleMotion = ({ world, stepInfo }) => {
     gameObject.velocityY = velocityYAfterApplicationOfForces
     gameObject.velocityAngle = velocityAngleAfterApplicationOfForces
 
-    const centerX = gameObject.centerX
-    const centerXAfterApplicationOfVelocity = centerX + velocityXAfterApplicationOfForces
-    const centerY = gameObject.centerY
-    const centerYAfterApplicationOfVelocity = centerY + velocityYAfterApplicationOfForces
-    const angle = gameObject.angle
-    const angleAfterApplicationOfVelocity = angle + velocityAngleAfterApplicationOfForces
+    const { centerX, centerY, angle } = gameObject
+    const centerXAfterApplicationOfVelocity =
+      centerX + velocityXAfterApplicationOfForces * timePerFrame
+    const centerYAfterApplicationOfVelocity =
+      centerY + velocityYAfterApplicationOfForces * timePerFrame
+    const angleAfterApplicationOfVelocity =
+      angle + velocityAngleAfterApplicationOfForces * timePerFrame
 
     // no move
     if (
