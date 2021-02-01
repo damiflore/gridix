@@ -66,9 +66,9 @@ export const handleMotion = ({ world, stepInfo }) => {
       : (velocityAngle + accelerationAngle * timePerFrame) * frictionAmbientCoef
 
     // update velocity
-    gameObject.velocityX = velocityXAfterApplicationOfForces
-    gameObject.velocityY = velocityYAfterApplicationOfForces
-    gameObject.velocityAngle = velocityAngleAfterApplicationOfForces
+    gameObject.velocityX = velocityXAfterApplicationOfForces * timePerFrame
+    gameObject.velocityY = velocityYAfterApplicationOfForces * timePerFrame
+    gameObject.velocityAngle = velocityAngleAfterApplicationOfForces * timePerFrame
 
     const centerX = gameObject.centerX
     const centerXAfterApplicationOfVelocity = centerX + velocityXAfterApplicationOfForces

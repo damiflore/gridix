@@ -7,7 +7,10 @@ import {
 import { forEachCollidingPairs } from "../collision/collision.js"
 import { motionAllowedFromMass } from "./physic.motion.js"
 
+const relaxationCount = 5
 const positionResolutionCoef = 1
+// min relative velocity between bodies to trigge the velocity impact
+const bounceThreshold = 1
 
 export const handleCollision = ({
   world,
@@ -15,7 +18,7 @@ export const handleCollision = ({
   collisionPositionResolution,
   collisionVelocityImpact, // could be renamed collisionImpulse
 }) => {
-  let collisionIterations = 5
+  let collisionIterations = relaxationCount
   while (collisionIterations--) {
     forEachCollidingPairs({
       world,
@@ -108,9 +111,6 @@ const adjustPositionToSolveCollision = (
   b.centerX = bPositionXCorrection
   b.centerY = bPositionYCorrection
 }
-
-// min relative velocity between bodies to trigge the velocity impact
-const bounceThreshold = 1
 
 const applyCollisionImpactOnVelocity = (
   a,

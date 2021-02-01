@@ -1,4 +1,4 @@
-import { motionAllowedFromMass, getTotalForces } from "./physic.motion.js"
+import { motionAllowedFromMass } from "./physic.motion.js"
 
 export const handleSleep = ({
   world,

@@ -46,16 +46,16 @@ ou au moin de petit fichier html pour tester des cas concrets
 
 // import { drawCollisionInfo } from "./draw/draw.js"
 import { motionAllowedFromMass } from "./physic/physic.motion.js"
-// import { demoBloc } from "./demo-bloc.js"
-import { demoCool } from "./demo-cool.js"
+import { demoBloc } from "./demo-bloc.js"
+// import { demoCool } from "./demo-cool.js"
 // import { forEachCollidingPairs } from "./collision/collision.js"
 import { updateDevtool } from "./devtool.js"
 import { createGameEngine } from "./engine/engine.js"
 import { registerPageLifecyle } from "./page/page-lifecyle.js"
 
 let gameObjectSelected = null
-// const world = demoBloc()
-const world = demoCool()
+const world = demoBloc()
+// const world = demoCool()
 const canvas = document.createElement("canvas")
 canvas.width = world.width
 canvas.height = world.height

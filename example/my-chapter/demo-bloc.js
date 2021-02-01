@@ -9,13 +9,13 @@ import { getIntersectionRatioBetweenRectangles } from "./geometry/rectangle.js"
 
 export const demoBloc = () => {
   const worldGrid = {
-    cellXCount: 24,
-    cellYCount: 14,
+    cellXCount: 10,
+    cellYCount: 10,
     cellSize: 32,
   }
   const world = createWorld({
-    width: 0,
-    height: 0,
+    width: worldGrid.cellXCount * worldGrid.cellSize,
+    height: worldGrid.cellYCount * worldGrid.cellSize,
     onGameObjectMove: (gameObject) => {
       updateGameObjectStateFromPosition(gameObject, world)
     },
