@@ -107,7 +107,7 @@ export const demoBloc = () => {
       name: "baril",
       centerX: centerXFromCellX(cellX, worldGrid),
       centerY: centerYFromCellY(cellY, worldGrid),
-      // TODO: use force instead of velocity
+      // TODO: add the onMove concept on a gameObject, then put this into a onMove
       update: (baril) => {
         // the goal here is to facilitate a moving baril to stop
         // exactly on a cell.
