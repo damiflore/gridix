@@ -6,19 +6,10 @@ import { updatePhysicForArcadeGame } from "../physic/physic.js"
 import { drawCollisionInfo } from "../draw/draw.js"
 import { createRectangle } from "./shape.js"
 
-export const createWorld = ({ cellXCount, cellYCount, cellSize }) => {
+export const createWorld = ({ width, height }) => {
   const gameObjects = []
   const collisionInfos = []
-  const grid = {
-    cellXCount,
-    cellYCount,
-    cellSize,
-  }
-  const world = {
-    width: cellXCount * cellSize,
-    height: cellYCount * cellSize,
-    grid,
-  }
+  const world = { width, height }
 
   // layers:
   // aboveGrid
@@ -134,7 +125,7 @@ export const createWorld = ({ cellXCount, cellYCount, cellSize }) => {
   }
 
   const gameObjectFromPoint = (point) => {
-    const gameObjectsAtPoint = gameObjectsFromPoint(gameObjects, point)
+    const gameObjectsAtPoint = gameObjectsFromPoint(point)
     // ideally get the once with highest z-index
     return gameObjectsAtPoint[gameObjectsAtPoint.length - 1]
   }
