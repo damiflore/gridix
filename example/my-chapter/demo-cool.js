@@ -10,9 +10,14 @@ export const demoCool = () => {
 
   addBoundsToWorld(world)
 
+  world.gravity = true
+
   world.addGameObject({
     name: "gravity",
     update: () => {
+      if (!world.gravity) {
+        return
+      }
       world.forEachGameObject((gameObject) => {
         if (gameObject.rigid && motionAllowedFromMass(gameObject.mass)) {
           gameObject.forces.push({

@@ -46,7 +46,6 @@ ou au moin de petit fichier html pour tester des cas concrets
 
 // import { drawCollisionInfo } from "./draw/draw.js"
 import { motionAllowedFromMass } from "./physic/physic.motion.js"
-import { PHYSIC_CONSTANTS } from "./physic/physic.constants.js"
 // import { demoBloc } from "./demo-bloc.js"
 import { demoCool } from "./demo-cool.js"
 // import { forEachCollidingPairs } from "./collision/collision.js"
@@ -248,10 +247,10 @@ const gameEngine = createGameEngine({
           }
         },
         "gravity-enable": () => {
-          PHYSIC_CONSTANTS.forceYAmbient = 200
+          world.gravity = true
         },
         "gravity-disable": () => {
-          PHYSIC_CONSTANTS.forceYAmbient = 0
+          world.gravity = false
         },
         "excite": () => {
           world.forEachGameObject((gameObject) => {
