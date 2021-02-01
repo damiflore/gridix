@@ -28,6 +28,9 @@ export const createRigidBody = () => {
     angleLocked: false,
 
     forces: [],
+    forceX: 0,
+    forceY: 0,
+    forceAngle: 0,
     // Object with negavite, 0, or infinite mass cannot move.
     // colliding such object has no impact on the object itself
     // big mass are less impacted by collision with object with smaller mass
