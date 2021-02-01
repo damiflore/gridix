@@ -10,7 +10,7 @@ export const demoCool = () => {
 
   addBoundsToWorld(world)
 
-  const gravity = 5
+  const gravity = 200
 
   world.gravity = true
   world.addGameObject({
