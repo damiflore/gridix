@@ -4,6 +4,20 @@ export const getVectorLength = ({ x, y }) => {
   return Math.sqrt(x * x + y * y)
 }
 
+export const clampVectorLength = (vector, max) => {
+  const length = getVectorLength(vector)
+  if (length > max) {
+    return vector
+  }
+
+  const scale = max / length
+  const vectorClamped = {
+    x: vector.x * scale,
+    y: vector.y * scale,
+  }
+  return vectorClamped
+}
+
 export const addVector = (vectorA, vectorB) => {
   return {
     x: vectorA.x + vectorB.x,
@@ -19,6 +33,10 @@ export const substractVector = (vectorA, vectorB) => {
 }
 
 export const scaleVector = (vector, scale) => {
+  if (scale === 1) {
+    return vector
+  }
+
   return {
     x: vector.x * scale,
     y: vector.y * scale,

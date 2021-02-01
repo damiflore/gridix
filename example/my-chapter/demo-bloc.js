@@ -1,10 +1,11 @@
 /* eslint-disable no-nested-ternary */
+import { trackKeyboardKeydown } from "../../src/interaction/keyboard.js"
 import { createRectangle } from "./world/shape.js"
 import { createWorld, addBoundsToWorld } from "./world/world.js"
-import { trackKeyboardKeydown } from "../../src/interaction/keyboard.js"
 import { closestCellCenterFromPoint, centerXFromCellX, centerYFromCellY } from "./geometry/grid.js"
 import { getCollisionInfo } from "./collision/collisionInfo.js"
 import { getIntersectionRatioBetweenRectangles } from "./geometry/rectangle.js"
+import { clampMagnitude, sameSign } from "./math/math.js"
 // import { getDistanceBetweenVectors } from "./geometry/vector.js"
 
 export const demoBloc = () => {
@@ -45,33 +46,43 @@ export const demoBloc = () => {
     node: document,
   })
   const keyboardVelocity = 200
+  // the accell/decel numbers below are dependent of the ambient friction
+  // idéalement la vitesse du hero dans une direction devrait
+  // rendre plus difficile de repartir dans une autre direction ?
+  const maxAccel = 25000
+  const maxDecel = 5000
   world.addGameObject({
     name: "keyboard-navigation",
     update: (_, { timePerFrame }) => {
       // https://docs.unity3d.com/ScriptReference/Rigidbody2D.AddForce.html
       // https://gamedev.stackexchange.com/a/169844
 
-      // Quand on change de direction, celui ci est instantané.
-      // Ca pose un souci qui devient évident lorsque la friction est faible:
-      // Le héros bouge d'un seul coup dans l'autre direction, il est impossible de
-      // controller l'endroit ou on veut s'arreter
-      // On s'en rend compte en allant sur la glace.
+      let forceX = 0
       const keyXCoef = keyToCoef(leftKey, rightKey)
       if (keyXCoef) {
         const { velocityX } = hero
-        const keyVelocity = keyboardVelocity * keyXCoef
-        const velocityXDiff = keyVelocity - velocityX
-        const forceXFromKey = (velocityXDiff * hero.mass) / timePerFrame
-        hero.forces.push({ x: forceXFromKey })
+        const velocityCurrent = velocityX
+        const velocityDesired = keyboardVelocity * keyXCoef
+        const velocityDiff = velocityDesired - velocityCurrent
+        const max = sameSign(velocityCurrent, keyXCoef) ? maxAccel : maxDecel
+        const acceleration = clampMagnitude(velocityDiff / timePerFrame, max * hero.frictionAmbient)
+        forceX = hero.mass * acceleration
       }
 
+      let forceY = 0
       const keyYCoef = keyToCoef(upKey, downKey)
       if (keyYCoef) {
         const { velocityY } = hero
-        const keyVelocity = keyboardVelocity * keyYCoef
-        const velocityYDiff = keyVelocity - velocityY
-        const forceYFromKey = (velocityYDiff * hero.mass) / timePerFrame
-        hero.forces.push({ y: forceYFromKey })
+        const velocityCurrent = velocityY
+        const velocityDesired = keyboardVelocity * keyYCoef
+        const velocityDiff = velocityDesired - velocityCurrent
+        const max = sameSign(velocityCurrent, keyYCoef) ? maxAccel : maxDecel
+        const acceleration = clampMagnitude(velocityDiff / timePerFrame, max * hero.frictionAmbient)
+        forceY = hero.mass * acceleration
+      }
+
+      if (forceX || forceY) {
+        hero.forces.push({ x: forceX, y: forceY })
       }
     },
   })
