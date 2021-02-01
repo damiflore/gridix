@@ -1,16 +1,31 @@
 /* eslint-disable no-nested-ternary */
 import { createRectangle } from "./world/shape.js"
-import { addBoundsToWorld } from "./world/world.js"
+import { createWorld, addBoundsToWorld } from "./world/world.js"
 import { trackKeyboardKeydown } from "../../src/interaction/keyboard.js"
 import { closestCellCenterFromPoint, centerXFromCellX, centerYFromCellY } from "./geometry/grid.js"
+import { getCollisionInfo } from "./collision/collisionInfo.js"
+import { getIntersectionRatioBetweenRectangles } from "./geometry/rectangle.js"
 // import { getDistanceBetweenVectors } from "./geometry/vector.js"
 
-export const demoBloc = ({ world }) => {
+export const demoBloc = () => {
+  const worldGrid = {
+    cellXCount: 24,
+    cellYCount: 14,
+    cellSize: 32,
+  }
+  const world = createWorld({
+    width: 0,
+    height: 0,
+    onGameObjectMove: (gameObject) => {
+      updateGameObjectStateFromPosition(gameObject, world)
+    },
+  })
+
   addBoundsToWorld(world)
 
   let hero
 
-  const { cellSize } = world.grid
+  const { cellSize } = worldGrid
 
   // put keyboard first so that sidewalk will be able to add/substract force from keyboard impulse
   const downKey = trackKeyboardKeydown({
@@ -63,8 +78,8 @@ export const demoBloc = ({ world }) => {
 
   const addWall = ({ cellX, cellY }) => {
     const wall = createRectangle({
-      centerX: centerXFromCellX(cellX, world.grid),
-      centerY: centerYFromCellY(cellY, world.grid),
+      centerX: centerXFromCellX(cellX, worldGrid),
+      centerY: centerYFromCellY(cellY, worldGrid),
       angleLocked: true,
       width: cellSize,
       height: cellSize,
@@ -79,8 +94,8 @@ export const demoBloc = ({ world }) => {
   const addBaril = ({ cellX, cellY }) => {
     const baril = createRectangle({
       name: "baril",
-      centerX: centerXFromCellX(cellX, world.grid),
-      centerY: centerYFromCellY(cellY, world.grid),
+      centerX: centerXFromCellX(cellX, worldGrid),
+      centerY: centerYFromCellY(cellY, worldGrid),
       // TODO: use force instead of velocity
       update: (baril) => {
         // the goal here is to facilitate a moving baril to stop
@@ -172,8 +187,8 @@ export const demoBloc = ({ world }) => {
       // rigid: true,
       hitbox: true,
       frictionGround: 0.05,
-      centerX: centerXFromCellX(cellX, world.grid),
-      centerY: centerYFromCellY(cellY, world.grid),
+      centerX: centerXFromCellX(cellX, worldGrid),
+      centerY: centerYFromCellY(cellY, worldGrid),
       width: cellSize,
       height: cellSize,
       fillStyle: "lightblue",
@@ -191,8 +206,8 @@ export const demoBloc = ({ world }) => {
         gameObject.forces.push(sidewalkForce)
         return () => {}
       },
-      centerX: centerXFromCellX(cellX, world.grid),
-      centerY: centerYFromCellY(cellY, world.grid),
+      centerX: centerXFromCellX(cellX, worldGrid),
+      centerY: centerYFromCellY(cellY, worldGrid),
       width: cellSize,
       height: cellSize,
       fillStyle: "lightgreen",
@@ -203,8 +218,8 @@ export const demoBloc = ({ world }) => {
   const addHero = ({ cellX, cellY }) => {
     const hero = createRectangle({
       name: "hero",
-      centerX: centerXFromCellX(cellX, world.grid),
-      centerY: centerYFromCellY(cellY, world.grid),
+      centerX: centerXFromCellX(cellX, worldGrid),
+      centerY: centerYFromCellY(cellY, worldGrid),
       angleLocked: true,
       width: 32,
       height: 32,
@@ -241,6 +256,50 @@ export const demoBloc = ({ world }) => {
   addIce({ cellX: 6, cellY: 8 })
 
   hero = addHero({ cellX: 0, cellY: 0 })
+
+  return world
+}
+
+const updateGameObjectStateFromPosition = (gameObject, world) => {
+  let gameObjectWithFrictionAndHighestIntersectionRatio = null
+  const highestIntersectionRatio = 0
+  world.forEachGameObject((gameObjectCandidate) => {
+    if (gameObjectCandidate === gameObject) {
+      return
+    }
+    if (!gameObject.hitbox) {
+      return
+    }
+    if (!gameObjectCandidate.hitbox) {
+      return
+    }
+    const { frictionGround } = gameObjectCandidate
+    if (frictionGround === undefined) {
+      return
+    }
+    const collisionInfo = getCollisionInfo(gameObject, gameObjectCandidate)
+
+    if (!collisionInfo) {
+      return
+    }
+
+    // ideally we would choose the ground with highest intersection ratio
+    // with gameObject
+    const intersectionRatio = getIntersectionRatioBetweenRectangles(gameObject, gameObjectCandidate)
+    if (intersectionRatio > highestIntersectionRatio) {
+      gameObjectWithFrictionAndHighestIntersectionRatio = gameObjectCandidate
+    }
+  })
+
+  // the only "drawback" is the if hero stands on the ground
+  // but ground has no frictionGround set, then the first object with a frictionGround
+  // will be applied. It can be fixed by ensuring all ground objects
+  // got a frictionGround set
+  const frictionAmbient = gameObjectWithFrictionAndHighestIntersectionRatio
+    ? gameObjectWithFrictionAndHighestIntersectionRatio.frictionGround
+    : 0.2
+
+  gameObject.frictionAmbient = frictionAmbient
 }
 
 const keyToCoef = (firstKey, secondKey) => {
