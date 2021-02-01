@@ -171,6 +171,11 @@ const gameEngine = createGameEngine({
             gameObjectSelected.sleeping = true
           }
         },
+        "debug-sleep": () => {
+          if (gameObjectSelected) {
+            gameObjectSelected.debugSleep = true
+          }
+        },
 
         "move-left": () => {
           if (gameObjectSelected) {

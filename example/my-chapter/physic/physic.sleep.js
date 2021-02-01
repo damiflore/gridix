@@ -67,6 +67,12 @@ const updateSleepingState = (
     return
   }
 
+  if (gameObject.debugSleep) {
+    gameObject.debugSleep = false
+    // eslint-disable-next-line no-debugger
+    debugger
+  }
+
   if (gameObject.sleeping) {
     if (
       shouldAwake(gameObject, {
