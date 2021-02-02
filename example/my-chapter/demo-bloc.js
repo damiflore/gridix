@@ -2,9 +2,13 @@
 import { trackKeyboardKeydown } from "../../src/interaction/keyboard.js"
 import { createRectangle } from "./world/shape.js"
 import { createWorld, addBoundsToWorld } from "./world/world.js"
-import { closestCellCenterFromPoint, centerXFromCellX, centerYFromCellY } from "./geometry/grid.js"
-import { getCollisionInfo } from "./collision/collisionInfo.js"
-import { getIntersectionRatioBetweenRectangles } from "./geometry/rectangle.js"
+import {
+  closestCellIndexFromPoint,
+  closestCellCenterFromPoint,
+  centerXFromCellX,
+  centerYFromCellY,
+  generateCells,
+} from "./geometry/grid.js"
 import { clampMagnitude, sameSign } from "./math/math.js"
 // import { getDistanceBetweenVectors } from "./geometry/vector.js"
 
@@ -13,18 +17,79 @@ export const demoBloc = () => {
     cellXCount: 10,
     cellYCount: 10,
     cellSize: 32,
+    cells: [],
   }
+  worldGrid.cells = generateCells(worldGrid)
+
+  const onGameObjectLeaveCell = (
+    gameObject,
+    cellMates,
+    // cellIndex
+  ) => {
+    cellMates.forEach((cellMate) => {
+      if (cellMate.onCellMateLeave) {
+        cellMate.onCellMateLeave(gameObject)
+      }
+    })
+  }
+  const onGameObjectEnterCell = (
+    gameObject,
+    cellMates,
+    // cellIndex
+  ) => {
+    cellMates.forEach((cellMate) => {
+      if (cellMate.onCellMateJoin) {
+        cellMate.onCellMateJoin(gameObject)
+      }
+    })
+  }
+
+  let hero
+
   const world = createWorld({
     width: worldGrid.cellXCount * worldGrid.cellSize,
     height: worldGrid.cellYCount * worldGrid.cellSize,
     onGameObjectMove: (gameObject) => {
-      updateGameObjectStateFromPosition(gameObject, world)
+      const cellIndexPrevious =
+        gameObject.centerXPrev === undefined
+          ? -1
+          : closestCellIndexFromPoint(
+              {
+                x: gameObject.centerXPrev,
+                y: gameObject.centerYPrev,
+              },
+              worldGrid,
+            )
+      const cellIndex = closestCellIndexFromPoint(
+        {
+          x: gameObject.centerX,
+          y: gameObject.centerY,
+        },
+        worldGrid,
+      )
+      if (cellIndexPrevious !== cellIndex) {
+        let cellMatesPrevious = []
+        let cellMates = []
+
+        if (cellIndexPrevious > -1) {
+          cellMatesPrevious = removeItemFromCell(worldGrid, cellIndexPrevious, gameObject)
+          onGameObjectLeaveCell(gameObject, cellMatesPrevious, cellIndexPrevious)
+        }
+        if (cellIndex > -1) {
+          cellMates = worldGrid.cells[cellIndex] || []
+          addItemToCell(worldGrid, cellIndex, gameObject)
+          onGameObjectEnterCell(gameObject, cellMates, cellIndex)
+        }
+
+        // useless for now
+        // if (gameObject.onCellChange) {
+        //   gameObject.onCellChange(cellMates, cellMatesPrevious)
+        // }
+      }
     },
   })
 
   addBoundsToWorld(world)
-
-  let hero
 
   const { cellSize } = worldGrid
 
@@ -118,6 +183,8 @@ export const demoBloc = () => {
         // baril moving the opposite direction of closest cell -> do nothing
         // baril already "exactly" on the cell -> do nothing
 
+        baril.frictionAmbient = baril.flagIce ? 0.02 : 0.7
+
         const { sleeping } = baril
         if (sleeping) {
           return
@@ -199,6 +266,13 @@ export const demoBloc = () => {
       width: cellSize,
       height: cellSize,
       fillStyle: "lightblue",
+      onCellMateJoin: (gameObject) => {
+        debugger
+        gameObject.flagIce = true
+      },
+      onCellMateLeave: (gameObject) => {
+        gameObject.flagIce = false
+      },
     })
     world.addGameObject(ice)
   }
@@ -225,6 +299,9 @@ export const demoBloc = () => {
   const addHero = ({ cellX, cellY }) => {
     const hero = createRectangle({
       name: "hero",
+      update: () => {
+        hero.frictionAmbient = hero.flagIce ? 0.02 : 0.2
+      },
       centerX: centerXFromCellX(cellX, worldGrid),
       centerY: centerYFromCellY(cellY, worldGrid),
       angleLocked: true,
@@ -233,7 +310,6 @@ export const demoBloc = () => {
       fillStyle: "red",
       rigid: true,
       friction: 0.01,
-      frictionAmbient: 0.2,
     })
     world.addGameObject(hero)
     return hero
@@ -267,46 +343,41 @@ export const demoBloc = () => {
   return world
 }
 
-const updateGameObjectStateFromPosition = (gameObject, world) => {
-  let gameObjectWithFrictionAndHighestIntersectionRatio = null
-  const highestIntersectionRatio = 0
-  world.forEachGameObject((gameObjectCandidate) => {
-    if (gameObjectCandidate === gameObject) {
-      return
-    }
-    if (!gameObject.hitbox) {
-      return
-    }
-    if (!gameObjectCandidate.hitbox) {
-      return
-    }
-    const { frictionGround } = gameObjectCandidate
-    if (frictionGround === undefined) {
-      return
-    }
-    const collisionInfo = getCollisionInfo(gameObject, gameObjectCandidate)
+const removeItemFromCell = (grid, cellIndex, item) => {
+  const cells = grid.cells
+  const cell = cells[cellIndex]
 
-    if (!collisionInfo) {
-      return
+  if (!cell) {
+    const cellWithoutItem = []
+    cells[cellIndex] = cellWithoutItem
+    return cellWithoutItem
+  }
+
+  let i = cell.length
+  const cellWithoutItem = []
+  while (i--) {
+    const value = cell[i]
+    if (value !== item) {
+      cellWithoutItem.push(item)
     }
+  }
+  cells[cellIndex] = cellWithoutItem
 
-    // ideally we would choose the ground with highest intersection ratio
-    // with gameObject
-    const intersectionRatio = getIntersectionRatioBetweenRectangles(gameObject, gameObjectCandidate)
-    if (intersectionRatio > highestIntersectionRatio) {
-      gameObjectWithFrictionAndHighestIntersectionRatio = gameObjectCandidate
-    }
-  })
+  return cellWithoutItem
+}
 
-  // the only "drawback" is the if hero stands on the ground
-  // but ground has no frictionGround set, then the first object with a frictionGround
-  // will be applied. It can be fixed by ensuring all ground objects
-  // got a frictionGround set
-  const frictionAmbient = gameObjectWithFrictionAndHighestIntersectionRatio
-    ? gameObjectWithFrictionAndHighestIntersectionRatio.frictionGround
-    : 0.2
+const addItemToCell = (grid, cellIndex, item) => {
+  const cells = grid.cells
+  const cell = cells[cellIndex]
+  if (cell) {
+    const cellWithItem = [...cell, item]
+    cells[cellIndex] = cellWithItem
+    return cellWithItem
+  }
 
-  gameObject.frictionAmbient = frictionAmbient
+  const cellWithItem = [item]
+  cells[cellIndex] = cellWithItem
+  return cellWithItem
 }
 
 const keyToCoef = (firstKey, secondKey) => {

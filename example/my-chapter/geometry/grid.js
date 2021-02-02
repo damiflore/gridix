@@ -1,10 +1,39 @@
 // https://github.com/MassiveHeights/Black-Donuts/blob/f8aab3baba364b7f1d5e71f177639086299acb52/js/objects/board.js#L180
+
+export const closestCellIndexFromPoint = ({ x, y }, { cellSize, cellXCount, cellYCount }) => {
+  if (x < 0) {
+    return -1
+  }
+  const closestCellX = Math.floor(x / cellSize)
+  if (closestCellX > cellXCount) {
+    return -1
+  }
+
+  if (y < 0) {
+    return -1
+  }
+  const closestCellY = Math.floor(y / cellSize)
+  if (closestCellY > cellYCount) {
+    return -1
+  }
+
+  const closestCellIndex = cellIndexFromCell(
+    {
+      cellX: closestCellX,
+      cellY: closestCellY,
+    },
+    { cellXCount },
+  )
+  return closestCellIndex
+}
+
 export const closestCellCenterFromPoint = ({ x, y }, { cellSize }) => {
-  const closestColumn = Math.floor(x / cellSize)
-  const closestRow = Math.floor(y / cellSize)
+  const closestCellX = Math.floor(x / cellSize)
+  const closestCellY = Math.floor(y / cellSize)
+
   const closestCellCenter = {
-    x: closestColumn * cellSize + cellSize / 2,
-    y: closestRow * cellSize + cellSize / 2,
+    x: closestCellX * cellSize + cellSize / 2,
+    y: closestCellY * cellSize + cellSize / 2,
   }
 
   return closestCellCenter
@@ -47,4 +76,26 @@ export const cellIndexFromCell = ({ cellX, cellY }, { cellXCount }) => {
   const cellIndex = cellX + cellY * cellXCount
 
   return cellIndex
+}
+
+export const getLastCellIndex = ({ cellXCount, cellYCount }) => {
+  const cellCount = cellYCount * cellXCount
+  const lastCellIndex = cellCount - 1
+
+  return lastCellIndex
+}
+
+export const generateCells = (grid, fillWith) => {
+  const lastCellIndex = getLastCellIndex(grid)
+  const cellCount = lastCellIndex + 1
+  const cells = new Array(cellCount)
+
+  if (fillWith !== undefined) {
+    let i = cellCount
+    while (i--) {
+      cells[i] = fillWith
+    }
+  }
+
+  return cells
 }
