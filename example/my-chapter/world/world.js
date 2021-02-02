@@ -34,9 +34,7 @@ export const createWorld = ({ width, height, onGameObjectMove = () => {} }) => {
       collisionCallback: ({ collisionInfo }) => {
         collisionInfos.push(collisionInfo)
       },
-      moveCallback: (gameObject) => {
-        onGameObjectMove(gameObject)
-      },
+      moveCallback: onGameObjectMove,
       collisionPositionResolution: true,
       collisionVelocityImpact: true,
     })
@@ -49,7 +47,13 @@ export const createWorld = ({ width, height, onGameObjectMove = () => {} }) => {
   }
 
   const addGameObject = (gameObject) => {
-    onGameObjectMove(gameObject)
+    onGameObjectMove(gameObject, {
+      from: null,
+      to: { x: gameObject.centerX, y: gameObject.centerY, angle: gameObject.angle },
+      x: gameObject.centerX,
+      y: gameObject.centerY,
+      angle: gameObject.angle,
+    })
     gameObjects.push(gameObject)
   }
 

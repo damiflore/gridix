@@ -49,24 +49,15 @@ export const demoBloc = () => {
   const world = createWorld({
     width: worldGrid.cellXCount * worldGrid.cellSize,
     height: worldGrid.cellYCount * worldGrid.cellSize,
-    onGameObjectMove: (gameObject) => {
-      const cellIndexPrevious =
-        gameObject.centerXPrev === undefined
-          ? -1
-          : closestCellIndexFromPoint(
-              {
-                x: gameObject.centerXPrev,
-                y: gameObject.centerYPrev,
-              },
-              worldGrid,
-            )
-      const cellIndex = closestCellIndexFromPoint(
-        {
-          x: gameObject.centerX,
-          y: gameObject.centerY,
-        },
-        worldGrid,
-      )
+    onGameObjectMove: (gameObject, move) => {
+      // some objects are pure logic, we should detect them somehow
+      // -> !rigid is not enough for will do for now
+      if (!gameObject.rigid) {
+        return
+      }
+
+      const cellIndexPrevious = move.from ? closestCellIndexFromPoint(move.from, worldGrid) : -1
+      const cellIndex = closestCellIndexFromPoint(move.to, worldGrid)
       if (cellIndexPrevious !== cellIndex) {
         let cellMatesPrevious = []
         let cellMates = []

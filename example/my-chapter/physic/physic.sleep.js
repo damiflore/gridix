@@ -28,14 +28,17 @@ export const handleSleep = ({
       return
     }
 
-    const moveX = centerX - centerXPrev
-    const moveY = centerY - centerYPrev
-    const moveAngle = angle - anglePrev
+    const move = {
+      from: { x: centerXPrev, y: centerYPrev, angle: anglePrev },
+      to: { x: centerX, y: centerY, angle },
+      x: centerX - centerXPrev,
+      y: centerY - centerYPrev,
+      angle: angle - anglePrev,
+    }
+
     updateSleepingState(gameObject, {
       stepInfo,
-      moveX,
-      moveY,
-      moveAngle,
+      move,
       sleepMoveThreshold,
       sleepForceThreshold,
       sleepVelocityThreshold,
@@ -49,9 +52,7 @@ const updateSleepingState = (
   gameObject,
   {
     stepInfo,
-    moveX,
-    moveY,
-    moveAngle,
+    move,
     sleepMoveThreshold,
     sleepForceThreshold,
     sleepVelocityThreshold,
@@ -74,9 +75,7 @@ const updateSleepingState = (
   }
 
   const moveIsNotable = !getMoveIsNegligible({
-    moveX,
-    moveY,
-    moveAngle,
+    move,
     sleepMoveThreshold,
   })
 
@@ -90,7 +89,7 @@ const updateSleepingState = (
     ) {
       gameObject.lastNotableMotionTime = stepInfo.time
       gameObject.sleeping = false
-      moveCallback(gameObject)
+      moveCallback(gameObject, move)
     }
     return
   }
@@ -98,7 +97,7 @@ const updateSleepingState = (
   // it's moving enough
   if (moveIsNotable) {
     gameObject.lastNotableMotionTime = stepInfo.time
-    moveCallback(gameObject)
+    moveCallback(gameObject, move)
     return
   }
 
@@ -123,16 +122,16 @@ const updateSleepingState = (
   })
 }
 
-const getMoveIsNegligible = ({ moveX, moveY, moveAngle, sleepMoveThreshold }) => {
-  if (Math.abs(moveX) > sleepMoveThreshold) {
+const getMoveIsNegligible = ({ move, sleepMoveThreshold }) => {
+  if (Math.abs(move.x) > sleepMoveThreshold) {
     return false
   }
 
-  if (Math.abs(moveY) > sleepMoveThreshold) {
+  if (Math.abs(move.y) > sleepMoveThreshold) {
     return false
   }
 
-  if (Math.abs(moveAngle) > sleepMoveThreshold) {
+  if (Math.abs(move.angle) > sleepMoveThreshold) {
     return false
   }
 

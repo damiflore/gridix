@@ -48,6 +48,10 @@ export const handleMotion = ({ world, stepInfo }) => {
       return
     }
 
+    // in theory we should divide all forces by the mass
+    // but in practice it would be more efficient to take the force as it is
+    // and when some code wants to apply force, it divide is by the mass if
+    // if the force is a constant that is not proportional to the mass
     const forceDivider = mass
     const frictionAmbientCoef = 1 - gameObject.frictionAmbient
     const accelerationX = forceTotal.x / forceDivider
