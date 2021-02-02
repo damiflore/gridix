@@ -1,3 +1,6 @@
+const UPDATE_MAX_MS = 10
+const DRAW_MAX_MS = 10
+
 export const createGameEngine = ({
   framePerSecond = 60,
   maxUpdatePerFrame = 30,
@@ -8,6 +11,34 @@ export const createGameEngine = ({
   let frame
   let looping = false
   let paused = false
+
+  if (import.meta.dev) {
+    const updateOriginal = update
+    update = (stepInfo) => {
+      const updateStartMs = Date.now()
+      updateOriginal(stepInfo)
+      const updateEndMs = Date.now()
+      const updateDuration = updateEndMs - updateStartMs
+      if (updateDuration > DRAW_MAX_MS) {
+        console.warn(
+          `update is too slow, took ${updateDuration}ms (should be less than ${UPDATE_MAX_MS})`,
+        )
+      }
+    }
+
+    const drawOriginal = draw
+    draw = (stepInfo) => {
+      const drawStartMs = Date.now()
+      drawOriginal(stepInfo)
+      const drawEndMs = Date.now()
+      const drawDuration = drawEndMs - drawStartMs
+      if (drawDuration > DRAW_MAX_MS) {
+        console.warn(
+          `draw is too slow, took ${drawDuration}ms (should be less than ${DRAW_MAX_MS})`,
+        )
+      }
+    }
+  }
 
   const gameEngine = {
     framePerSecond,
@@ -56,6 +87,7 @@ export const createGameEngine = ({
       stepInfo.time += timePerFrame
       update(stepInfo)
     }
+
     draw(stepInfo)
   }
 
