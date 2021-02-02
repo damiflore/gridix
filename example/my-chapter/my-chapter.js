@@ -276,7 +276,16 @@ registerPageLifecyle({
     gameEngine.pauseGameLoop()
   },
 })
-gameEngine.startGameLoop()
+// the first loop of the game engine is likely more expensive than the others
+// - internal logic might setup things
+// - browser might realize we will or just have created a lot of objects
+// so wait a bit for browser to be peaceful before starting the game engine
+window.requestIdleCallback(
+  () => {
+    gameEngine.startGameLoop()
+  },
+  { timeout: 200 },
+)
 
 canvas.addEventListener("click", (clickEvent) => {
   const clickPoint = {
