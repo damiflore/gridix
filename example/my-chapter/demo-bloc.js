@@ -266,7 +266,7 @@ export const demoBloc = () => {
         const cellContent = worldGrid.cells[sidewalk.cellIndex]
         cellContent.forEach((cellMate) => {
           if (cellMate !== sidewalk) {
-            cellMate.forces.push({ y: -600 })
+            cellMate.forces.push({ y: -6000 })
           }
         })
       },

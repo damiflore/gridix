@@ -24,7 +24,7 @@ export const updatePhysicForArcadeGame = ({
   // we consider object as static/motionless
   // when this happen for more than sleepStartSeconds
   // object is put to sleep
-  sleepMoveThreshold = 0.1,
+  sleepMoveThreshold = 0.01,
   sleepForceThreshold = 1,
   sleepVelocityThreshold = 0.1,
   sleepStartDuration = 2,
