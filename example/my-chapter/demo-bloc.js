@@ -20,29 +20,7 @@ export const demoBloc = () => {
     cells: [],
   }
   worldGrid.cells = generateCells(worldGrid)
-
-  const onGameObjectLeaveCell = (
-    gameObject,
-    cellMates,
-    // cellIndex
-  ) => {
-    cellMates.forEach((cellMate) => {
-      if (cellMate.onCellMateLeave) {
-        cellMate.onCellMateLeave(gameObject)
-      }
-    })
-  }
-  const onGameObjectEnterCell = (
-    gameObject,
-    cellMates,
-    // cellIndex
-  ) => {
-    cellMates.forEach((cellMate) => {
-      if (cellMate.onCellMateJoin) {
-        cellMate.onCellMateJoin(gameObject)
-      }
-    })
-  }
+  window.worldGrid = worldGrid
 
   let hero
 
@@ -52,8 +30,12 @@ export const demoBloc = () => {
     onGameObjectMove: (gameObject, move) => {
       // some objects are pure logic, we should detect them somehow
       // -> !rigid is not enough for will do for now
-      if (!gameObject.rigid) {
+      if (!gameObject.rigid && !gameObject.hitbox) {
         return
+      }
+
+      if (move.from && gameObject.onMove) {
+        gameObject.onMove(move)
       }
 
       const cellIndexPrevious = move.from ? closestCellIndexFromPoint(move.from, worldGrid) : -1
@@ -62,14 +44,27 @@ export const demoBloc = () => {
         let cellMatesPrevious = []
         let cellMates = []
 
-        if (cellIndexPrevious > -1) {
+        if (cellIndexPrevious === -1) {
+        } else {
           cellMatesPrevious = removeItemFromCell(worldGrid, cellIndexPrevious, gameObject)
-          onGameObjectLeaveCell(gameObject, cellMatesPrevious, cellIndexPrevious)
+          cellMatesPrevious.forEach((cellMatePrevious) => {
+            if (cellMatePrevious.onCellMateLeave) {
+              cellMatePrevious.onCellMateLeave(gameObject)
+            }
+          })
         }
-        if (cellIndex > -1) {
+
+        if (cellIndex === -1) {
+          gameObject.cellIndex = -1
+        } else {
           cellMates = worldGrid.cells[cellIndex] || []
           addItemToCell(worldGrid, cellIndex, gameObject)
-          onGameObjectEnterCell(gameObject, cellMates, cellIndex)
+          cellMates.forEach((cellMate) => {
+            if (cellMate.onCellMateJoin) {
+              cellMate.onCellMateJoin(gameObject)
+            }
+          })
+          gameObject.cellIndex = cellIndex
         }
 
         // useless for now
@@ -113,7 +108,7 @@ export const demoBloc = () => {
       // https://docs.unity3d.com/ScriptReference/Rigidbody2D.AddForce.html
       // https://gamedev.stackexchange.com/a/169844
 
-      const whatever = hero.frictionAmbient === 0.2 ? keyboardVelocity : keyboardVelocity + 50
+      const whatever = hero.flagIce ? keyboardVelocity + 50 : keyboardVelocity
 
       let forceX = 0
       const keyXCoef = keyToCoef(leftKey, rightKey)
@@ -165,8 +160,7 @@ export const demoBloc = () => {
       name: "baril",
       centerX: centerXFromCellX(cellX, worldGrid),
       centerY: centerYFromCellY(cellY, worldGrid),
-      // TODO: add the onMove concept on a gameObject, then put this into a onMove
-      update: (baril) => {
+      update: () => {
         // the goal here is to facilitate a moving baril to stop
         // exactly on a cell.
         // sleeping baril -> do nothing
@@ -175,12 +169,8 @@ export const demoBloc = () => {
         // baril already "exactly" on the cell -> do nothing
 
         baril.frictionAmbient = baril.flagIce ? 0.02 : 0.7
-
-        const { sleeping } = baril
-        if (sleeping) {
-          return
-        }
-
+      },
+      onMove: () => {
         const { velocityX, velocityY } = baril
         // too fast
         const velocityXStrength = Math.abs(velocityX)
@@ -258,7 +248,6 @@ export const demoBloc = () => {
       height: cellSize,
       fillStyle: "lightblue",
       onCellMateJoin: (gameObject) => {
-        debugger
         gameObject.flagIce = true
       },
       onCellMateLeave: (gameObject) => {
@@ -273,10 +262,13 @@ export const demoBloc = () => {
       name: "sidewalk-top",
       // rigid: true,
       hitbox: true,
-      areaEffect: (sidewalk, gameObject) => {
-        const sidewalkForce = { origin: sidewalk, y: -600 }
-        gameObject.forces.push(sidewalkForce)
-        return () => {}
+      update: () => {
+        const cellContent = worldGrid.cells[sidewalk.cellIndex]
+        cellContent.forEach((cellMate) => {
+          if (cellMate !== sidewalk) {
+            cellMate.forces.push({ y: -600 })
+          }
+        })
       },
       centerX: centerXFromCellX(cellX, worldGrid),
       centerY: centerYFromCellY(cellY, worldGrid),
@@ -334,7 +326,7 @@ export const demoBloc = () => {
   return world
 }
 
-const removeItemFromCell = (grid, cellIndex, item) => {
+const removeItemFromCell = (grid, cellIndex, itemToRemove) => {
   const cells = grid.cells
   const cell = cells[cellIndex]
 
@@ -347,9 +339,9 @@ const removeItemFromCell = (grid, cellIndex, item) => {
   let i = cell.length
   const cellWithoutItem = []
   while (i--) {
-    const value = cell[i]
-    if (value !== item) {
-      cellWithoutItem.push(item)
+    const itemCandidate = cell[i]
+    if (itemCandidate !== itemToRemove) {
+      cellWithoutItem.push(itemCandidate)
     }
   }
   cells[cellIndex] = cellWithoutItem
