@@ -1,0 +1,1 @@
+window.splashscreen.remove()

@@ -39,7 +39,7 @@ import { updateDevtool } from "./devtool.js"
 import { createGameEngine } from "./engine/engine.js"
 import { registerPageLifecyle } from "./page/page-lifecyle.js"
 
-const demoPhysic = false
+const demoPhysic = true
 
 let gameObjectSelected = null
 const world = demoPhysic ? demoCool() : demoBloc()
