@@ -49,7 +49,7 @@ export const createBaril = ({ cellX, cellY, worldGrid }) => {
   return baril
 }
 
-const onMoveBaril = (baril, { worldGrid }) => {
+const onMoveBaril = (baril, worldGrid) => {
   const { velocityX, velocityY } = baril
   // too fast
   const velocityXStrength = Math.abs(velocityX)

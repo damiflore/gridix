@@ -4,19 +4,21 @@ export const closestCellIndexFromPoint = ({ x, y }, { cellSize, cellXCount, cell
   if (x < 0) {
     return -1
   }
-  const closestCellX = Math.floor(x / cellSize)
-  if (closestCellX > cellXCount) {
+  const closestCellXFloat = x / cellSize
+  if (closestCellXFloat > cellXCount) {
     return -1
   }
 
   if (y < 0) {
     return -1
   }
-  const closestCellY = Math.floor(y / cellSize)
-  if (closestCellY > cellYCount) {
+  const closestCellYFloat = y / cellSize
+  if (closestCellYFloat > cellYCount) {
     return -1
   }
 
+  const closestCellX = Math.floor(closestCellXFloat)
+  const closestCellY = Math.floor(closestCellYFloat)
   const closestCellIndex = cellIndexFromCell(
     {
       cellX: closestCellX,

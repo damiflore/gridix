@@ -25,7 +25,7 @@ export const createWorld = ({
     collisionCallback: ({ collisionInfo }) => {
       collisionInfos.push(collisionInfo)
     },
-    moveCallback: onGameObjectMoved,
+    onRigidBodyMoved: onGameObjectMoved,
     collisionPositionResolution: true,
     collisionVelocityImpact: true,
   })
