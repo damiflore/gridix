@@ -2,6 +2,7 @@
 import { trackKeyboardKeydown } from "../../src/interaction/keyboard.js"
 import { createRectangle } from "./world/shape.js"
 import { createWorld, addBoundsToWorld } from "./world/world.js"
+import { addForce, addImpulse } from "./physic/physic.motion.js"
 import {
   closestCellIndexFromPoint,
   closestCellCenterFromPoint,
@@ -119,7 +120,7 @@ export const demoBloc = () => {
         const velocityDiff = velocityDesired - velocityCurrent
         const max = sameSign(velocityCurrent, keyXCoef) ? maxAccel : maxDecel
         const acceleration = clampMagnitude(velocityDiff / timePerFrame, max * hero.frictionAmbient)
-        forceX = hero.mass * acceleration
+        forceX = acceleration
       }
 
       let forceY = 0
@@ -131,11 +132,11 @@ export const demoBloc = () => {
         const velocityDiff = velocityDesired - velocityCurrent
         const max = sameSign(velocityCurrent, keyYCoef) ? maxAccel : maxDecel
         const acceleration = clampMagnitude(velocityDiff / timePerFrame, max * hero.frictionAmbient)
-        forceY = hero.mass * acceleration
+        forceY = acceleration
       }
 
       if (forceX || forceY) {
-        hero.forces.push({ x: forceX, y: forceY })
+        addImpulse(hero, { x: forceX, y: forceY })
       }
     },
   })
@@ -204,7 +205,7 @@ export const demoBloc = () => {
             return
           }
 
-          baril.forces.push({ x: baril.mass * force * cellCenterToCenterXDiff })
+          addImpulse(baril, { x: force * cellCenterToCenterXDiff })
           return
         }
 
@@ -220,7 +221,7 @@ export const demoBloc = () => {
           return
         }
 
-        baril.forces.push({ y: baril.mass * force * cellCenterToCenterYDiff })
+        addImpulse(baril, { y: force * cellCenterToCenterYDiff })
       },
       angleLocked: true,
       sleeping: true,
@@ -266,7 +267,7 @@ export const demoBloc = () => {
         const cellContent = worldGrid.cells[sidewalk.cellIndex]
         cellContent.forEach((cellMate) => {
           if (cellMate !== sidewalk) {
-            cellMate.forces.push({ y: -6000 })
+            addForce(cellMate, { y: -6000 })
           }
         })
       },

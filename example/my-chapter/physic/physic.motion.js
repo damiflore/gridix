@@ -109,6 +109,20 @@ export const handleMotion = ({ world, stepInfo }) => {
   return positionUpdates
 }
 
+export const addImpulse = (gameObject, { x = 0, y = 0, angle = 0 }) => {
+  const { mass } = gameObject
+
+  gameObject.forces.push({
+    x: x * mass,
+    y: y * mass,
+    angle: angle * mass,
+  })
+}
+
+export const addForce = (gameObject, force) => {
+  gameObject.forces.push(force)
+}
+
 export const getTotalForces = (forces) => {
   let forceXTotal = 0
   let forceYTotal = 0
