@@ -17,8 +17,10 @@ export const createRigidBody = () => {
     // centerYWhenSleepStarted: 0,
     // angleWhenSleepStarted: 0,
 
+    debugMotion: false,
     debugCollisionResolution: false,
     debugCollisionDetection: false,
+    debugSleep: false,
 
     centerX: 0,
     centerY: 0,

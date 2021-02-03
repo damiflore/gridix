@@ -12,6 +12,12 @@ export const handleMotion = ({ world, stepInfo }) => {
       return
     }
 
+    if (gameObject.debugMotion) {
+      gameObject.debugMotion = false
+      // eslint-disable-next-line no-debugger
+      debugger
+    }
+
     const { mass, velocityX, velocityY, velocityAngle, forces } = gameObject
     const motionAllowedByMass = motionAllowedFromMass(mass)
     if (!motionAllowedByMass) {

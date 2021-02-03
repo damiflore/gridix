@@ -2,10 +2,6 @@
 /**
 TODO
 
-- introduire les grilles avec 3 layer
-
-- utiliser les grilles pour implémenter le areaEffect (frictionAmbient et sidewalk)
-
 - LATER:  utiliser la méthod update pour les rigid object au lieu de boucler
 sur les game object pour faire la physique (sauve un tour de boucle sur tous les game objects)
 -> plus tard, quand on y verra plus clair

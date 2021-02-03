@@ -11,7 +11,6 @@ import {
   generateCells,
 } from "./geometry/grid.js"
 import { clampMagnitude, sameSign } from "./math/math.js"
-// import { getDistanceBetweenVectors } from "./geometry/vector.js"
 
 export const demoBloc = () => {
   const worldGrid = {
