@@ -42,55 +42,59 @@ export const createBaril = ({ cellX, cellY, worldGrid }) => {
       baril.frictionAmbient = baril.flagIce ? 0.02 : 0.7
     },
     onMove: () => {
-      const { velocityX, velocityY } = baril
-      // too fast
-      const velocityXStrength = Math.abs(velocityX)
-      if (velocityXStrength > 10) {
-        return
-      }
-      const velocityYStrength = Math.abs(velocityY)
-      if (velocityYStrength > 10) {
-        return
-      }
-
-      const force = 50
-      const { centerX, centerY } = baril
-      const closestCellCenter = closestCellCenterFromPoint({ x: centerX, y: centerY }, worldGrid)
-      const cellCenterToCenterXDiff = closestCellCenter.x - centerX
-
-      if (velocityXStrength > velocityYStrength) {
-        // no velocity, don't awake
-        if (velocityX === 0) {
-          return
-        }
-        // velocity going the other way
-        if (!sameSign(cellCenterToCenterXDiff, velocityX)) {
-          return
-        }
-        // no worthy adjustement on X required
-        if (Math.abs(cellCenterToCenterXDiff) < 0.1) {
-          return
-        }
-
-        addImpulse(baril, { x: force * cellCenterToCenterXDiff })
-        return
-      }
-
-      const cellCenterToCenterYDiff = closestCellCenter.y - centerY
-      if (velocityY === 0) {
-        return
-      }
-      if (!sameSign(cellCenterToCenterYDiff, velocityY)) {
-        return
-      }
-      // no worthy adjustement on Y required
-      if (Math.abs(cellCenterToCenterYDiff) < 0.1) {
-        return
-      }
-
-      addImpulse(baril, { y: force * cellCenterToCenterYDiff })
+      onMoveBaril(baril, worldGrid)
     },
   })
 
   return baril
+}
+
+const onMoveBaril = (baril, { worldGrid }) => {
+  const { velocityX, velocityY } = baril
+  // too fast
+  const velocityXStrength = Math.abs(velocityX)
+  if (velocityXStrength > 10) {
+    return
+  }
+  const velocityYStrength = Math.abs(velocityY)
+  if (velocityYStrength > 10) {
+    return
+  }
+
+  const force = 50
+  const { centerX, centerY } = baril
+  const closestCellCenter = closestCellCenterFromPoint({ x: centerX, y: centerY }, worldGrid)
+  const cellCenterToCenterXDiff = closestCellCenter.x - centerX
+
+  if (velocityXStrength > velocityYStrength) {
+    // no velocity, don't awake
+    if (velocityX === 0) {
+      return
+    }
+    // velocity going the other way
+    if (!sameSign(cellCenterToCenterXDiff, velocityX)) {
+      return
+    }
+    // no worthy adjustement on X required
+    if (Math.abs(cellCenterToCenterXDiff) < 0.1) {
+      return
+    }
+
+    addImpulse(baril, { x: force * cellCenterToCenterXDiff })
+    return
+  }
+
+  const cellCenterToCenterYDiff = closestCellCenter.y - centerY
+  if (velocityY === 0) {
+    return
+  }
+  if (!sameSign(cellCenterToCenterYDiff, velocityY)) {
+    return
+  }
+  // no worthy adjustement on Y required
+  if (Math.abs(cellCenterToCenterYDiff) < 0.1) {
+    return
+  }
+
+  addImpulse(baril, { y: force * cellCenterToCenterYDiff })
 }
