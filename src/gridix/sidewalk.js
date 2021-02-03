@@ -21,7 +21,7 @@ export const createSideWalk = ({ cellX, cellY, worldGrid, force = -6000 }) => {
       const cellContent = worldGrid.cells[sidewalk.cellIndex]
       cellContent.forEach((cellMate) => {
         if (cellMate !== sidewalk) {
-          addForce(cellMate, { y: force })
+          addForce(cellMate, { y: force, origin: sidewalk })
         }
       })
     },
