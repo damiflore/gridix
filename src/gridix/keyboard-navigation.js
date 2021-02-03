@@ -7,7 +7,7 @@ export const createKeyboardNavigation = ({
   // idéalement la vitesse du hero dans une direction devrait
   // rendre plus difficile de repartir dans une autre direction ?
   maxAccel = 25000,
-  maxDecel = 5000,
+  maxDecel = 10000,
   keyboardVelocity = 200,
   heroRef,
 } = {}) => {
