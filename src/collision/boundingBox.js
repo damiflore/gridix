@@ -12,16 +12,16 @@ export const testBoundingBoxContact = (a, b) => {
     return false
   }
 
-  return testShapeContact(aBoundingBox, bBoundingBox)
+  return testBoundingBoxShapeContact(aBoundingBox, bBoundingBox)
 }
 
 const getBoundingBox = (rigidBody) => {
-  const { shape } = rigidBody
-  if (shape === "circle") {
+  const { shapeName } = rigidBody
+  if (shapeName === "circle") {
     return circleToBoundingCircle(rigidBody)
   }
 
-  if (shape === "rectangle") {
+  if (shapeName === "rectangle") {
     const { angle } = rigidBody
     if (angle === 0) {
       return rectangleToBoundingRectangle(rigidBody)
@@ -47,22 +47,22 @@ const getBoundingBox = (rigidBody) => {
   return null
 }
 
-const testShapeContact = (a, b) => {
-  const aShapeName = a.shapeName
-  const bShapeName = b.shapeName
+const testBoundingBoxShapeContact = (a, b) => {
+  const aBoundingBoxShapeName = a.boundingBoxShapeName
+  const bBoundingBoxShapeName = b.boundingBoxShapeName
 
-  if (aShapeName === "circle" && bShapeName === "circle") {
+  if (aBoundingBoxShapeName === "circle" && bBoundingBoxShapeName === "circle") {
     return circleHitCircle(a, b)
   }
 
-  if (aShapeName === "rectangle" && bShapeName === "rectangle") {
+  if (aBoundingBoxShapeName === "rectangle" && bBoundingBoxShapeName === "rectangle") {
     return rectangleHitRectangle(a, b)
   }
 
-  if (aShapeName === "circle" && bShapeName === "rectangle") {
+  if (aBoundingBoxShapeName === "circle" && bBoundingBoxShapeName === "rectangle") {
     return circleHitRectangle(a, b)
   }
-  if (aShapeName === "rectangle" && bShapeName === "circle") {
+  if (aBoundingBoxShapeName === "rectangle" && bBoundingBoxShapeName === "circle") {
     return circleHitRectangle(b, a)
   }
 
@@ -146,7 +146,7 @@ const circleHitRectangle = (circle, rectangle) => {
 
 const circleToBoundingCircle = (circle) => {
   return {
-    shape: "circle",
+    boundingBoxShapeName: "bounding-circle",
     centerX: circle.centerX,
     centerY: circle.centerY,
     radius: circle.radius,
@@ -158,7 +158,7 @@ const rectangleToBoundingCircle = (rectangle) => {
   const rectangleHeight = rectangle.height
 
   return {
-    shape: "circle",
+    boundingBoxShapeName: "bounding-circle",
     centerX: rectangle.centerX,
     centerY: rectangle.centerY,
     radius: Math.sqrt(rectangleWidth * rectangleWidth + rectangleHeight * rectangleHeight) / 2,
@@ -170,7 +170,7 @@ const rectangleToBoundingRectangle = ({ centerX, centerY, width, height }) => {
   const heightHalf = height / 2
 
   return {
-    shape: "rectangle",
+    boundingBoxShapeName: "rectangle",
     left: centerX - widthHalf,
     top: centerY - heightHalf,
     right: centerX + widthHalf,
@@ -210,7 +210,7 @@ const rotatedRectangleToBoundingRectangle = (rectangle) => {
   )
 
   return {
-    shape: "rectangle",
+    boundingBoxShapeName: "rectangle",
     left: boundingRectangleLeft,
     top: boundingRectangleTop,
     right: boundingRectangleLeft + boundingRectangleWidth,

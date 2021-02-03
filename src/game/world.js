@@ -114,6 +114,8 @@ export const createWorld = ({
     removeGameObject,
     gameObjectFromPoint,
     gameObjectsFromPoint,
+
+    simulation: physicSimulation,
   })
 
   return world

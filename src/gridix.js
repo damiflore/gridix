@@ -1,9 +1,10 @@
 import { createGameEngine } from "./engine/engine.js"
 import { registerPageLifecyle } from "./page/page-lifecyle.js"
-import { demoBloc } from "./gridix/demo.js"
+import { createGridixWorld } from "./gridix/gridix.world.js"
 
 // let gameObjectSelected = null
-const world = demoBloc()
+const world = createGridixWorld()
+window.world = world
 
 const gameEngine = createGameEngine({
   framePerSecond: 60,

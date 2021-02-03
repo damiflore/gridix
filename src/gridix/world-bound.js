@@ -1,4 +1,5 @@
 import { createRectangle } from "src/geometry/rectangle.js"
+import { createRigidBody } from "src/physic/rigid-body.js"
 
 export const createWorldBounds = ({ worldWidth, worldHeight, worldBoundSize = 32 }) => {
   const left = createWorldBound({
@@ -44,11 +45,11 @@ export const createWorldBounds = ({ worldWidth, worldHeight, worldBoundSize = 32
 const createWorldBound = ({ side, centerX, centerY, width, height }) => {
   const rectangle = createRectangle({ centerX, centerY, width, height })
 
-  const rigidBody = {
+  const rigidBody = createRigidBody({
     ...rectangle,
     mass: Infinity,
     restitution: 0,
-  }
+  })
 
   const worldBound = {
     ...rigidBody,

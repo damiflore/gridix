@@ -7,7 +7,7 @@ import { createSideWalk } from "./sidewalk.js"
 import { createIce } from "./ice.js"
 import { createHero } from "./hero.js"
 
-export const demoBloc = () => {
+export const createGridixWorld = () => {
   const worldGrid = {
     cellXCount: 10,
     cellYCount: 10,
