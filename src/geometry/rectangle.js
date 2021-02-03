@@ -1,5 +1,22 @@
 import { rotateVector, normalizeVector, substractVector } from "./vector.js"
 
+export const createRectangle = ({
+  width = 0,
+  height = 0,
+  centerX = 0,
+  centerY = 0,
+  angle = 0,
+} = {}) => {
+  return {
+    shapeName: "rectangle",
+    width,
+    height,
+    centerX,
+    centerY,
+    angle,
+  }
+}
+
 export const rectangleToTopLeftCorner = ({ centerX, centerY, width, height, angle }) => {
   return rotateVector(
     { x: centerX - width / 2, y: centerY - height / 2 },

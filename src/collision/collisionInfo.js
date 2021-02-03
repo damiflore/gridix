@@ -79,21 +79,21 @@ const reverseCollisionInfo = ({
 }
 
 const getRawCollisionInfo = (rigidBody, otherRigidBody) => {
-  const shape = rigidBody.shape
-  const otherShape = otherRigidBody.shape
+  const shapeName = rigidBody.shapeName
+  const otherShapeName = otherRigidBody.shapeName
 
-  if (shape === "circle" && otherShape === "circle") {
+  if (shapeName === "circle" && otherShapeName === "circle") {
     return getCollisionInfoForCircleToCircle(rigidBody, otherRigidBody)
   }
 
-  if (shape === "rectangle" && otherShape === "rectangle") {
+  if (shapeName === "rectangle" && otherShapeName === "rectangle") {
     return getCollisionInfoForRectangleToRectangle(rigidBody, otherRigidBody)
   }
 
-  if (shape === "rectangle" && otherShape === "circle") {
+  if (shapeName === "rectangle" && otherShapeName === "circle") {
     return getCollisionInfoForRectangleToCircle(rigidBody, otherRigidBody)
   }
-  if (shape === "circle" && otherShape === "rectangle") {
+  if (shapeName === "circle" && otherShapeName === "rectangle") {
     return getCollisionInfoForRectangleToCircle(otherRigidBody, rigidBody)
   }
 

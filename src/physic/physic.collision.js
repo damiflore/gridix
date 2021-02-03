@@ -244,11 +244,13 @@ const applyCollisionImpactOnVelocity = (
 }
 
 const rotationInertiaFromGameObject = (gameObject) => {
-  if (gameObject.shape === "circle") {
+  const { shapeName } = gameObject
+
+  if (shapeName === "circle") {
     return rotationInertiaFromCircle(gameObject)
   }
 
-  if (gameObject.shape === "rectangle") {
+  if (shapeName === "rectangle") {
     return rotationInertiaFromRectangle(gameObject)
   }
 

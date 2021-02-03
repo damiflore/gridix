@@ -2,13 +2,15 @@ import { updatePhysicForArcadeGame } from "./physic.step.js"
 
 const PHYSIC_SIMULATION_MAX_DURATION = 15
 
-export const createWorld = ({
+export const createSimulation = ({
   onRigidBodyAdded = () => {},
+  onRigidBodyCollision = () => {},
+  onRigidBodyMoved = () => {},
   onRigidBodyRemoved = () => {},
 } = {}) => {
-  const rigidBodies = []
+  const simulation = {}
 
-  const world = {}
+  const rigidBodies = []
 
   const addRigidBody = (rigidBody) => {
     rigidBodies.push(rigidBody)
@@ -29,6 +31,8 @@ export const createWorld = ({
     updatePhysicForArcadeGame({
       rigidBodies,
       stepInfo,
+      collisionCallback: onRigidBodyCollision,
+      moveCallback: onRigidBodyMoved,
     })
 
     const endMs = Date.now()
@@ -42,11 +46,11 @@ export const createWorld = ({
     }
   }
 
-  Object.assign(world, {
+  Object.assign(simulation, {
     step,
     addRigidBody,
     removeRigidBody,
   })
 
-  return world
+  return simulation
 }

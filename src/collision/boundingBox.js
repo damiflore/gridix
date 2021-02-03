@@ -48,18 +48,21 @@ const getBoundingBox = (rigidBody) => {
 }
 
 const testShapeContact = (a, b) => {
-  if (a.shape === "circle" && b.shape === "circle") {
+  const aShapeName = a.shapeName
+  const bShapeName = b.shapeName
+
+  if (aShapeName === "circle" && bShapeName === "circle") {
     return circleHitCircle(a, b)
   }
 
-  if (a.shape === "rectangle" && b.shape === "rectangle") {
+  if (aShapeName === "rectangle" && bShapeName === "rectangle") {
     return rectangleHitRectangle(a, b)
   }
 
-  if (a.shape === "circle" && b.shape === "rectangle") {
+  if (aShapeName === "circle" && bShapeName === "rectangle") {
     return circleHitRectangle(a, b)
   }
-  if (a.shape === "rectangle" && b.shape === "circle") {
+  if (aShapeName === "rectangle" && bShapeName === "circle") {
     return circleHitRectangle(b, a)
   }
 
