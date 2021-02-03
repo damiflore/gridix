@@ -3,6 +3,7 @@ import { closestCellIndexFromPoint, generateCells } from "src/geometry/grid.js"
 import { createWorldBounds } from "./world-bound.js"
 import { createKeyboardNavigation } from "./keyboard-navigation.js"
 import { createWall } from "./wall.js"
+import { createBaril } from "./baril.js"
 import { createSideWalk } from "./sidewalk.js"
 import { createIce } from "./ice.js"
 import { createHero } from "./hero.js"
@@ -44,7 +45,7 @@ export const createGridixWorld = () => {
   }
 
   const addBaril = ({ cellX, cellY }) => {
-    const baril = createWall({
+    const baril = createBaril({
       cellX,
       cellY,
       worldGrid,
@@ -92,26 +93,26 @@ export const createGridixWorld = () => {
   // put keyboard first so that sidewalk will be able to add/substract force from keyboard impulse
   world.addGameObject(keyboardNav)
 
-  // addSideWalkTop({ cellX: 5, cellY: 1 })
-  // addSideWalkTop({ cellX: 5, cellY: 2 })
-  // addSideWalkTop({ cellX: 5, cellY: 3 })
+  addSideWalkTop({ cellX: 5, cellY: 1 })
+  addSideWalkTop({ cellX: 5, cellY: 2 })
+  addSideWalkTop({ cellX: 5, cellY: 3 })
 
-  // addWall({ cellX: 1, cellY: 0 })
-  // addWall({ cellX: 1, cellY: 1 })
-  // addBaril({ cellX: 1, cellY: 2 })
-  // addBaril({ cellX: 2, cellY: 2 })
-  // addBaril({ cellX: 5, cellY: 3 })
-  // addWall({ cellX: 1, cellY: 3 })
+  addWall({ cellX: 1, cellY: 0 })
+  addWall({ cellX: 1, cellY: 1 })
+  addBaril({ cellX: 1, cellY: 2 })
+  addBaril({ cellX: 2, cellY: 2 })
+  addBaril({ cellX: 5, cellY: 3 })
+  addWall({ cellX: 1, cellY: 3 })
 
-  // // addIce({ cellX: 0, cellY: 0 })
-  // addIce({ cellX: 3, cellY: 7 })
-  // addIce({ cellX: 4, cellY: 7 })
-  // addIce({ cellX: 5, cellY: 7 })
-  // addIce({ cellX: 3, cellY: 8 })
-  // addIce({ cellX: 4, cellY: 8 })
-  // addIce({ cellX: 5, cellY: 8 })
-  // addIce({ cellX: 6, cellY: 7 })
-  // addIce({ cellX: 6, cellY: 8 })
+  // addIce({ cellX: 0, cellY: 0 })
+  addIce({ cellX: 3, cellY: 7 })
+  addIce({ cellX: 4, cellY: 7 })
+  addIce({ cellX: 5, cellY: 7 })
+  addIce({ cellX: 3, cellY: 8 })
+  addIce({ cellX: 4, cellY: 8 })
+  addIce({ cellX: 5, cellY: 8 })
+  addIce({ cellX: 6, cellY: 7 })
+  addIce({ cellX: 6, cellY: 8 })
 
   heroRef.current = addHero({ cellX: 0, cellY: 0 })
 

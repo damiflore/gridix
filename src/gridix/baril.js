@@ -26,10 +26,10 @@ export const createBaril = ({ cellX, cellY, worldGrid }) => {
     frictionAmbient: 0.7,
   })
 
-  const baril = createRectangle({
+  const baril = {
     ...rigidBody,
     name: "baril",
-    filleStyle: "brown",
+    fillStyle: "brown",
     draw: drawRectangle,
     update: () => {
       // the goal here is to facilitate a moving baril to stop
@@ -44,7 +44,7 @@ export const createBaril = ({ cellX, cellY, worldGrid }) => {
     onMove: () => {
       onMoveBaril(baril, worldGrid)
     },
-  })
+  }
 
   return baril
 }
