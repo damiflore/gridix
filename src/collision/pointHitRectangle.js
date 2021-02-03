@@ -1,4 +1,4 @@
-import { rotateVector } from "../geometry/vector.js"
+import { rotateVector } from "src/geometry/vector.js"
 
 export const pointHitRectangle = (point, rectangle) => {
   if (rectangle.angle) {

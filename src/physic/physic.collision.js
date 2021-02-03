@@ -3,8 +3,8 @@ import {
   scaleVector,
   normalizeVector,
   getVectorialProduct,
-} from "../geometry/vector.js"
-import { forEachCollidingPairs } from "../collision/collision.js"
+} from "src/geometry/vector.js"
+import { forEachCollidingPairs } from "src/collision/collision.js"
 import { motionAllowedFromMass } from "./physic.motion.js"
 
 const relaxationCount = 5
@@ -13,7 +13,7 @@ const positionResolutionCoef = 1
 const bounceThreshold = 1
 
 export const handleCollision = ({
-  world,
+  rigidBodies,
   collisionCallback,
   collisionPositionResolution,
   collisionVelocityImpact, // could be renamed collisionImpulse
@@ -21,20 +21,15 @@ export const handleCollision = ({
   let collisionIterations = relaxationCount
   while (collisionIterations--) {
     forEachCollidingPairs({
-      world,
+      rigidBodies,
       // iterate only on rigid
       // non static, non sleeping pairs
       canCollidePredicate: (a, b) => {
-        if (!a.rigid || !b.rigid) {
-          return false
-        }
-
         const aIsStatic = a.sleeping || !motionAllowedFromMass(a.mass)
         const bIsStatic = b.sleeping || !motionAllowedFromMass(b.mass)
         if (aIsStatic && bIsStatic) {
           return false
         }
-
         return true
       },
       pairCollisionCallback: (a, b, collisionInfo) => {

@@ -1,5 +1,5 @@
-import { substractVector, getScalarProduct, scaleVector } from "../geometry/vector.js"
-import { rectangleToCorners, rectangleToNormals } from "../geometry/rectangle.js"
+import { substractVector, getScalarProduct, scaleVector } from "src/geometry/vector.js"
+import { rectangleToCorners, rectangleToNormals } from "src/geometry/rectangle.js"
 import { createCollisionInfo } from "./collisionInfo.js"
 
 export const getCollisionInfoForRectangleToRectangle = (rectangleA, rectangleB) => {

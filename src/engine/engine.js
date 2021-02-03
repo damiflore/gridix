@@ -46,6 +46,7 @@ export const createGameEngine = ({
   }
 
   const stepInfo = {
+    // maybe rename stepInfo.time into stepInfo.gameTime ?
     time: 0,
     timePerFrame: 0,
     framePerSecondEstimation: 0,

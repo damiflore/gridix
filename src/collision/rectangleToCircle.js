@@ -3,8 +3,8 @@ import {
   scaleVector,
   normalizeVector,
   getVectorLength,
-} from "../geometry/vector.js"
-import { rectangleToCorners, rectangleToNormals } from "../geometry/rectangle.js"
+} from "src/geometry/vector.js"
+import { rectangleToCorners, rectangleToNormals } from "src/geometry/rectangle.js"
 import { createCollisionInfo } from "./collisionInfo.js"
 
 export const getCollisionInfoForRectangleToCircle = (rectangle, circle) => {

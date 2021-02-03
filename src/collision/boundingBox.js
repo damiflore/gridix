@@ -1,14 +1,13 @@
-/* eslint-disable no-nested-ternary */
-import { getVectorLength } from "../geometry/vector.js"
-import { rectangleToCorners } from "../geometry/rectangle.js"
+import { getVectorLength } from "src/geometry/vector.js"
+import { rectangleToCorners } from "src/geometry/rectangle.js"
 
 export const testBoundingBoxContact = (a, b) => {
-  const aBoundingBox = getGameObjectBoundingBox(a)
+  const aBoundingBox = getBoundingBox(a)
   if (!aBoundingBox) {
     return false
   }
 
-  const bBoundingBox = getGameObjectBoundingBox(b)
+  const bBoundingBox = getBoundingBox(b)
   if (!bBoundingBox) {
     return false
   }
@@ -16,33 +15,33 @@ export const testBoundingBoxContact = (a, b) => {
   return testShapeContact(aBoundingBox, bBoundingBox)
 }
 
-const getGameObjectBoundingBox = (gameObject) => {
-  const { shape } = gameObject
+const getBoundingBox = (rigidBody) => {
+  const { shape } = rigidBody
   if (shape === "circle") {
-    return circleToBoundingCircle(gameObject)
+    return circleToBoundingCircle(rigidBody)
   }
 
   if (shape === "rectangle") {
-    const { angle } = gameObject
+    const { angle } = rigidBody
     if (angle === 0) {
-      return rectangleToBoundingRectangle(gameObject)
+      return rectangleToBoundingRectangle(rigidBody)
     }
 
-    const { width, height } = gameObject
+    const { width, height } = rigidBody
     const rectangleAspectRatio = width > height ? width / height : height / width
     // when rectangle is almost squarish, the circle bounding box is a good approximation
     // and circle bounding box is cheaper to compute
     if (rectangleAspectRatio < 3) {
-      return rectangleToBoundingCircle(gameObject)
+      return rectangleToBoundingCircle(rigidBody)
     }
 
     // for very small rectangle it's fine too to use a circle
     const rectangleArea = width * height
     if (rectangleArea < 6) {
-      return rectangleToBoundingCircle(gameObject)
+      return rectangleToBoundingCircle(rigidBody)
     }
 
-    return rotatedRectangleToBoundingRectangle(gameObject)
+    return rotatedRectangleToBoundingRectangle(rigidBody)
   }
 
   return null

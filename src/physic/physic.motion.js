@@ -4,34 +4,30 @@
 
 // const limitVelocityPrecision = limitNumberPrecision(4)
 
-export const handleMotion = ({ world, stepInfo }) => {
+export const handleMotion = ({ rigidBodies, stepInfo }) => {
   const { timePerFrame } = stepInfo
   const positionUpdates = []
-  world.forEachGameObject((gameObject) => {
-    if (!gameObject.rigid) {
-      return
-    }
-
-    if (gameObject.debugMotion) {
-      gameObject.debugMotion = false
+  rigidBodies.forEach((rigidBody) => {
+    if (rigidBody.debugMotion) {
+      rigidBody.debugMotion = false
       // eslint-disable-next-line no-debugger
       debugger
     }
 
-    const { mass, velocityX, velocityY, velocityAngle, forces } = gameObject
+    const { mass, velocityX, velocityY, velocityAngle, forces } = rigidBody
     const motionAllowedByMass = motionAllowedFromMass(mass)
     if (!motionAllowedByMass) {
       if (forces.length > 0) {
         if (import.meta.dev) {
-          warnForcesIgnored(gameObject)
+          warnForcesIgnored(rigidBody)
         }
         forces.length = 0
       }
       if (velocityX || velocityY || velocityAngle) {
         if (import.meta.dev) {
-          warnVelocityIgnored(gameObject)
+          warnVelocityIgnored(rigidBody)
         }
-        gameObject.velocityX = gameObject.velocityY = gameObject.velocityAngle = 0
+        rigidBody.velocityX = rigidBody.velocityY = rigidBody.velocityAngle = 0
       }
       return
     }
@@ -46,11 +42,11 @@ export const handleMotion = ({ world, stepInfo }) => {
     // if there is a constant force dragging object to the bottom (gravity)
     // it must be reapplied every update
     forces.length = 0
-    gameObject.forceX = forceTotal.x
-    gameObject.forceY = forceTotal.y
-    gameObject.forceAngle = forceTotal.angle
+    rigidBody.forceX = forceTotal.x
+    rigidBody.forceY = forceTotal.y
+    rigidBody.forceAngle = forceTotal.angle
 
-    if (gameObject.sleeping) {
+    if (rigidBody.sleeping) {
       return
     }
 
@@ -59,7 +55,7 @@ export const handleMotion = ({ world, stepInfo }) => {
     // and when some code wants to apply force, it divide is by the mass if
     // if the force is a constant that is not proportional to the mass
     const forceDivider = mass
-    const frictionAmbientCoef = 1 - gameObject.frictionAmbient
+    const frictionAmbientCoef = 1 - rigidBody.frictionAmbient
     const accelerationX = forceTotal.x / forceDivider
     const accelerationY = forceTotal.y / forceDivider
     const accelerationAngle = forceTotal.angle / forceDivider
@@ -68,16 +64,16 @@ export const handleMotion = ({ world, stepInfo }) => {
       (velocityX + accelerationX * timePerFrame) * frictionAmbientCoef
     const velocityYAfterApplicationOfForces =
       (velocityY + accelerationY * timePerFrame) * frictionAmbientCoef
-    const velocityAngleAfterApplicationOfForces = gameObject.angleLocked
+    const velocityAngleAfterApplicationOfForces = rigidBody.angleLocked
       ? 0
       : (velocityAngle + accelerationAngle * timePerFrame) * frictionAmbientCoef
 
     // update velocity
-    gameObject.velocityX = velocityXAfterApplicationOfForces
-    gameObject.velocityY = velocityYAfterApplicationOfForces
-    gameObject.velocityAngle = velocityAngleAfterApplicationOfForces
+    rigidBody.velocityX = velocityXAfterApplicationOfForces
+    rigidBody.velocityY = velocityYAfterApplicationOfForces
+    rigidBody.velocityAngle = velocityAngleAfterApplicationOfForces
 
-    const { centerX, centerY, angle } = gameObject
+    const { centerX, centerY, angle } = rigidBody
     const centerXAfterApplicationOfVelocity =
       centerX + velocityXAfterApplicationOfForces * timePerFrame
     const centerYAfterApplicationOfVelocity =
@@ -94,11 +90,11 @@ export const handleMotion = ({ world, stepInfo }) => {
       return
     }
 
-    gameObject.centerX = centerXAfterApplicationOfVelocity
-    gameObject.centerY = centerYAfterApplicationOfVelocity
-    gameObject.angle = angleAfterApplicationOfVelocity
+    rigidBody.centerX = centerXAfterApplicationOfVelocity
+    rigidBody.centerY = centerYAfterApplicationOfVelocity
+    rigidBody.angle = angleAfterApplicationOfVelocity
     positionUpdates.push({
-      gameObject,
+      rigidBody,
       from: {
         centerX,
         centerY,
@@ -115,18 +111,18 @@ export const handleMotion = ({ world, stepInfo }) => {
   return positionUpdates
 }
 
-export const addImpulse = (gameObject, { x = 0, y = 0, angle = 0 }) => {
-  const { mass } = gameObject
+export const addImpulse = (rigidBody, { x = 0, y = 0, angle = 0 }) => {
+  const { mass } = rigidBody
 
-  gameObject.forces.push({
+  rigidBody.forces.push({
     x: x * mass,
     y: y * mass,
     angle: angle * mass,
   })
 }
 
-export const addForce = (gameObject, force) => {
-  gameObject.forces.push(force)
+export const addForce = (rigidBody, force) => {
+  rigidBody.forces.push(force)
 }
 
 export const getTotalForces = (forces) => {
@@ -164,18 +160,18 @@ export const motionAllowedFromMass = (mass) => {
   return true
 }
 
-const warnForcesIgnored = (gameObject) => {
+const warnForcesIgnored = (rigidBody) => {
   console.warn(`found forces on object unable of motion, all forces ignored.
---- game object name ---
-${gameObject.name}
+--- rigid body name ---
+${rigidBody.name}
 --- forces ---
-${JSON.stringify(gameObject.forces, null, "  ")}`)
+${JSON.stringify(rigidBody.forces, null, "  ")}`)
 }
 
-const warnVelocityIgnored = (gameObject) => {
+const warnVelocityIgnored = (rigidBody) => {
   console.warn(
     `found velocity on object unable of motion, all velocity forced to zero.
---- game object name ---
-${gameObject.name}`,
+--- rigid body name ---
+${rigidBody.name}`,
   )
 }

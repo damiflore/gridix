@@ -1,16 +1,23 @@
-import { getScalarProduct } from "../geometry/vector.js"
+import { getScalarProduct } from "src/geometry/vector.js"
 import { testBoundingBoxContact } from "./boundingBox.js"
 import { getCollisionInfoForCircleToCircle } from "./circleToCircle.js"
 import { getCollisionInfoForRectangleToRectangle } from "./rectangleToRectangle.js"
 import { getCollisionInfoForRectangleToCircle } from "./rectangleToCircle.js"
 
-export const getCollisionInfo = (gameObject, otherGameObject) => {
-  const boundingBoxContact = testBoundingBoxContact(gameObject, otherGameObject)
+export const getCollisionInfo = (rigidBody, otherRigidBody) => {
+  if (rigidBody.debugCollisionDetection || otherRigidBody.debugCollisionDetection) {
+    rigidBody.debugCollisionDetection = false
+    otherRigidBody.debugCollisionDetection = false
+    // eslint-disable-next-line no-debugger
+    debugger
+  }
+
+  const boundingBoxContact = testBoundingBoxContact(rigidBody, otherRigidBody)
   if (!boundingBoxContact) {
     return null
   }
 
-  const collisionInfo = getRawCollisionInfo(gameObject, otherGameObject)
+  const collisionInfo = getRawCollisionInfo(rigidBody, otherRigidBody)
   if (!collisionInfo) {
     return null
   }
@@ -20,8 +27,8 @@ export const getCollisionInfo = (gameObject, otherGameObject) => {
     y: collisionInfo.collisionNormalY,
   }
   const centerDiff = {
-    x: otherGameObject.centerX - gameObject.centerX,
-    y: otherGameObject.centerY - gameObject.centerY,
+    x: otherRigidBody.centerX - rigidBody.centerX,
+    y: otherRigidBody.centerY - rigidBody.centerY,
   }
 
   if (getScalarProduct(collisionNormal, centerDiff) < 0) {
@@ -71,23 +78,23 @@ const reverseCollisionInfo = ({
   }
 }
 
-const getRawCollisionInfo = (gameObject, otherGameObject) => {
-  const shape = gameObject.shape
-  const otherShape = otherGameObject.shape
+const getRawCollisionInfo = (rigidBody, otherRigidBody) => {
+  const shape = rigidBody.shape
+  const otherShape = otherRigidBody.shape
 
   if (shape === "circle" && otherShape === "circle") {
-    return getCollisionInfoForCircleToCircle(gameObject, otherGameObject)
+    return getCollisionInfoForCircleToCircle(rigidBody, otherRigidBody)
   }
 
   if (shape === "rectangle" && otherShape === "rectangle") {
-    return getCollisionInfoForRectangleToRectangle(gameObject, otherGameObject)
+    return getCollisionInfoForRectangleToRectangle(rigidBody, otherRigidBody)
   }
 
   if (shape === "rectangle" && otherShape === "circle") {
-    return getCollisionInfoForRectangleToCircle(gameObject, otherGameObject)
+    return getCollisionInfoForRectangleToCircle(rigidBody, otherRigidBody)
   }
   if (shape === "circle" && otherShape === "rectangle") {
-    return getCollisionInfoForRectangleToCircle(otherGameObject, gameObject)
+    return getCollisionInfoForRectangleToCircle(otherRigidBody, rigidBody)
   }
 
   return null

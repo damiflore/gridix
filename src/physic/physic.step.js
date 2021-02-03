@@ -2,12 +2,8 @@ import { handleMotion } from "./physic.motion.js"
 import { handleCollision } from "./physic.collision.js"
 import { handleSleep } from "./physic.sleep.js"
 
-// maybe rename stepInfo.time into stepInfo.gameTime ?
-
-const PHYSIC_UPDATE_MAX_DURATION = 15
-
 export const updatePhysicForArcadeGame = ({
-  world,
+  rigidBodies,
   stepInfo,
   collisionCallback = () => {},
   collisionPositionResolution = true,
@@ -37,20 +33,18 @@ export const updatePhysicForArcadeGame = ({
   // https://github.com/MassiveHeights/Black/blob/e4967f19cbdfe42b3612981c810ac499ad34b154/src/physics/arcade/pairs/Pair.js#L51
   // bounceThreshold = 1,
 }) => {
-  const startMs = Date.now()
-
   handleMotion({
-    world,
+    rigidBodies,
     stepInfo,
   })
   handleCollision({
-    world,
+    rigidBodies,
     collisionCallback,
     collisionPositionResolution,
     collisionVelocityImpact,
   })
   handleSleep({
-    world,
+    rigidBodies,
     stepInfo,
     sleepMoveThreshold,
     sleepForceThreshold,
@@ -58,16 +52,4 @@ export const updatePhysicForArcadeGame = ({
     sleepStartDuration,
     moveCallback,
   })
-
-  const endMs = Date.now()
-  const duration = endMs - startMs
-  if (duration > PHYSIC_UPDATE_MAX_DURATION) {
-    if (import.meta.dev) {
-      console.warn(
-        `physic update is too slow, took ${duration}ms (should be less than ${PHYSIC_UPDATE_MAX_DURATION})`,
-      )
-      // eslint-disable-next-line no-debugger
-      // debugger
-    }
-  }
 }
