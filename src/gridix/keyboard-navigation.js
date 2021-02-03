@@ -9,7 +9,7 @@ export const createKeyboardNavigation = ({
   maxAccel = 25000,
   maxDecel = 5000,
   keyboardVelocity = 200,
-  world,
+  heroRef,
 } = {}) => {
   const downKey = trackKeyboardKeydown({
     code: "ArrowDown",
@@ -34,7 +34,7 @@ export const createKeyboardNavigation = ({
       // https://docs.unity3d.com/ScriptReference/Rigidbody2D.AddForce.html
       // https://gamedev.stackexchange.com/a/169844
 
-      const { hero } = world
+      const hero = heroRef.current
       const whatever = hero.flagIce ? keyboardVelocity + 50 : keyboardVelocity
 
       let forceX = 0

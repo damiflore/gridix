@@ -14,7 +14,7 @@ export const createHero = ({ cellX, cellY, worldGrid }) => {
   const rigidBody = createRigidBody({
     ...rectangle,
     angleLocked: true,
-    mass: Infinity,
+    mass: 1,
     friction: 0.01,
   })
 

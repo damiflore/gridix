@@ -1,5 +1,5 @@
 const RIGID_BODY_PROPS = {
-  hitbox: true,
+  rigid: true,
   sleeping: false,
   lastNotableMotionTime: 0,
   centerXPrev: undefined,

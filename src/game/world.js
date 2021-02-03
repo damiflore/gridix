@@ -4,6 +4,7 @@ import { createSimulation } from "src/physic/physic.simulation.js"
 import { drawCollisionInfo } from "src/draw/draw.js"
 
 export const createWorld = ({
+  container,
   worldWidth = 0,
   worldHeight = 0,
   onGameObjectAdded = () => {},
@@ -13,6 +14,12 @@ export const createWorld = ({
   const gameObjects = []
   const collisionInfos = []
   const world = { worldWidth, worldHeight }
+
+  const canvas = document.createElement("canvas")
+  canvas.width = world.worldWidth
+  canvas.height = world.worldHeight
+  container.appendChild(canvas)
+  const context = canvas.getContext("2d")
 
   const physicSimulation = createSimulation({
     collisionCallback: ({ collisionInfo }) => {
@@ -35,7 +42,7 @@ export const createWorld = ({
     physicSimulation.step(stepInfo)
   }
 
-  const draw = (stepInfo, context) => {
+  const draw = () => {
     collisionInfos.forEach((collisionInfo) => {
       drawCollisionInfo(collisionInfo, context)
     })

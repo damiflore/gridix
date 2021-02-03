@@ -4,11 +4,6 @@ import { demoBloc } from "./gridix/demo.js"
 
 // let gameObjectSelected = null
 const world = demoBloc()
-const canvas = document.createElement("canvas")
-canvas.width = world.width
-canvas.height = world.height
-document.querySelector("#app").appendChild(canvas)
-const context = canvas.getContext("2d")
 
 const gameEngine = createGameEngine({
   framePerSecond: 60,
@@ -17,7 +12,7 @@ const gameEngine = createGameEngine({
   },
 
   draw: (stepInfo) => {
-    world.draw(stepInfo, context)
+    world.draw(stepInfo)
   },
 })
 window.addEventListener("error", () => {
