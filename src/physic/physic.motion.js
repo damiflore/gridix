@@ -161,11 +161,20 @@ export const motionAllowedFromMass = (mass) => {
 }
 
 const warnForcesIgnored = (rigidBody) => {
-  console.warn(`found forces on object unable of motion, all forces ignored.
---- rigid body name ---
-${rigidBody.name}
---- forces ---
-${JSON.stringify(rigidBody.forces, null, "  ")}`)
+  const { forces } = rigidBody
+  forces.forEach((force) => {
+    if (force.origin) {
+      console.warn(
+        `Tried to apply forces on object uanble of motion: ${force.origin.name} cannot add force to ${rigidBody.name}.`,
+      )
+    } else if (force.name) {
+      console.warn(
+        `Tried to apply forces on object uanble of motion: cannot add ${force.name} to ${rigidBody.name}.`,
+      )
+    } else {
+      console.warn(`Tried to apply forces on object uanble of motion`)
+    }
+  })
 }
 
 const warnVelocityIgnored = (rigidBody) => {
