@@ -7,13 +7,8 @@ export const handleSleep = ({
   sleepForceThreshold,
   sleepVelocityThreshold,
   sleepStartDuration,
-  moveCallback,
+  onRigidBodyMoved,
 }) => {
-  // je pense on veut une premiere chose qui est de track qui bouge
-  // avec prev/next
-  // et un deuxieme qui est de stocker une valeur lorsqu'il s'est endormi
-  // sauf que sleep réutilise le concept de prev/next sur la position
-
   rigidBodies.forEach((rigidBody) => {
     const { centerX, centerY, angle } = rigidBody
     const { centerXPrev, centerYPrev, anglePrev } = rigidBody
@@ -43,7 +38,7 @@ export const handleSleep = ({
       sleepForceThreshold,
       sleepVelocityThreshold,
       sleepStartDuration,
-      moveCallback,
+      onRigidBodyMoved,
     })
   })
 }
@@ -57,7 +52,7 @@ const updateSleepingState = (
     sleepForceThreshold,
     sleepVelocityThreshold,
     sleepStartDuration,
-    moveCallback,
+    onRigidBodyMoved,
   },
 ) => {
   if (!motionAllowedFromMass(rigidBody.mass)) {
@@ -85,7 +80,7 @@ const updateSleepingState = (
     ) {
       rigidBody.lastNotableMotionTime = stepInfo.time
       rigidBody.sleeping = false
-      moveCallback(rigidBody, move)
+      onRigidBodyMoved(rigidBody, move)
     }
     return
   }
@@ -93,7 +88,7 @@ const updateSleepingState = (
   // it's moving enough
   if (moveIsNotable) {
     rigidBody.lastNotableMotionTime = stepInfo.time
-    moveCallback(rigidBody, move)
+    onRigidBodyMoved(rigidBody, move)
     return
   }
 

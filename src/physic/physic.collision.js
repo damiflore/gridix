@@ -9,12 +9,11 @@ import { motionAllowedFromMass } from "./physic.motion.js"
 
 const relaxationCount = 5
 const positionResolutionCoef = 1
-// min relative velocity between bodies to trigge the velocity impact
-const bounceThreshold = 1
 
 export const handleCollision = ({
   rigidBodies,
-  collisionCallback,
+  bounceThreshold,
+  onRigidBodyCollision,
   collisionPositionResolution,
   collisionVelocityImpact, // could be renamed collisionImpulse
 }) => {
@@ -22,8 +21,7 @@ export const handleCollision = ({
   while (collisionIterations--) {
     forEachCollidingPairs({
       rigidBodies,
-      // iterate only on rigid
-      // non static, non sleeping pairs
+      // iterate on rigid, non static, non sleeping pairs
       canCollidePredicate: (a, b) => {
         const aIsStatic = a.sleeping || !motionAllowedFromMass(a.mass)
         const bIsStatic = b.sleeping || !motionAllowedFromMass(b.mass)
@@ -33,7 +31,7 @@ export const handleCollision = ({
         return true
       },
       pairCollisionCallback: (a, b, collisionInfo) => {
-        collisionCallback({
+        onRigidBodyCollision({
           a,
           b,
           collisionInfo,
@@ -44,6 +42,7 @@ export const handleCollision = ({
           collisionInfo,
           collisionPositionResolution,
           collisionVelocityImpact,
+          bounceThreshold,
         })
       },
     })
@@ -56,6 +55,7 @@ const resolveCollision = ({
   collisionInfo,
   collisionPositionResolution,
   collisionVelocityImpact,
+  bounceThreshold,
 }) => {
   const aMass = a.mass
   const bMass = b.mass
@@ -83,6 +83,7 @@ const resolveCollision = ({
       aMassInverted,
       bMassInverted,
       massInvertedSum,
+      bounceThreshold,
       collisionInfo,
     })
   }
@@ -110,7 +111,7 @@ const adjustPositionToSolveCollision = (
 const applyCollisionImpactOnVelocity = (
   a,
   b,
-  { aMassInverted, bMassInverted, massInvertedSum, collisionInfo },
+  { aMassInverted, bMassInverted, massInvertedSum, bounceThreshold, collisionInfo },
 ) => {
   const aVelocityX = a.velocityX
   const aVelocityY = a.velocityY

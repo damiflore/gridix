@@ -1,9 +1,3 @@
-/* eslint-disable operator-assignment */
-// import { PHYSIC_CONSTANTS } from "./physic.constants.js"
-// import { limitNumberPrecision } from "../math/limitNumberPrecision.js"
-
-// const limitVelocityPrecision = limitNumberPrecision(4)
-
 export const handleMotion = ({ rigidBodies, stepInfo }) => {
   const { timePerFrame } = stepInfo
   const positionUpdates = []
@@ -41,6 +35,8 @@ export const handleMotion = ({ rigidBodies, stepInfo }) => {
     // forces are punctual by default
     // if there is a constant force dragging object to the bottom (gravity)
     // it must be reapplied every update
+    // it's still possible to know the forces applied on a rigid body
+    // during that step because it's stored on .forceX, .forceY, and .forceAngle
     forces.length = 0
     rigidBody.forceX = forceTotal.x
     rigidBody.forceY = forceTotal.y
