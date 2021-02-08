@@ -12,7 +12,6 @@
 
   <body>
     <div id="app"></div>
-    <iframe src="./splashscreen/splashscreen.html"></iframe>
     <script>
       // we have to register early to this event in case browser dispatch it quickly
       // other scripts will have to check window.beforeinstallpromptEvent
@@ -23,6 +22,7 @@
         window.beforeinstallpromptEvent = beforeinstallpromptEvent
       })
     </script>
+    <iframe src="./splashscreen/splashscreen.html"></iframe>
     <script id="main-script" type="module" src="./main.js"></script>
   </body>
 </html>

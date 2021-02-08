@@ -16,3 +16,8 @@
 .devtools-placeholder {
   background: lightblue;
 }
+
+button svg {
+  width: 18px;
+  height: 18px;
+}
