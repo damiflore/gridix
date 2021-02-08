@@ -5,7 +5,7 @@ import {
   checkServiceWorkerUpdate,
   activateServiceWorkerUpdate,
 } from "@jsenv/pwa"
-import { createDOM } from "src/dom.js"
+import { createDOM } from "src/helper/dom.js"
 
 // on fera une sorte de notif
 if (canUseServiceWorker) {

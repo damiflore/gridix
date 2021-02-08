@@ -24,14 +24,22 @@ export const createGridixWorld = () => {
     worldHeight: worldGrid.cellYCount * worldGrid.cellSize,
     onGameObjectAdded: (gameObject) => {
       if (typeof gameObject.centerX === "number") {
-        assignGameObjectCellOnAdded(gameObject, worldGrid)
+        updateGameObjectCell({
+          gameObject,
+          worldGrid,
+          reason: "add",
+        })
       }
     },
     onGameObjectMoved: (gameObject, move) => {
       if (move.from && gameObject.onMove) {
         gameObject.onMove(move)
       }
-      updateGameObjectCellOnMoved(gameObject, move, worldGrid)
+      updateGameObjectCell({
+        gameObject,
+        worldGrid,
+        reason: "move",
+      })
     },
   })
 
@@ -119,29 +127,36 @@ export const createGridixWorld = () => {
   return world
 }
 
-const assignGameObjectCellOnAdded = (gameObject, worldGrid) => {
-  const cellIndex = closestCellIndexFromPoint(
-    { x: gameObject.centerX, y: gameObject.centerY },
-    worldGrid,
-  )
-  gameObject.cellIndex = cellIndex
+const updateGameObjectCell = ({ gameObject, worldGrid, reason }) => {
+  if (reason === "add") {
+    const cellIndex = closestCellIndexFromPoint(
+      { x: gameObject.centerX, y: gameObject.centerY },
+      worldGrid,
+    )
+    gameObject.cellIndex = cellIndex
 
-  if (cellIndex === -1) {
-    return
+    if (cellIndex === -1) {
+      return
+    }
+
+    const cellMates = worldGrid.cells[cellIndex] || []
+    addItemToCell(worldGrid, cellIndex, gameObject)
+    cellMates.forEach((cellMate) => {
+      if (cellMate.onCellMateJoin) {
+        cellMate.onCellMateJoin(gameObject)
+      }
+    })
   }
 
-  const cellMates = worldGrid.cells[cellIndex] || []
-  addItemToCell(worldGrid, cellIndex, gameObject)
-  cellMates.forEach((cellMate) => {
-    if (cellMate.onCellMateJoin) {
-      cellMate.onCellMateJoin(gameObject)
-    }
-  })
-}
-
-const updateGameObjectCellOnMoved = (gameObject, move, worldGrid) => {
   const cellIndexPrevious = gameObject.cellIndex
-  const cellIndex = closestCellIndexFromPoint(move.to, worldGrid)
+  const cellIndex = closestCellIndexFromPoint(
+    {
+      x: gameObject.centerX,
+      y: gameObject.centerY,
+      angle: gameObject.angle,
+    },
+    worldGrid,
+  )
   if (cellIndexPrevious === cellIndex) {
     return
   }
