@@ -2,7 +2,6 @@
   background: lightgrey;
   position: absolute;
   bottom: 0;
-  height: 100px;
   width: 100%;
 }
 
@@ -11,10 +10,6 @@
   width: 100%;
   cursor: ns-resize;
   position: absolute;
-}
-
-.devtools-placeholder {
-  background: lightblue;
 }
 
 button svg {

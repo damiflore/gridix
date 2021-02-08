@@ -14,6 +14,18 @@ export const clampMagnitude = (number, max) => {
   return number
 }
 
+export const clamp = (number, min, max = Infinity) => {
+  if (number < min) {
+    return min
+  }
+
+  if (number > max) {
+    return max
+  }
+
+  return number
+}
+
 export const sameSign = (a, b) => {
   if (a < 0) {
     return b < 0

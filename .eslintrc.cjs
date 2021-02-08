@@ -22,6 +22,9 @@ const config = createEslintConfig({
   browser: true,
   node: false,
 
+  react: true,
+  jsx: true,
+
   // prettier param tells we are using prettier. It will disable all eslint rules
   // already handled by prettier.
   prettier: true,
@@ -32,7 +35,7 @@ const importResolverSettings = config.settings["import/resolver"]
 const importResolverPath = Object.keys(importResolverSettings)[0]
 config.overrides = [
   {
-    files: ["script/**/*.js", ".github/**/*.js"],
+    files: ["script/**/*.js", ".github/**/*.js", "jsenv.config.js"],
     env: {
       browser: false,
       es6: true,
