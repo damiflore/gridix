@@ -18,12 +18,26 @@ Lorsqu'on ferme les devtools
 
 */
 
-import { injectStylesheetIntoDocument } from "src/helper/dom.js"
+import { createDOM, injectStylesheetIntoDocument } from "src/helper/dom.js"
 
 const devtoolsCssUrl = new URL("./devtools.css", import.meta.url)
 
 export const injectDevtools = ({ worldContainer }) => {
   injectStylesheetIntoDocument(devtoolsCssUrl)
+
+  const devtoolsRootNode = createDOM(`<div class="devtools">
+  <div class="devtools-resize-top"></div>
+  <div class="devtools-header">
+      <button name="button-close-devtools">X</button>
+      <button name="button-display-mode-devtool-first">
+
+      </button>
+  </div>
+  <div class="devtools-body">
+    <div class="devtools-placeholder"></div>
+  </div>
+</div>`)
+
   const devtoolsRootNode = document.createElement("div")
   devtoolsRootNode.className = "devtools"
   worldContainer.appendChild(devtoolsRootNode)
@@ -31,21 +45,6 @@ export const injectDevtools = ({ worldContainer }) => {
   const resizeTop = document.createElement("div")
   resizeTop.className = "devtools-resize-top"
   devtoolsRootNode.appendChild(resizeTop)
-  resizeTop.onmousedown = (mousedownEvent) => {
-    let startPageY = mousedownEvent.pageY
-    const startHeight = devtoolsRootNode.offsetHeight
-    document.onmousemove = (mousemoveEvent) => {
-      const nowPageY = mousemoveEvent.pageY
-      const heightToAdd = startPageY - nowPageY
-      const height = startHeight + heightToAdd
-      // si la hauteur des devtools < 30px mettons
-      // -> alors on ferme les devtools ?
-      updateDevtoolsHeight(height)
-    }
-    document.onmouseup = () => {
-      document.onmousemove = () => {}
-    }
-  }
 
   const placeholder = document.createElement("div")
   placeholder.className = "devtools-placeholder"
@@ -66,17 +65,49 @@ export const injectDevtools = ({ worldContainer }) => {
   })
 
   let devtoolsOpened = false
+  let closeDevtools = () => {}
 
   const openDevtools = async () => {
     if (devtoolsOpened) return
     devtoolsOpened = true
 
-    import("./devtools.js")
-  }
+    // faudrais un resize observer aussi pour mettre a jour
+    // mais bon plus tard
+    const observer = new ResizeObserver((entries) => {
+      const devtoolResized = entries.find((entry) => entry.target === devtoolsRootNode)
+      if (devtoolResized) {
+        updateDevtoolsHeight(devtoolResized.contentRect.height)
+      } else {
+        // const entry = entries[0]
+        updateDevtoolsHeight(devtoolsRootNode.offsetHeight)
+      }
+    })
 
-  const closeDevtools = () => {
-    if (!devtoolsOpened) return
-    devtoolsOpened = false
+    observer.observe(worldContainer)
+    observer.observe(devtoolsRootNode)
+
+    resizeTop.onmousedown = (mousedownEvent) => {
+      let startPageY = mousedownEvent.pageY
+      const startHeight = devtoolsRootNode.offsetHeight
+      document.onmousemove = (mousemoveEvent) => {
+        const nowPageY = mousemoveEvent.pageY
+        const heightToAdd = startPageY - nowPageY
+        const height = startHeight + heightToAdd
+        // si la hauteur des devtools < 30px mettons
+        // -> alors on ferme les devtools ?
+        updateDevtoolsHeight(height)
+      }
+      document.onmouseup = () => {
+        document.onmousemove = () => {}
+      }
+    }
+
+    closeDevtools = () => {
+      devtoolsOpened = false
+      closeDevtools = () => {}
+
+      observer.disconnect()
+    }
   }
 
   const worldRootNode = worldContainer.children[0]
@@ -91,19 +122,4 @@ export const injectDevtools = ({ worldContainer }) => {
     worldRootNode.style.height = `${worldHeight}px`
     devtoolsRootNode.style.height = `${devtoolsHeight}px`
   }
-
-  // faudrais un resize observer aussi pour mettre a jour
-  // mais bon plus tard
-  const observer = new ResizeObserver((entries) => {
-    const devtoolResized = entries.find((entry) => entry.target === devtoolsRootNode)
-    if (devtoolResized) {
-      updateDevtoolsHeight(devtoolResized.contentRect.height)
-    } else {
-      // const entry = entries[0]
-      updateDevtoolsHeight(devtoolsRootNode.offsetHeight)
-    }
-  })
-
-  observer.observe(worldContainer)
-  observer.observe(devtoolsRootNode)
 }
