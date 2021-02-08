@@ -19,6 +19,7 @@ export const createGridixWorld = () => {
   window.worldGrid = worldGrid
 
   const world = createWorld({
+    devtools: true,
     container: document.querySelector("#app"),
     worldWidth: worldGrid.cellXCount * worldGrid.cellSize,
     worldHeight: worldGrid.cellYCount * worldGrid.cellSize,

@@ -1,0 +1,14 @@
+.world-container {
+  width: 100%;
+  height: 100%;
+  background: black;
+  position: relative;
+}
+
+.world {
+  overflow: auto;
+}
+
+.world > canvas {
+  background: white;
+}

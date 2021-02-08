@@ -1,0 +1,18 @@
+.devtools {
+  background: lightgrey;
+  position: absolute;
+  bottom: 0;
+  height: 100px;
+  width: 100%;
+}
+
+.devtools-resize-top {
+  height: 7px;
+  width: 100%;
+  cursor: ns-resize;
+  position: absolute;
+}
+
+.devtools-placeholder {
+  background: lightblue;
+}

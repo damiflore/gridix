@@ -2,8 +2,12 @@ import { pointHitCircle } from "src/collision/pointHitCircle.js"
 import { pointHitRectangle } from "src/collision/pointHitRectangle.js"
 import { createSimulation } from "src/physic/physic.simulation.js"
 import { drawCollisionInfo } from "src/draw/draw.js"
+import { injectStylesheetIntoDocument } from "src/helper/dom.js"
+
+const worldCssUrl = new URL("./world.css", import.meta.url)
 
 export const createWorld = ({
+  devtools = true,
   container,
   worldWidth = 0,
   worldHeight = 0,
@@ -11,14 +15,29 @@ export const createWorld = ({
   onGameObjectMoved = () => {},
   onGameObjectRemoved = () => {},
 }) => {
+  injectStylesheetIntoDocument(worldCssUrl)
+
   const gameObjects = []
   const collisionInfos = []
   const world = { worldWidth, worldHeight }
 
+  const worldContainer = document.createElement("div")
+  worldContainer.className = "world-container"
+  container.appendChild(worldContainer)
+
+  const worldNode = document.createElement("div")
+  worldNode.className = "world"
+  worldContainer.appendChild(worldNode)
+
   const canvas = document.createElement("canvas")
   canvas.width = world.worldWidth
   canvas.height = world.worldHeight
-  container.appendChild(canvas)
+  worldNode.appendChild(canvas)
+
+  if (devtools) {
+    loadAndInjectDevtools({ worldContainer })
+  }
+
   const context = canvas.getContext("2d")
 
   const physicSimulation = createSimulation({
@@ -119,6 +138,11 @@ export const createWorld = ({
   })
 
   return world
+}
+
+const loadAndInjectDevtools = async ({ worldContainer }) => {
+  const { injectDevtools } = await import("src/devtools/devtools.inject.js")
+  injectDevtools({ worldContainer })
 }
 
 const pointHitGameObject = (point, gameObject) => {
