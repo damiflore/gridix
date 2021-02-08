@@ -1,11 +1,24 @@
 import React from "react"
 import { addDOMEventListener } from "src/helper/dom.js"
 
-export const DevtoolsView = (props) => {
+export const DevtoolsView = ({
+  onResizeTop,
+  onClickInspect,
+  onClickLayoutBalanced,
+  onClickLayoutDevtoolsFirst,
+  onClickLayoutGameFirst,
+  onClickCloseDevtools,
+}) => {
   return (
     <div>
-      <DevtoolsResizeTop />
-      <DevtoolsHeader {...props} />
+      <DevtoolsResizeTop onResizeTop={onResizeTop} />
+      <DevtoolsHeader
+        onClickInspect={onClickInspect}
+        onClickLayoutBalanced={onClickLayoutBalanced}
+        onClickLayoutDevtoolsFirst={onClickLayoutDevtoolsFirst}
+        onClickLayoutGameFirst={onClickLayoutGameFirst}
+        onClickCloseDevtools={onClickCloseDevtools}
+      />
       <DevtoolsBody />
     </div>
   )
@@ -35,16 +48,22 @@ const useDragGesture = () => {
 
       const startPageX = mousedownEvent.pageX
       const startPageY = mousedownEvent.pageY
+      let previousPageX = startPageX
+      let previousPageY = startPageY
 
       removeMousemoveListener = addDOMEventListener(document, "mousemove", (mousemoveEvent) => {
         const nowPageX = mousemoveEvent.pageX
         const nowPageY = mousemoveEvent.pageY
-        const moveX = nowPageX - startPageX
-        const moveY = nowPageY - startPageY
+        const moveX = nowPageX - previousPageX
+        const moveY = nowPageY - previousPageY
+        previousPageX = nowPageX
+        previousPageY = nowPageY
         dragGestureSetter({
           type: "move",
-          x: moveX,
-          y: moveY,
+          data: {
+            moveX,
+            moveY,
+          },
         })
       })
     })
@@ -66,6 +85,7 @@ const DevtoolsResizeTop = ({
 }) => {
   const [nodeRefForDrag, dragGesture] = useDragGesture()
   const dragGesturePreviousRef = React.useRef(dragGesture)
+
   React.useEffect(() => {
     // const dragGesturePrevious = dragGesturePreviousRef.current
     dragGesturePreviousRef.current = dragGesture
@@ -74,7 +94,7 @@ const DevtoolsResizeTop = ({
     //   onResizeTopStart()
     // }
     if (dragGesture.type === "move") {
-      onResizeTop()
+      onResizeTop(dragGesture.data)
     }
     // if (dragGesturePrevious.type !== "end" && dragGesture.type === "end") {
     //   onResizeTopEnd()
@@ -130,8 +150,7 @@ const ButtonLayoutBalanced = ({ onClick }) => {
     <button name="button-layout-balanced" onClick={onClick}>
       <svg viewBox="0 0 100 100">
         <g>
-          <rect x="10" y="10" width="80" height="35" fill="currentColor" />
-          <rect x="10" y="55" width="80" height="35" fill="currentColor" />
+          <rect x="10" y="50" width="80" height="50" fill="currentColor" />
         </g>
       </svg>
     </button>
@@ -143,8 +162,7 @@ const ButtonLayoutDevtoolsFirst = ({ onClick }) => {
     <button name="button-layout-devtool-first" onClick={onClick}>
       <svg viewBox="0 0 100 100">
         <g>
-          <rect x="10" y="10" width="80" height="20" fill="currentColor" />
-          <rect x="10" y="40" width="80" height="50" fill="currentColor" />
+          <rect x="10" y="20" width="80" height="80" fill="currentColor" />
         </g>
       </svg>
     </button>
@@ -156,8 +174,7 @@ const ButtonLayoutGameFirst = ({ onClick }) => {
     <button name="button-layout-game-first" onClick={onClick}>
       <svg viewBox="0 0 100 100">
         <g>
-          <rect x="10" y="10" width="80" height="50" fill="currentColor" />
-          <rect x="10" y="70" width="80" height="20" fill="currentColor" />
+          <rect x="10" y="80" width="80" height="20" fill="currentColor" />
         </g>
       </svg>
     </button>

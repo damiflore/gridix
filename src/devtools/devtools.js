@@ -39,9 +39,9 @@ export const Devtools = ({ worldContainer }) => {
       if (keydownEvent.metaKey && keydownEvent.code === "KeyI") {
         keydownEvent.preventDefault()
         if (opened) {
-          open()
-        } else {
           close()
+        } else {
+          open()
         }
       }
     })
@@ -87,11 +87,17 @@ export const Devtools = ({ worldContainer }) => {
 
   React.useEffect(() => {
     const devtoolsRootNode = worldContainer.children[1]
-    devtoolsRootNode.style.display = opened ? "block" : ""
+    devtoolsRootNode.style.display = opened ? "" : "none"
   }, [opened])
 
   return opened ? (
     <DevtoolsView
+      onResizeTop={(data) => {
+        const { moveY } = data
+        heightSetter((height) => {
+          return height + moveY * -1
+        })
+      }}
       onClickLayoutBalanced={() => {
         heightSetter(heightAvailable * 0.5)
       }}
