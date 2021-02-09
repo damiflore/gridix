@@ -14,8 +14,8 @@ export const DevtoolsView = ({
     <div className="devtools-document">
       <DevtoolsResizeTop onResizeTop={onResizeTop} />
       <div className="devtools-head">
-        <GameEngineDevtools gameEngine={window.gameEngine} />
         <ButtonInspect onClick={onClickInspect} />
+        <GameEngineDevtools gameEngine={window.gameEngine} />
         <div className="spacer"></div>
         <ButtonCloseDevtools onClick={onClickCloseDevtools} />
       </div>

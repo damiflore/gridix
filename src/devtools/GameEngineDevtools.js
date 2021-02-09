@@ -17,7 +17,7 @@ export const GameEngineDevtools = ({ gameEngine }) => {
 
   return (
     <>
-      <GameEngineIndicator paused={paused} />
+      {/* <GameEngineIndicator paused={paused} /> */}
       <GameEngineButtonPlayback
         paused={paused}
         onClickResume={() => {
@@ -27,45 +27,50 @@ export const GameEngineDevtools = ({ gameEngine }) => {
           gameEngine.pauseGameLoop()
         }}
       />
+      <GameEngineButtonStep
+        paused={paused}
+        onClick={() => {
+          gameEngine.nextGameStep()
+        }}
+      />
     </>
   )
 }
 
-const GameEngineIndicator = ({ paused }) => {
-  if (paused) {
-    return (
-      <button className="game-engine-indicator game-engine-indicator--off">
-        <svg viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="15" fill="currentColor" />
-        </svg>
-      </button>
-    )
-  }
+// const GameEngineIndicator = ({ paused }) => {
+//   if (paused) {
+//     return (
+//       <button className="game-engine-indicator game-engine-indicator--off">
+//         <svg viewBox="0 0 100 100">
+//           <circle cx="50" cy="50" r="15" fill="currentColor" />
+//         </svg>
+//       </button>
+//     )
+//   }
 
-  return (
-    <button className="game-engine-indicator game-engine-indicator--on">
-      <svg viewBox="0 0 100 100">
-        <circle className="circle" cx="50" cy="50" r="15" fill="currentColor" />
-        <circle className="ring" cx="50" cy="50" r="50" stroke="currentColor" />
-      </svg>
-    </button>
-  )
-}
+//   return (
+//     <button className="game-engine-indicator game-engine-indicator--on">
+//       <svg viewBox="0 0 100 100">
+//         <circle className="circle" cx="50" cy="50" r="15" fill="currentColor" />
+//         <circle className="ring" cx="50" cy="50" r="50" stroke="currentColor" />
+//       </svg>
+//     </button>
+//   )
+// }
 
 const GameEngineButtonPlayback = ({ paused, onClickResume, onClickPause }) => {
   if (paused) {
     return (
-      <button className="game-engine-button-resume" onClick={onClickResume}>
-        <svg viewBox="0 0 50 50">
-          {/* <circle opacity=".4" fill="currentColor" cx="25" cy="25" r="25" /> */}
-          <path d="M21.35 16.12a.878.878 0 0 0-.901.009.946.946 0 0 0-.449.81V33.06c0 .334.17.642.449.811a.888.888 0 0 0 .9.01l12.187-8.062A.946.946 0 0 0 34 25a.944.944 0 0 0-.464-.819L21.35 16.12z" />
+      <button className="game-engine-button-resume" onClick={onClickResume} title="Play game">
+        <svg viewBox="0 0 100 100">
+          <polygon points="40,30 70,50, 40,70" fill="currentColor"></polygon>
         </svg>
       </button>
     )
   }
 
   return (
-    <button className="game-engine-button-pause" onClick={onClickPause}>
+    <button className="game-engine-button-pause" onClick={onClickPause} title="Pause game">
       <svg viewBox="0 0 50 50">
         {/* <circle opacity=".4" fill="currentColor" cx="25" cy="25" r="25" /> */}
         <path d="M30 17a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V18a1 1 0 0 1 1-1h2zm-8 0a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V18a1 1 0 0 1 1-1h2z" />
@@ -74,6 +79,23 @@ const GameEngineButtonPlayback = ({ paused, onClickResume, onClickPause }) => {
   )
 }
 
-// const GameEngineButtonPause = () => {}
+const GameEngineButtonStep = ({ paused, onClick }) => {
+  const disabled = !paused
 
-// const GameEngineButtonStep = () => {}
+  return (
+    <button
+      className="game-engine-button-step"
+      disabled={disabled}
+      onClick={onClick}
+      title="Play one step"
+    >
+      <svg viewBox="0 0 100 100">
+        <g transform="translate(-5)">
+          <polygon points="40,30 70,50, 40,70" fill="currentColor"></polygon>
+          <line x1="70" y1="30" x2="70" y2="70" strokeWidth="6" stroke="currentColor"></line>
+        </g>
+      </svg>
+      `
+    </button>
+  )
+}
