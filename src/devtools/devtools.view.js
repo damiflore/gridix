@@ -4,22 +4,29 @@ import { addDOMEventListener } from "src/helper/dom.js"
 export const DevtoolsView = ({
   onResizeTop,
   onClickInspect,
-  onClickLayoutBalanced,
-  onClickLayoutDevtoolsFirst,
-  onClickLayoutGameFirst,
+  onClickLayoutBottomSmall,
+  onClickLayoutBottomMedium,
+  onClickLayoutBottomBig,
   onClickCloseDevtools,
 }) => {
   return (
-    <div>
+    <div className="devtools-document">
       <DevtoolsResizeTop onResizeTop={onResizeTop} />
-      <DevtoolsHeader
-        onClickInspect={onClickInspect}
-        onClickLayoutBalanced={onClickLayoutBalanced}
-        onClickLayoutDevtoolsFirst={onClickLayoutDevtoolsFirst}
-        onClickLayoutGameFirst={onClickLayoutGameFirst}
-        onClickCloseDevtools={onClickCloseDevtools}
-      />
-      <DevtoolsBody />
+      <div className="devtools-head">
+        <ButtonInspect onClick={onClickInspect} />
+        <div className="spacer"></div>
+        <ButtonCloseDevtools onClick={onClickCloseDevtools} />
+      </div>
+      <div className="devtools-body">
+        <div className="devtools-left">Left</div>
+        <div className="devtools-center">Center</div>
+        <div className="devtools-right">Right</div>
+      </div>
+      <div className="devtools-foot">
+        <ButtonLayoutBottomSmall onClick={onClickLayoutBottomSmall} />
+        <ButtonLayoutBottomMedium onClick={onClickLayoutBottomMedium} />
+        <ButtonLayoutBottomBig onClick={onClickLayoutBottomBig} />
+      </div>
     </div>
   )
 }
@@ -104,24 +111,6 @@ const DevtoolsResizeTop = ({
   return <div ref={nodeRefForDrag} className="devtools-resize-top"></div>
 }
 
-const DevtoolsHeader = ({
-  onClickInspect,
-  onClickLayoutBalanced,
-  onClickLayoutDevtoolsFirst,
-  onClickLayoutGameFirst,
-  onClickCloseDevtools,
-}) => {
-  return (
-    <div className="devtools-header">
-      <ButtonInspect onClick={onClickInspect} />
-      <ButtonLayoutBalanced onClick={onClickLayoutBalanced} />
-      <ButtonLayoutDevtoolsFirst onClick={onClickLayoutDevtoolsFirst} />
-      <ButtonLayoutGameFirst onClick={onClickLayoutGameFirst} />
-      <ButtonCloseDevtools onClick={onClickCloseDevtools} />
-    </div>
-  )
-}
-
 const ButtonInspect = () => {
   return (
     <button name="button-inspect">
@@ -145,9 +134,21 @@ const ButtonInspect = () => {
   )
 }
 
-const ButtonLayoutBalanced = ({ onClick }) => {
+const ButtonLayoutBottomSmall = ({ onClick }) => {
   return (
-    <button name="button-layout-balanced" onClick={onClick}>
+    <button onClick={onClick}>
+      <svg viewBox="0 0 100 100">
+        <g>
+          <rect x="10" y="80" width="80" height="20" fill="currentColor" />
+        </g>
+      </svg>
+    </button>
+  )
+}
+
+const ButtonLayoutBottomMedium = ({ onClick }) => {
+  return (
+    <button onClick={onClick}>
       <svg viewBox="0 0 100 100">
         <g>
           <rect x="10" y="50" width="80" height="50" fill="currentColor" />
@@ -157,24 +158,12 @@ const ButtonLayoutBalanced = ({ onClick }) => {
   )
 }
 
-const ButtonLayoutDevtoolsFirst = ({ onClick }) => {
+const ButtonLayoutBottomBig = ({ onClick }) => {
   return (
-    <button name="button-layout-devtool-first" onClick={onClick}>
+    <button onClick={onClick}>
       <svg viewBox="0 0 100 100">
         <g>
           <rect x="10" y="20" width="80" height="80" fill="currentColor" />
-        </g>
-      </svg>
-    </button>
-  )
-}
-
-const ButtonLayoutGameFirst = ({ onClick }) => {
-  return (
-    <button name="button-layout-game-first" onClick={onClick}>
-      <svg viewBox="0 0 100 100">
-        <g>
-          <rect x="10" y="80" width="80" height="20" fill="currentColor" />
         </g>
       </svg>
     </button>
@@ -192,8 +181,4 @@ const ButtonCloseDevtools = ({ onClick }) => {
       </svg>
     </button>
   )
-}
-
-const DevtoolsBody = () => {
-  return <div className="devtools-body"></div>
 }

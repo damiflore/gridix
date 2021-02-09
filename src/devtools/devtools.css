@@ -1,6 +1,8 @@
 .devtools {
   background: lightgrey;
   position: absolute;
+  display: flex;
+  flex-direction: column;
   bottom: 0;
   width: 100%;
 }
@@ -10,6 +12,51 @@
   width: 100%;
   cursor: ns-resize;
   position: absolute;
+}
+
+.devtools-document {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.devtools-head {
+  line-height: 32px;
+  height: 32px;
+  display: flex;
+}
+
+.spacer {
+  flex-grow: 1;
+}
+
+.devtools-body {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  min-height: 0;
+  background: white;
+}
+
+.devtools-left {
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.devtools-center {
+  overflow: auto;
+  overscroll-behavior: contain;
+  flex-grow: 1;
+}
+
+.devtools-right {
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.devtools-foot {
+  position: relative;
 }
 
 button svg {

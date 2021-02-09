@@ -5,7 +5,7 @@ import { clamp } from "src/math/math.js"
 
 export const Devtools = ({ worldContainer }) => {
   const worldMinHeight = 150
-  const devtoolsMinHeight = 50
+  const devtoolsMinHeight = 100
   const stateFromStorage = fromStorage() || { opened: false, height: 0 }
 
   const [opened, openedSetter] = React.useState(stateFromStorage.opened)
@@ -63,7 +63,6 @@ export const Devtools = ({ worldContainer }) => {
 
   React.useEffect(() => {
     const remainingHeight = heightAvailable - worldMinHeight
-
     devtoolsHeightSetter(clamp(height, devtoolsMinHeight, remainingHeight))
   }, [heightAvailable, height])
 
@@ -98,14 +97,14 @@ export const Devtools = ({ worldContainer }) => {
           return height + moveY * -1
         })
       }}
-      onClickLayoutBalanced={() => {
+      onClickLayoutBottomSmall={() => {
+        heightSetter(heightAvailable * 0.2)
+      }}
+      onClickLayoutBottomMedium={() => {
         heightSetter(heightAvailable * 0.5)
       }}
-      onClickLayoutDevtoolsFirst={() => {
+      onClickLayoutBottomBig={() => {
         heightSetter(heightAvailable * 0.8)
-      }}
-      onClickLayoutGameFirst={() => {
-        heightSetter(heightAvailable * 0.2)
       }}
       onClickCloseDevtools={() => {
         close()
