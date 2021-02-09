@@ -13,7 +13,7 @@ export const DevtoolsView = ({
   onClickCloseDevtools,
 }) => {
   return (
-    <div className="devtools-document">
+    <>
       <DevtoolsResizeTop onResizeTop={onResizeTop} />
       <div className="devtools-head">
         <InputInspect
@@ -35,7 +35,7 @@ export const DevtoolsView = ({
         <ButtonLayoutBottomMedium onClick={onClickLayoutBottomMedium} />
         <ButtonLayoutBottomBig onClick={onClickLayoutBottomBig} />
       </div>
-    </div>
+    </>
   )
 }
 
