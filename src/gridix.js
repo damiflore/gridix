@@ -53,14 +53,3 @@ window.requestIdleCallback(
 )
 
 window.gameEngine = gameEngine
-
-// canvas.addEventListener("click", (clickEvent) => {
-//   const clickPoint = {
-//     x: clickEvent.offsetX,
-//     y: clickEvent.offsetY,
-//   }
-//   const gameObjectUnderClick = world.gameObjectFromPoint(clickPoint)
-//   if (gameObjectUnderClick) {
-//     gameObjectSelected = gameObjectUnderClick
-//   }
-// })

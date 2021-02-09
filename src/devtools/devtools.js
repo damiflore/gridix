@@ -1,6 +1,7 @@
 import React from "react"
 import { addDOMEventListener } from "src/helper/dom.js"
 import { DevtoolsView } from "./devtools.view.js"
+import { InspectCanvas } from "./InspectCanvas.js"
 import { clamp } from "src/math/math.js"
 
 export const Devtools = ({ world, worldNode }) => {
@@ -98,35 +99,40 @@ export const Devtools = ({ world, worldNode }) => {
     worldDevtoolsNode.style.display = opened ? "" : "none"
   }, [opened])
 
-  return opened ? (
-    <DevtoolsView
-      inspecting={inspecting}
-      onInspectStart={() => {
-        inspectingSetter(true)
-      }}
-      onInspectStop={() => {
-        inspectingSetter(false)
-      }}
-      onResizeTop={(data) => {
-        const { moveY } = data
-        heightSetter((height) => {
-          return height + moveY * -1
-        })
-      }}
-      onClickLayoutBottomSmall={() => {
-        heightSetter(heightAvailable * 0.2)
-      }}
-      onClickLayoutBottomMedium={() => {
-        heightSetter(heightAvailable * 0.5)
-      }}
-      onClickLayoutBottomBig={() => {
-        heightSetter(heightAvailable * 0.8)
-      }}
-      onClickCloseDevtools={() => {
-        close()
-      }}
-    />
-  ) : null
+  return (
+    <>
+      {inspecting ? <InspectCanvas worldNode={worldNode} /> : null}
+      {opened ? (
+        <DevtoolsView
+          inspecting={inspecting}
+          onInspectStart={() => {
+            inspectingSetter(true)
+          }}
+          onInspectStop={() => {
+            inspectingSetter(false)
+          }}
+          onResizeTop={(data) => {
+            const { moveY } = data
+            heightSetter((height) => {
+              return height + moveY * -1
+            })
+          }}
+          onClickLayoutBottomSmall={() => {
+            heightSetter(heightAvailable * 0.2)
+          }}
+          onClickLayoutBottomMedium={() => {
+            heightSetter(heightAvailable * 0.5)
+          }}
+          onClickLayoutBottomBig={() => {
+            heightSetter(heightAvailable * 0.8)
+          }}
+          onClickCloseDevtools={() => {
+            close()
+          }}
+        />
+      ) : null}
+    </>
+  )
 }
 
 const fromStorage = () => {
