@@ -59,7 +59,6 @@ export const createGameEngine = ({
     // reread them in case they got updated from outside
     const { framePerSecond, maxUpdatePerFrame } = gameEngine
     const timePerFrame = 1 / framePerSecond
-    stepInfo.timePerFrame = timePerFrame
 
     const msPerFrame = timePerFrame * 1000
     // stepInfo.frameCount++
@@ -67,7 +66,7 @@ export const createGameEngine = ({
     const currentMs = Date.now()
     // when it is called for the first time,
     // or after resumeGameLoop() or nextGameStep()
-    // previousMs is undefined and running update once is what we want
+    // previousMs is undefined and running update+draw once is what we want
     const ellapsedMs = previousMs ? currentMs - previousMs : msPerFrame
     previousMs = currentMs
 
@@ -80,7 +79,20 @@ export const createGameEngine = ({
       updateCount = maxUpdatePerFrame
     } else {
       updateCount = updateIdealCount
+
+      // requestAnimationFrame was too fast
+      // there is nothing to update or draw
+      // it's postponed to the next requestAnimationFrame
+      if (updateCount === 0) {
+        return
+      }
+
+      if (updateCount > 1) {
+        console.info(`perform ${updateCount} updates to catch up`)
+      }
     }
+
+    stepInfo.timePerFrame = timePerFrame
     stepInfo.framePerSecondEstimation = Math.round(1000 / ellapsedMs)
     stepInfo.memoryUsed = Math.round(window.performance.memory.usedJSHeapSize / 1048576)
     stepInfo.memoryLimit = window.performance.memory.jsHeapSizeLimit / 1048576
