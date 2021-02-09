@@ -1,5 +1,6 @@
 import React from "react"
 import { addDOMEventListener } from "src/helper/dom.js"
+import { GameEngineDevtools } from "./GameEngineDevtools.js"
 
 export const DevtoolsView = ({
   onResizeTop,
@@ -13,6 +14,7 @@ export const DevtoolsView = ({
     <div className="devtools-document">
       <DevtoolsResizeTop onResizeTop={onResizeTop} />
       <div className="devtools-head">
+        <GameEngineDevtools gameEngine={window.gameEngine} />
         <ButtonInspect onClick={onClickInspect} />
         <div className="spacer"></div>
         <ButtonCloseDevtools onClick={onClickCloseDevtools} />

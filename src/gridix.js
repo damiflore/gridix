@@ -19,6 +19,8 @@ const gameEngine = createGameEngine({
 window.addEventListener("error", () => {
   gameEngine.stopGameLoop()
 })
+// devrait etre moins important que si on l'apelle depuis un click utilisateur?
+// en tous cas si les devtools sont ouvert on veut pas force resume
 registerPageLifecyle({
   active: () => {
     gameEngine.resumeGameLoop()
@@ -46,6 +48,8 @@ window.requestIdleCallback(
   },
   { timeout: 200 },
 )
+
+window.gameEngine = gameEngine
 
 // canvas.addEventListener("click", (clickEvent) => {
 //   const clickPoint = {

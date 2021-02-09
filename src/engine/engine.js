@@ -116,6 +116,7 @@ export const createGameEngine = ({
       return
     }
     paused = true
+    gameEngine.onPausedStateChange(true)
   }
 
   const resumeGameLoop = () => {
@@ -124,6 +125,7 @@ export const createGameEngine = ({
     }
     paused = false
     previousMs = undefined
+    gameEngine.onPausedStateChange(false)
   }
 
   const nextGameStep = () => {
@@ -140,7 +142,11 @@ export const createGameEngine = ({
     previousMs = undefined
   }
 
+  const onPausedStateChange = () => {}
+
   Object.assign(gameEngine, {
+    isPaused: () => paused,
+    onPausedStateChange,
     startGameLoop,
     pauseGameLoop,
     resumeGameLoop,
