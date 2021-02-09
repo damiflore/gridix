@@ -16,7 +16,8 @@ const gameEngine = createGameEngine({
     world.draw(stepInfo)
   },
 })
-window.addEventListener("error", () => {
+window.addEventListener("error", (errorEvent) => {
+  console.error(errorEvent.message)
   gameEngine.stopGameLoop()
 })
 registerPageLifecyle({
