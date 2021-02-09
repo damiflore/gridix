@@ -1,10 +1,17 @@
 import React from "react"
 
 export const GameEngineDevtools = ({ gameEngine }) => {
-  const [paused, pausedSetter] = React.useState(gameEngine.isPaused())
+  const [paused, pausedSetter] = React.useState(false)
   React.useEffect(() => {
     gameEngine.onPausedStateChange = (paused) => {
       pausedSetter(paused)
+    }
+  }, [])
+
+  React.useEffect(() => {
+    gameEngine.pauseGameLoop()
+    return () => {
+      gameEngine.resumeGameLoop()
     }
   }, [])
 
