@@ -3,7 +3,7 @@ import { addDOMEventListener } from "src/helper/dom.js"
 import { DevtoolsView } from "./devtools.view.js"
 import { clamp } from "src/math/math.js"
 
-export const Devtools = ({ world, worldContainer }) => {
+export const Devtools = ({ world, worldNode }) => {
   const worldMinHeight = 150
   const devtoolsMinHeight = 100
   const stateFromStorage = fromStorage() || { opened: false, height: 0 }
@@ -60,8 +60,8 @@ export const Devtools = ({ world, worldContainer }) => {
     const observer = new ResizeObserver(([entry]) => {
       heightAvailableSetter(entry.contentRect.height)
     })
-    heightAvailableSetter(worldContainer.getBoundingClientRect().height)
-    observer.observe(worldContainer)
+    heightAvailableSetter(worldNode.getBoundingClientRect().height)
+    observer.observe(worldNode)
     return () => {
       observer.disconnect()
     }
@@ -81,18 +81,18 @@ export const Devtools = ({ world, worldContainer }) => {
   }, [heightAvailable, devtoolsHeight, opened])
 
   React.useEffect(() => {
-    const worldRootNode = worldContainer.children[0]
-    worldRootNode.style.height = `${worldHeight}px`
+    const worldViewNode = worldNode.children[0]
+    worldViewNode.style.height = `${worldHeight}px`
   }, [worldHeight])
 
   React.useEffect(() => {
-    const devtoolsRootNode = worldContainer.children[1]
-    devtoolsRootNode.style.height = `${devtoolsHeight}px`
+    const worldDevtoolsNode = worldNode.children[1]
+    worldDevtoolsNode.style.height = `${devtoolsHeight}px`
   }, [devtoolsHeight])
 
   React.useEffect(() => {
-    const devtoolsRootNode = worldContainer.children[1]
-    devtoolsRootNode.style.display = opened ? "" : "none"
+    const worldDevtoolsNode = worldNode.children[1]
+    worldDevtoolsNode.style.display = opened ? "" : "none"
   }, [opened])
 
   return opened ? (

@@ -1,14 +1,21 @@
-.world-container {
+.world {
   width: 100%;
   height: 100%;
-  background: black;
   position: relative;
 }
 
-.world {
+.world-view {
+  background: black;
   overflow: auto;
 }
 
-.world > canvas {
+.world-view-wrapper {
+  position: relative;
+  display: inline-block;
   background: white;
+}
+
+.world-view canvas {
+  width: 100%;
+  height: 100%;
 }

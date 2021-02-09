@@ -21,21 +21,28 @@ export const createWorld = ({
   const collisionInfos = []
   const world = { worldWidth, worldHeight }
 
-  const worldContainer = document.createElement("div")
-  worldContainer.className = "world-container"
-  container.appendChild(worldContainer)
-
   const worldNode = document.createElement("div")
   worldNode.className = "world"
-  worldContainer.appendChild(worldNode)
+  container.appendChild(worldNode)
+
+  const worldViewNode = document.createElement("div")
+  worldViewNode.className = "world-view"
+  worldNode.appendChild(worldViewNode)
+
+  const worldViewWrapper = document.createElement("div")
+  worldViewWrapper.className = "world-view-wrapper"
+
+  worldViewWrapper.style.width = `${world.worldWidth}px`
+  worldViewWrapper.style.height = `${world.worldHeight}px`
+  worldViewNode.appendChild(worldViewWrapper)
 
   const canvas = document.createElement("canvas")
   canvas.width = world.worldWidth
   canvas.height = world.worldHeight
-  worldNode.appendChild(canvas)
+  worldViewWrapper.appendChild(canvas)
 
   if (devtools) {
-    loadAndInjectDevtools({ world, worldContainer })
+    loadAndInjectDevtools({ world, worldNode })
   }
   world.devtools = {
     opened: false,
