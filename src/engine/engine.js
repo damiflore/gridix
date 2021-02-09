@@ -120,6 +120,7 @@ export const createGameEngine = ({
       return
     }
     looping = true
+    gameEngine.onStoppedStateChange(false)
     gameLoop()
   }
 
@@ -152,13 +153,18 @@ export const createGameEngine = ({
     looping = false
     window.cancelAnimationFrame(frame)
     previousMs = undefined
+    gameEngine.onStoppedStateChange(true)
   }
 
   const onPausedStateChange = () => {}
 
+  const onStoppedStateChange = () => {}
+
   Object.assign(gameEngine, {
     isPaused: () => paused,
+    isStopped: () => !looping,
     onPausedStateChange,
+    onStoppedStateChange,
     startGameLoop,
     pauseGameLoop,
     resumeGameLoop,
