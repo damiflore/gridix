@@ -4,6 +4,7 @@ import { GameEngineDevtools } from "./GameEngineDevtools.js"
 
 export const DevtoolsView = ({
   inspecting,
+  gameObjectInspected,
   onResizeTop,
   onInspectStart,
   onInspectStop,
@@ -27,7 +28,9 @@ export const DevtoolsView = ({
       </div>
       <div className="devtools-body">
         <div className="devtools-left"></div>
-        <div className="devtools-center">Center</div>
+        <div className="devtools-center">
+          <DevtoolsGameObjectInspection gameObjectInspected={gameObjectInspected} />
+        </div>
         <div className="devtools-right"></div>
       </div>
       <div className="devtools-foot">
@@ -37,6 +40,13 @@ export const DevtoolsView = ({
       </div>
     </>
   )
+}
+
+const DevtoolsGameObjectInspection = ({ gameObjectInspected }) => {
+  if (!gameObjectInspected) {
+    return "null"
+  }
+  return gameObjectInspected.name
 }
 
 const useDragGesture = () => {
@@ -146,7 +156,7 @@ const InputInspect = ({ inspecting, onInspectStart, onInspectStop }) => {
           }
         }}
       />
-      <svg viewBox="0 0 100 100">
+      <svg viewBox="0 0 100 100" width="32" height="32">
         <g>
           <rect
             x="20"

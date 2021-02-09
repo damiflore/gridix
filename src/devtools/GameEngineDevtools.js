@@ -81,7 +81,7 @@ const GameEngineButtonPlayback = ({
   if (stopped) {
     return (
       <button className="devtools-input" onClick={onStartGameRequested} title="Restart game">
-        <svg viewBox="0 0 100 100">
+        <svg viewBox="0 0 100 100" width="32" height="32">
           <polygon
             points="40,30 70,50, 40,70"
             stroke="currentColor"
@@ -96,7 +96,7 @@ const GameEngineButtonPlayback = ({
   if (paused) {
     return (
       <button className="devtools-input" onClick={onResumeRequested} title="Play game">
-        <svg viewBox="0 0 100 100">
+        <svg viewBox="0 0 100 100" width="32" height="32">
           <polygon points="40,30 70,50, 40,70" fill="currentColor"></polygon>
         </svg>
       </button>

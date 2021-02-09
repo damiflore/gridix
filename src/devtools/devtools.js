@@ -99,12 +99,31 @@ export const Devtools = ({ world, worldNode }) => {
     worldDevtoolsNode.style.display = opened ? "" : "none"
   }, [opened])
 
+  const [gameObjectInspected, gameObjectInspectedSetter] = React.useState(null)
+
   return (
     <>
-      {inspecting ? <InspectCanvas worldNode={worldNode} /> : null}
+      {inspecting ? (
+        <InspectCanvas
+          world={world}
+          worldNode={worldNode}
+          onGameObjectHoveredChange={() => {
+            // we do nothing special for now
+          }}
+          onGameObjectSelectedChange={(gameObjectSelected) => {
+            // stop inspection
+            // TODO: ça ne dervait pas virer le canvas?
+            // en fait si c'est juste lorsqu'on est dans les devtools qu'on veut
+            // savoir de quel objet on parle non ?
+            inspectingSetter(false)
+            gameObjectInspectedSetter(gameObjectSelected)
+          }}
+        />
+      ) : null}
       {opened ? (
         <DevtoolsView
           inspecting={inspecting}
+          gameObjectInspected={gameObjectInspected}
           onInspectStart={() => {
             inspectingSetter(true)
           }}
