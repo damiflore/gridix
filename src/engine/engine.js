@@ -3,7 +3,7 @@ const DRAW_MAX_MS = 10
 
 export const createGameEngine = ({
   framePerSecond = 60,
-  maxUpdatePerFrame = 30,
+  maxUpdatePerFrame = 5,
   update = () => {},
   draw = () => {},
 }) => {

@@ -3,7 +3,7 @@ import { addDOMEventListener } from "src/helper/dom.js"
 import { DevtoolsView } from "./devtools.view.js"
 import { clamp } from "src/math/math.js"
 
-export const Devtools = ({ worldContainer }) => {
+export const Devtools = ({ world, worldContainer }) => {
   const worldMinHeight = 150
   const devtoolsMinHeight = 100
   const stateFromStorage = fromStorage() || { opened: false, height: 0 }
@@ -20,6 +20,10 @@ export const Devtools = ({ worldContainer }) => {
   const close = () => {
     openedSetter(false)
   }
+
+  React.useEffect(() => {
+    world.devtools.opened = opened
+  }, [opened])
 
   React.useEffect(() => {
     localStorage.setItem(

@@ -35,7 +35,10 @@ export const createWorld = ({
   worldNode.appendChild(canvas)
 
   if (devtools) {
-    loadAndInjectDevtools({ worldContainer })
+    loadAndInjectDevtools({ world, worldContainer })
+  }
+  world.devtools = {
+    opened: false,
   }
 
   const context = canvas.getContext("2d")
@@ -140,9 +143,9 @@ export const createWorld = ({
   return world
 }
 
-const loadAndInjectDevtools = async ({ worldContainer }) => {
+const loadAndInjectDevtools = async (params) => {
   const { injectDevtools } = await import("src/devtools/devtools.inject.js")
-  injectDevtools({ worldContainer })
+  injectDevtools(params)
 }
 
 const pointHitGameObject = (point, gameObject) => {

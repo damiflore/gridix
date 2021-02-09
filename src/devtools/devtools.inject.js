@@ -26,12 +26,15 @@ import { Devtools } from "./devtools.js"
 
 const devtoolsCssUrl = new URL("./devtools.css", import.meta.url)
 
-export const injectDevtools = ({ worldContainer }) => {
+export const injectDevtools = ({ world, worldContainer }) => {
   injectStylesheetIntoDocument(devtoolsCssUrl)
 
   const devtoolsContainer = document.createElement("div")
   devtoolsContainer.className = "devtools"
   worldContainer.appendChild(devtoolsContainer)
 
-  ReactDOM.render(<Devtools worldContainer={worldContainer}></Devtools>, devtoolsContainer)
+  ReactDOM.render(
+    <Devtools world={world} worldContainer={worldContainer}></Devtools>,
+    devtoolsContainer,
+  )
 }
