@@ -1,25 +1,3 @@
-.game-engine-indicator--on,
-.game-engine-indicator--off,
-.game-engine-button-resume,
-.game-engine-button-pause,
-.game-engine-button-step {
-  width: 32px;
-  height: 32px;
-  background: transparent;
-  border: none;
-  margin: 0;
-  padding: 0;
-}
-
-.game-engine-indicator--on svg,
-.game-engine-indicator--off svg,
-.game-engine-button-resume svg,
-.game-engine-button-pause svg,
-.game-engine-button-step svg {
-  width: 100%;
-  height: 100%;
-}
-
 .game-engine-indicator--on svg {
   color: green;
 }

@@ -13,6 +13,7 @@ export const Devtools = ({ world, worldContainer }) => {
   const [devtoolsHeight, devtoolsHeightSetter] = React.useState(0)
   const [height, heightSetter] = React.useState(stateFromStorage.height)
   const [heightAvailable, heightAvailableSetter] = React.useState(0)
+  const [inspecting, inspectingSetter] = React.useState(false)
 
   const open = () => {
     openedSetter(true)
@@ -45,6 +46,7 @@ export const Devtools = ({ world, worldContainer }) => {
         if (opened) {
           close()
         } else {
+          inspectingSetter(true)
           open()
         }
       }
@@ -95,6 +97,13 @@ export const Devtools = ({ world, worldContainer }) => {
 
   return opened ? (
     <DevtoolsView
+      inspecting={inspecting}
+      onInspectStart={() => {
+        inspectingSetter(true)
+      }}
+      onInspectStop={() => {
+        inspectingSetter(false)
+      }}
       onResizeTop={(data) => {
         const { moveY } = data
         heightSetter((height) => {

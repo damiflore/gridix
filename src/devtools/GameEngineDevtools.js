@@ -61,7 +61,7 @@ export const GameEngineDevtools = ({ gameEngine }) => {
 const GameEngineButtonPlayback = ({ paused, onClickResume, onClickPause }) => {
   if (paused) {
     return (
-      <button className="game-engine-button-resume" onClick={onClickResume} title="Play game">
+      <button className="devtools-input" onClick={onClickResume} title="Play game">
         <svg viewBox="0 0 100 100">
           <polygon points="40,30 70,50, 40,70" fill="currentColor"></polygon>
         </svg>
@@ -70,7 +70,7 @@ const GameEngineButtonPlayback = ({ paused, onClickResume, onClickPause }) => {
   }
 
   return (
-    <button className="game-engine-button-pause" onClick={onClickPause} title="Pause game">
+    <button className="devtools-input" onClick={onClickPause} title="Pause game">
       <svg viewBox="0 0 50 50">
         {/* <circle opacity=".4" fill="currentColor" cx="25" cy="25" r="25" /> */}
         <path d="M30 17a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V18a1 1 0 0 1 1-1h2zm-8 0a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V18a1 1 0 0 1 1-1h2z" />
@@ -83,19 +83,13 @@ const GameEngineButtonStep = ({ paused, onClick }) => {
   const disabled = !paused
 
   return (
-    <button
-      className="game-engine-button-step"
-      disabled={disabled}
-      onClick={onClick}
-      title="Play one step"
-    >
+    <button className="devtools-input" disabled={disabled} onClick={onClick} title="Play one step">
       <svg viewBox="0 0 100 100">
         <g transform="translate(-5)">
           <polygon points="40,30 70,50, 40,70" fill="currentColor"></polygon>
           <line x1="70" y1="30" x2="70" y2="70" strokeWidth="6" stroke="currentColor"></line>
         </g>
       </svg>
-      `
     </button>
   )
 }

@@ -3,8 +3,10 @@ import { addDOMEventListener } from "src/helper/dom.js"
 import { GameEngineDevtools } from "./GameEngineDevtools.js"
 
 export const DevtoolsView = ({
+  inspecting,
   onResizeTop,
-  onClickInspect,
+  onInspectStart,
+  onInspectStop,
   onClickLayoutBottomSmall,
   onClickLayoutBottomMedium,
   onClickLayoutBottomBig,
@@ -14,15 +16,19 @@ export const DevtoolsView = ({
     <div className="devtools-document">
       <DevtoolsResizeTop onResizeTop={onResizeTop} />
       <div className="devtools-head">
-        <ButtonInspect onClick={onClickInspect} />
+        <InputInspect
+          inspecting={inspecting}
+          onInspectStart={onInspectStart}
+          onInspectStop={onInspectStop}
+        />
         <GameEngineDevtools gameEngine={window.gameEngine} />
         <div className="spacer"></div>
         <ButtonCloseDevtools onClick={onClickCloseDevtools} />
       </div>
       <div className="devtools-body">
-        <div className="devtools-left">Left</div>
+        <div className="devtools-left"></div>
         <div className="devtools-center">Center</div>
-        <div className="devtools-right">Right</div>
+        <div className="devtools-right"></div>
       </div>
       <div className="devtools-foot">
         <ButtonLayoutBottomSmall onClick={onClickLayoutBottomSmall} />
@@ -113,26 +119,54 @@ const DevtoolsResizeTop = ({
   return <div ref={nodeRefForDrag} className="devtools-resize-top"></div>
 }
 
-const ButtonInspect = () => {
+const InputInspect = ({ inspecting, onInspectStart, onInspectStop }) => {
+  React.useEffect(() => {
+    if (!inspecting) {
+      return null
+    }
+
+    return addDOMEventListener(document, "keydown", (keydownEvent) => {
+      if (keydownEvent.key === "Escape") {
+        keydownEvent.preventDefault()
+        onInspectStop()
+      }
+    })
+  }, [inspecting])
+
   return (
-    <button name="button-inspect">
-      <svg viewBox="0 0 432.568 432.568">
+    <label className="devtools-input">
+      <input
+        type="checkbox"
+        checked={inspecting}
+        onChange={(e) => {
+          if (e.target.checked) {
+            onInspectStart()
+          } else {
+            onInspectStop()
+          }
+        }}
+      />
+      <svg viewBox="0 0 100 100">
         <g>
-          <path
-            d="M65.46,129.429C65.46,74.604,110.064,30,164.89,30s99.43,44.604,99.43,99.429c0,11.408-1.92,22.602-5.707,33.27
-      l28.271,10.036c4.934-13.898,7.436-28.469,7.436-43.306C294.32,58.062,236.258,0,164.89,0S35.46,58.062,35.46,129.429
-      c0,26.908,8.183,52.709,23.664,74.615c15.128,21.405,36.056,37.545,60.522,46.675l10.488-28.106
-      C91.451,208.177,65.46,170.729,65.46,129.429z"
-          />
-          <path
-            d="M164.89,80c27.256,0,49.43,22.174,49.43,49.43c0,0.252-0.011,0.502-0.02,0.752l-0.02,0.643l29.988,0.826l0.015-0.45
-      c0.02-0.589,0.037-1.178,0.037-1.771c0-43.798-35.632-79.43-79.43-79.43c-43.797,0-79.429,35.632-79.429,79.43
-      c0,24.33,10.97,47,30.098,62.197l18.662-23.489c-11.922-9.472-18.76-23.581-18.76-38.708C115.461,102.174,137.635,80,164.89,80z"
-          />
-          <polygon points="164.89,129.43 164.89,432.568 255.511,323.766 397.108,324.283" />
+          <rect
+            x="20"
+            y="20"
+            width="60"
+            height="50"
+            rx="5"
+            ry="5"
+            stroke="currentColor"
+            strokeWidth="5"
+            fill="transparent"
+          ></rect>
+          <polygon
+            transform="translate(20, 20)"
+            points="40,30 70,50, 40,70"
+            fill="currentColor"
+          ></polygon>
         </g>
       </svg>
-    </button>
+    </label>
   )
 }
 
