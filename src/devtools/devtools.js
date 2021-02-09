@@ -58,10 +58,13 @@ export const Devtools = ({ world, worldNode }) => {
 
   React.useEffect(() => {
     const observer = new ResizeObserver(([entry]) => {
-      heightAvailableSetter(entry.contentRect.height)
+      const worldNodeHeight = entry.contentRect.height
+      heightAvailableSetter(worldNodeHeight)
     })
     heightAvailableSetter(worldNode.getBoundingClientRect().height)
-    observer.observe(worldNode)
+    setTimeout(() => {
+      observer.observe(worldNode)
+    })
     return () => {
       observer.disconnect()
     }
