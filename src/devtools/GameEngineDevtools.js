@@ -1,8 +1,17 @@
 import React from "react"
 
 export const GameEngineDevtools = ({ gameEngine }) => {
+  const [stopped, stoppedSetter] = React.useState(false)
+  React.useEffect(() => {
+    stoppedSetter(gameEngine.isStopped())
+    gameEngine.onStoppedStateChange = (stopped) => {
+      stoppedSetter(stopped)
+    }
+  }, [])
+
   const [paused, pausedSetter] = React.useState(false)
   React.useEffect(() => {
+    pausedSetter(gameEngine.isPaused())
     gameEngine.onPausedStateChange = (paused) => {
       pausedSetter(paused)
     }
@@ -19,11 +28,15 @@ export const GameEngineDevtools = ({ gameEngine }) => {
     <>
       {/* <GameEngineIndicator paused={paused} /> */}
       <GameEngineButtonPlayback
+        stopped={stopped}
         paused={paused}
-        onClickResume={() => {
+        onStartGameRequested={() => {
+          gameEngine.startGameLoop()
+        }}
+        onResumeRequested={() => {
           gameEngine.resumeGameLoop()
         }}
-        onClickPause={() => {
+        onPauseRequested={() => {
           gameEngine.pauseGameLoop()
         }}
       />
@@ -58,10 +71,31 @@ export const GameEngineDevtools = ({ gameEngine }) => {
 //   )
 // }
 
-const GameEngineButtonPlayback = ({ paused, onClickResume, onClickPause }) => {
+const GameEngineButtonPlayback = ({
+  stopped,
+  paused,
+  onStartGameRequested,
+  onResumeRequested,
+  onPauseRequested,
+}) => {
+  if (stopped) {
+    return (
+      <button className="devtools-input" onClick={onStartGameRequested} title="Restart game">
+        <svg viewBox="0 0 100 100">
+          <polygon
+            points="40,30 70,50, 40,70"
+            stroke="currentColor"
+            strokeWidth="5"
+            fill="transparent"
+          ></polygon>
+        </svg>
+      </button>
+    )
+  }
+
   if (paused) {
     return (
-      <button className="devtools-input" onClick={onClickResume} title="Play game">
+      <button className="devtools-input" onClick={onResumeRequested} title="Play game">
         <svg viewBox="0 0 100 100">
           <polygon points="40,30 70,50, 40,70" fill="currentColor"></polygon>
         </svg>
@@ -70,7 +104,7 @@ const GameEngineButtonPlayback = ({ paused, onClickResume, onClickPause }) => {
   }
 
   return (
-    <button className="devtools-input" onClick={onClickPause} title="Pause game">
+    <button className="devtools-input" onClick={onPauseRequested} title="Pause game">
       <svg viewBox="0 0 50 50">
         {/* <circle opacity=".4" fill="currentColor" cx="25" cy="25" r="25" /> */}
         <path d="M30 17a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V18a1 1 0 0 1 1-1h2zm-8 0a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V18a1 1 0 0 1 1-1h2z" />
