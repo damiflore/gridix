@@ -1,6 +1,7 @@
 import React from "react"
 import { addDOMEventListener } from "src/helper/dom.js"
 import { GameEngineDevtools } from "./GameEngineDevtools.js"
+import { GameObjectInspection } from "./GameObjectInspection.js"
 
 export const DevtoolsView = ({
   inspecting,
@@ -29,7 +30,7 @@ export const DevtoolsView = ({
       <div className="devtools-body">
         <div className="devtools-left"></div>
         <div className="devtools-center">
-          <DevtoolsGameObjectInspection gameObjectInspected={gameObjectInspected} />
+          <GameObjectInspection gameObjectInspected={gameObjectInspected} />
         </div>
         <div className="devtools-right"></div>
       </div>
@@ -40,13 +41,6 @@ export const DevtoolsView = ({
       </div>
     </>
   )
-}
-
-const DevtoolsGameObjectInspection = ({ gameObjectInspected }) => {
-  if (!gameObjectInspected) {
-    return "null"
-  }
-  return gameObjectInspected.name
 }
 
 const useDragGesture = () => {

@@ -1,25 +1,4 @@
-const RIGID_BODY_PROPS = {
-  rigid: true,
-  sleeping: false,
-  lastNotableMotionTime: 0,
-  centerXPrev: undefined,
-  centerYPrev: undefined,
-  anglePrev: undefined,
-  forceXWhenSleepStarted: 0,
-  forceYWhenSleepStarted: 0,
-  forceAngleWhenSleepStarted: 0,
-  velocityXWhenSleepStarted: 0,
-  velocityYWhenSleepStarted: 0,
-  velocityAngleWhenSleepStarted: 0,
-  // centerXWhenSleepStarted: 0,
-  // centerYWhenSleepStarted: 0,
-  // angleWhenSleepStarted: 0,
-
-  debugMotion: false,
-  debugCollisionResolution: false,
-  debugCollisionDetection: false,
-  debugSleep: false,
-
+export const RIGID_BODY_PHYSIC_PROPS = {
   centerX: 0,
   centerY: 0,
   // negative angle -> rotate clockwise
@@ -27,9 +6,14 @@ const RIGID_BODY_PROPS = {
   angle: 0,
   angleLocked: false,
 
+  velocityX: 0,
+  velocityY: 0,
+  velocityAngle: 0,
+
   forceX: 0,
   forceY: 0,
   forceAngle: 0,
+
   // Object with negatice, 0, or infinite mass cannot move.
   // colliding such object has no impact on the object itself
   // big mass are less impacted by collision with object with smaller mass
@@ -50,10 +34,30 @@ const RIGID_BODY_PROPS = {
   restitution: 0.2,
 
   rotationInertiaCoef: 0.2,
+}
 
-  velocityX: 0,
-  velocityY: 0,
-  velocityAngle: 0,
+export const RIGID_BODY_SLEEPING_PROPS = {
+  sleeping: false,
+  lastNotableMotionTime: 0,
+  centerXPrev: undefined,
+  centerYPrev: undefined,
+  anglePrev: undefined,
+  forceXWhenSleepStarted: 0,
+  forceYWhenSleepStarted: 0,
+  forceAngleWhenSleepStarted: 0,
+  velocityXWhenSleepStarted: 0,
+  velocityYWhenSleepStarted: 0,
+  velocityAngleWhenSleepStarted: 0,
+}
+
+const RIGID_BODY_PROPS = {
+  rigid: true,
+  ...RIGID_BODY_PHYSIC_PROPS,
+  ...RIGID_BODY_SLEEPING_PROPS,
+  debugMotion: false,
+  debugCollisionResolution: false,
+  debugCollisionDetection: false,
+  debugSleep: false,
 }
 
 export const createRigidBody = (props) => {
