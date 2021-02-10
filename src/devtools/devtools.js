@@ -1,7 +1,8 @@
 import React from "react"
 import { addDOMEventListener } from "src/helper/dom.js"
 import { DevtoolsView } from "./devtools.view.js"
-import { InspectCanvas } from "./InspectCanvas.js"
+import { InspectGesture } from "./InspectGesture.js"
+import { HighlightCanvas } from "./HighlightCanvas.js"
 import { clamp } from "src/math/math.js"
 
 export const Devtools = ({ world, worldNode }) => {
@@ -65,7 +66,7 @@ export const Devtools = ({ world, worldNode }) => {
     heightAvailableSetter(worldNode.getBoundingClientRect().height)
     setTimeout(() => {
       observer.observe(worldNode)
-    })
+    }, 200)
     return () => {
       observer.disconnect()
     }
@@ -100,24 +101,31 @@ export const Devtools = ({ world, worldNode }) => {
   }, [opened])
 
   const [gameObjectInspected, gameObjectInspectedSetter] = React.useState(null)
+  const [gameObjectToHighlight, gameObjectToHighlightSetter] = React.useState(null)
 
   return (
     <>
       {inspecting ? (
-        <InspectCanvas
+        <InspectGesture
           world={world}
           worldNode={worldNode}
-          onGameObjectHoveredChange={() => {
-            // we do nothing special for now
+          onInspectHover={(gameObjectOrNull) => {
+            gameObjectToHighlightSetter(gameObjectOrNull)
           }}
-          onGameObjectSelectedChange={(gameObjectSelected) => {
+          onInspectSelect={(gameObjectOrNull) => {
+            gameObjectInspectedSetter(gameObjectOrNull)
+            gameObjectToHighlightSetter(null)
+
             // stop inspection
-            // TODO: ça ne dervait pas virer le canvas?
-            // en fait si c'est juste lorsqu'on est dans les devtools qu'on veut
-            // savoir de quel objet on parle non ?
             inspectingSetter(false)
-            gameObjectInspectedSetter(gameObjectSelected)
           }}
+        />
+      ) : null}
+      {gameObjectToHighlight ? (
+        <HighlightCanvas
+          world={world}
+          worldNode={worldNode}
+          gameObjectToHighlight={gameObjectToHighlight}
         />
       ) : null}
       {opened ? (

@@ -49,7 +49,7 @@ window.requestIdleCallback(
   () => {
     gameEngine.startGameLoop()
   },
-  { timeout: 200 },
+  { timeout: 800 },
 )
 
 window.gameEngine = gameEngine
