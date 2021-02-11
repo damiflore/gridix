@@ -1,24 +1,47 @@
 import React from "react"
 
-export const GameObjectInspection = ({ gameObjectInspected }) => {
+export const GameObjectInspection = ({ world, gameObjectInspected }) => {
   if (!gameObjectInspected) {
     return "no game object inspected"
   }
 
+  const [updateCount, updateCountSetter] = React.useState(0)
+  React.useEffect(() => {
+    const gameObject = {
+      update: () => {
+        updateCountSetter((updateCount) => {
+          return updateCount + 1
+        })
+      },
+    }
+    world.addGameObject(gameObject)
+    return () => {
+      world.removeGameObject(gameObject)
+    }
+  }, [])
+
   return (
     <>
       <span>{gameObjectInspected.name}</span>
-      <ShapeDevtools gameObjectInspected={gameObjectInspected} />
-      <StyleDevtools gameObjectInspected={gameObjectInspected} />
-      <RigidBodyDevtools gameObjectInspected={gameObjectInspected} />
+      <button
+        onClick={() => {
+          console.log(gameObjectInspected)
+        }}
+      >
+        Log in console
+      </button>
+      <ShapeDevtools updateCount={updateCount} gameObjectInspected={gameObjectInspected} />
+      <StyleDevtools updateCount={updateCount} gameObjectInspected={gameObjectInspected} />
+      <RigidBodyDevtools updateCount={updateCount} gameObjectInspected={gameObjectInspected} />
     </>
   )
 }
 
-const ShapeDevtools = ({ gameObjectInspected }) => {
+const ShapeDevtools = ({ updateCount, gameObjectInspected }) => {
   if (gameObjectInspected.shapeName === "rectangle") {
     return (
       <PropertyGroup
+        updateCount={updateCount}
         object={gameObjectInspected}
         propertyGroupTitle={"rectangle"}
         propertyGroupNames={RECTANGLE_SHAPE_PROPS}
@@ -138,10 +161,13 @@ const EditableObjectProperty = ({ object, propertyName, propertyValue }) => {
 const EditableInputNumber = ({ value, onChange }) => {
   const inputNodeRef = React.useRef()
   const [editable, editableSetter] = React.useState(false)
-  const [val, valSetter] = React.useState(value)
-
-  const charCount = String(val).length + 1
+  const [valueLocal, valueLocalSetter] = React.useState(value)
+  const charCount = String(valueLocal).length + 1
   const fontSize = 12 // should be dynamic
+
+  React.useEffect(() => {
+    valueLocalSetter(value)
+  }, [value])
 
   return (
     <input
@@ -151,20 +177,39 @@ const EditableInputNumber = ({ value, onChange }) => {
       readOnly={!editable}
       // size={String(val).length}
       style={{ width: charCount * fontSize }}
-      onInput={() => {
+      // onInput={() => {
+      //   const inputNode = inputNodeRef.current
+      //   const valueFromInput = parseFloat(inputNode.value)
+      //   valueEditedSetter(valueFromInput)
+      // }}
+      onKeyDown={(keydownEvent) => {
         const inputNode = inputNodeRef.current
-        const valueFromInput = parseFloat(inputNode.value)
-        valSetter(valueFromInput)
+        if (keydownEvent.key === "Enter") {
+          inputNode.blur()
+        }
+      }}
+      onChange={() => {
+        valueLocalSetter(inputNodeRef.current.value)
       }}
       onBlur={() => {
-        onChange(val)
+        const floatValue = floatValueFromInput(inputNodeRef.current)
+        valueLocalSetter(floatValue)
+        onChange(floatValue)
         editableSetter(false)
       }}
-      onChange={() => {}}
       onDoubleClick={() => {
         editableSetter(true)
       }}
-      defaultValue={val}
+      value={valueLocal}
     />
   )
+}
+
+const floatValueFromInput = (input) => {
+  const { value } = input
+  if (value === "") {
+    return 0
+  }
+  const floatValue = parseFloat(value)
+  return floatValue
 }

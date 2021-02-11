@@ -41,13 +41,6 @@ export const createWorld = ({
   canvas.height = world.worldHeight
   worldViewWrapper.appendChild(canvas)
 
-  if (devtools) {
-    loadAndInjectDevtools({ world, worldNode })
-  }
-  world.devtools = {
-    opened: false,
-  }
-
   const context = canvas.getContext("2d")
 
   const physicSimulation = createSimulation({
@@ -146,6 +139,13 @@ export const createWorld = ({
 
     simulation: physicSimulation,
   })
+
+  if (devtools) {
+    loadAndInjectDevtools({ world, worldNode })
+  }
+  world.devtools = {
+    opened: false,
+  }
 
   return world
 }

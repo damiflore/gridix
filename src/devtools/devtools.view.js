@@ -4,6 +4,7 @@ import { GameEngineDevtools } from "./GameEngineDevtools.js"
 import { GameObjectInspection } from "./GameObjectInspection.js"
 
 export const DevtoolsView = ({
+  world,
   inspecting,
   gameObjectInspected,
   onResizeTop,
@@ -30,7 +31,7 @@ export const DevtoolsView = ({
       <div className="devtools-body">
         <div className="devtools-left"></div>
         <div className="devtools-center">
-          <GameObjectInspection gameObjectInspected={gameObjectInspected} />
+          <GameObjectInspection world={world} gameObjectInspected={gameObjectInspected} />
         </div>
         <div className="devtools-right"></div>
       </div>
