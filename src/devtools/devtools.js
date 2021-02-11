@@ -1,5 +1,6 @@
 import React from "react"
 import { addDOMEventListener } from "src/helper/dom.js"
+import { useNodeSize } from "src/helper/hooks.js"
 import { DevtoolsView } from "./devtools.view.js"
 import { InspectGesture } from "./InspectGesture.js"
 import { HighlightCanvas } from "./HighlightCanvas.js"
@@ -14,8 +15,10 @@ export const Devtools = ({ world, worldNode }) => {
   const [worldHeight, worldHeightSetter] = React.useState(0)
   const [devtoolsHeight, devtoolsHeightSetter] = React.useState(0)
   const [height, heightSetter] = React.useState(stateFromStorage.height)
-  const [heightAvailable, heightAvailableSetter] = React.useState(0)
   const [inspecting, inspectingSetter] = React.useState(false)
+
+  const worldSize = useNodeSize({ current: worldNode })
+  const heightAvailable = worldSize.height
 
   const open = () => {
     openedSetter(true)
@@ -59,20 +62,6 @@ export const Devtools = ({ world, worldNode }) => {
   }, [opened])
 
   React.useEffect(() => {
-    const observer = new ResizeObserver(([entry]) => {
-      const worldNodeHeight = entry.contentRect.height
-      heightAvailableSetter(worldNodeHeight)
-    })
-    heightAvailableSetter(worldNode.getBoundingClientRect().height)
-    setTimeout(() => {
-      observer.observe(worldNode)
-    }, 200)
-    return () => {
-      observer.disconnect()
-    }
-  }, [])
-
-  React.useEffect(() => {
     const remainingHeight = heightAvailable - worldMinHeight
     devtoolsHeightSetter(clamp(height, devtoolsMinHeight, remainingHeight))
   }, [heightAvailable, height])
@@ -100,7 +89,7 @@ export const Devtools = ({ world, worldNode }) => {
     worldDevtoolsNode.style.display = opened ? "" : "none"
   }, [opened])
 
-  const [gameObjectInspected, gameObjectInspectedSetter] = React.useState(null)
+  const [gameObjectInspected, gameObjectInspectedSetter] = React.useState(world.hero)
   const [gameObjectToHighlight, gameObjectToHighlightSetter] = React.useState(null)
 
   return (
@@ -130,6 +119,7 @@ export const Devtools = ({ world, worldNode }) => {
       ) : null}
       {opened ? (
         <DevtoolsView
+          world={world}
           inspecting={inspecting}
           gameObjectInspected={gameObjectInspected}
           onInspectStart={() => {
