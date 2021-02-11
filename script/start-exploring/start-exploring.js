@@ -9,6 +9,7 @@ startExploring({
       "./main.html": true,
     },
     "example": {
+      "src/**/*.html": true,
       "example/**/*.html": true,
     },
     "unit tests": {

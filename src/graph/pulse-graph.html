@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Graph</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      import { createPulseGraph } from "./stat-2.js"
+
+      const pulseGraph = createPulseGraph({
+        text: "fps",
+        min: 0,
+        max: 60,
+        precision: 0,
+        // maxDynamic: false,
+      })
+      let previousMs
+
+      document.querySelector("#app").appendChild(pulseGraph.canvas)
+
+      const loop = () => {
+        const nowMs = Date.now()
+
+        if (previousMs) {
+          const msEllapsed = nowMs - previousMs
+          const fpsEstimation = 1000 / msEllapsed
+          pulseGraph.update(fpsEstimation)
+        }
+
+        previousMs = nowMs
+        window.requestAnimationFrame(loop)
+      }
+      loop()
+    </script>
+  </body>
+</html>
