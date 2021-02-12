@@ -20,7 +20,7 @@ export const createPulseGraph = ({
   maxDynamic = true,
   circleRadius = 2,
   curve = "quadra",
-  maxPoints = 500,
+  maxPoints = 100,
   precision = 2,
 
   legendFontSize = 14,
