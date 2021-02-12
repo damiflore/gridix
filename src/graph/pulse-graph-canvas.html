@@ -28,8 +28,10 @@
 
         if (previousMs) {
           const msEllapsed = nowMs - previousMs
-          const fpsEstimation = 1000 / msEllapsed
-          pulseGraph.update(fpsEstimation)
+          if (msEllapsed > 16.6) {
+            const fpsEstimation = 1000 / msEllapsed
+            pulseGraph.update(fpsEstimation)
+          }
         }
 
         previousMs = nowMs

@@ -1,4 +1,5 @@
-import { drawCurve, drawCurveQuadratic } from "./draw-curve.js"
+import { getDrawCommandsForQuadraticCurve } from "./draw-command-curve-quadratic.js"
+import { applyDrawCommandsToCanvasContext } from "./draw-command-canvas-context.js"
 
 const pixelRatio = Math.round(window.devicePixelRatio || 1)
 
@@ -10,7 +11,7 @@ const maxPrecision = (value, max = 2) => {
 export const createPulseGraph = ({
   fg = "#0f0",
   bg = "#020",
-  width = 200,
+  width = 300,
   height = 100,
   graphPadding = 3,
   lineWidth = 1,
@@ -19,9 +20,9 @@ export const createPulseGraph = ({
   max = 1,
   maxDynamic = true,
   circleRadius = 2,
-  curve = "quadra",
   maxPoints = 100,
   precision = 2,
+  area = false,
 
   legendFontSize = 14,
   valueFontSize = 30,
@@ -106,17 +107,18 @@ export const createPulseGraph = ({
     context.restore()
 
     context.beginPath()
-    if (curve === "line") {
-      drawCurve(context, circles)
-    } else {
-      drawCurveQuadratic(context, circles)
-    }
+
+    const drawCommands = getDrawCommandsForQuadraticCurve(circles, { area })
+    applyDrawCommandsToCanvasContext(drawCommands, context)
 
     context.save()
     context.lineWidth = lineWidth
     context.lineCap = "round"
     context.strokeStyle = lineStyle
     context.stroke()
+    if (area) {
+      context.fill()
+    }
     context.restore()
 
     // circles.forEach((circle) => {

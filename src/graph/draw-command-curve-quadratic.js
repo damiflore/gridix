@@ -1,11 +1,6 @@
 // https://medium.com/@francoisromain/smooth-a-svg-path-with-cubic-bezier-curves-e37b49d46c74
 
-export const getSVGPathCommandForQuadraticCurve = (points, options) => {
-  const commands = getCommandsForQuadraticCurve(points, options)
-  return svgPathCommandStringFromCommands(commands)
-}
-
-const getCommandsForQuadraticCurve = (points, { area = false } = {}) => {
+export const getDrawCommandsForQuadraticCurve = (points, { area = false } = {}) => {
   if (points.length === 0) {
     return []
   }
@@ -94,19 +89,4 @@ const quadraticCurveTo = ({ controlPointX, controlPointY, endPointX, endPointY }
     endPointX,
     endPointY,
   }
-}
-
-const svgPathCommandStringFromCommands = (commands) => {
-  return commands.map((command) => svgPathCommandFromCommand(command)).join(" ")
-}
-
-const svgPathCommandFromCommand = (command) => {
-  return svgPathCommandMappings[command.type](command)
-}
-
-const svgPathCommandMappings = {
-  moveTo: ({ x, y }) => `M ${x} ${y}`,
-  lineTo: ({ x, y }) => `L ${x} ${y}`,
-  quadraticCurveTo: ({ controlPointX, controlPointY, endPointX, endPointY }) =>
-    `Q ${controlPointX} ${controlPointY} ${endPointX} ${endPointY}`,
 }

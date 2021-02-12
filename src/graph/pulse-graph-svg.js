@@ -1,5 +1,6 @@
 import React from "react"
-import { getSVGPathCommandForQuadraticCurve } from "./svg-path-curve-quadratic.js"
+import { getDrawCommandsForQuadraticCurve } from "./draw-command-curve-quadratic.js"
+import { svgPathCommandFromDrawCommands } from "./draw-command-svg-path.js"
 
 export const PulseGraphRAF = ({
   backgroundColor = "#020",
@@ -109,6 +110,8 @@ const PulseGraph = ({ backgroundColor, minValue, maxValue, values, maxValues } =
     return point
   })
 
+  const drawCommands = getDrawCommandsForQuadraticCurve(points, { area: true })
+
   return (
     <svg viewBox="0 0 100 100" className="pulse-graph" preserveAspectRatio="none">
       <g className="pulse-graph-background">
@@ -117,11 +120,7 @@ const PulseGraph = ({ backgroundColor, minValue, maxValue, values, maxValues } =
         ) : null}
       </g>
 
-      <path
-        d={getSVGPathCommandForQuadraticCurve(points, { area: true })}
-        stroke="red"
-        fill="black"
-      ></path>
+      <path d={svgPathCommandFromDrawCommands(drawCommands)} stroke="red" fill="black"></path>
 
       <g className="pulse-graph-points">
         {points.map((point, index) => {
