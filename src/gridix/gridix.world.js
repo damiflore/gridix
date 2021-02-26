@@ -6,6 +6,7 @@ import { createWall } from "./wall.js"
 import { createBaril } from "./baril.js"
 import { createSideWalk } from "./sidewalk.js"
 import { createIce } from "./ice.js"
+import { createHole } from "./hole.js"
 import { createHero } from "./hero.js"
 
 export const createGridixWorld = () => {
@@ -71,6 +72,15 @@ export const createGridixWorld = () => {
     world.addGameObject(ice)
   }
 
+  const addHole = ({ cellX, cellY }) => {
+    const hole = createHole({
+      cellX,
+      cellY,
+      worldGrid,
+    })
+    world.addGameObject(hole)
+  }
+
   const addSideWalkTop = ({ cellX, cellY }) => {
     const sidewalk = createSideWalk({
       cellX,
@@ -106,6 +116,8 @@ export const createGridixWorld = () => {
   addSideWalkTop({ cellX: 5, cellY: 2 })
   addSideWalkTop({ cellX: 5, cellY: 3 })
 
+  addHole({ cellX: 6, cellY: 5 })
+
   addWall({ cellX: 1, cellY: 0 })
   addWall({ cellX: 1, cellY: 1 })
   addBaril({ cellX: 1, cellY: 2 })
@@ -130,6 +142,7 @@ export const createGridixWorld = () => {
 
 const updateGameObjectCell = ({ gameObject, worldGrid, reason }) => {
   if (reason === "add") {
+    const cellIndexPrevious = -1
     const cellIndex = closestCellIndexFromPoint(
       { x: gameObject.centerX, y: gameObject.centerY },
       worldGrid,
@@ -144,7 +157,7 @@ const updateGameObjectCell = ({ gameObject, worldGrid, reason }) => {
     addItemToCell(worldGrid, cellIndex, gameObject)
     cellMates.forEach((cellMate) => {
       if (cellMate.onCellMateJoin) {
-        cellMate.onCellMateJoin(gameObject)
+        cellMate.onCellMateJoin(gameObject, { cellIndexPrevious })
       }
     })
   }
@@ -181,7 +194,7 @@ const updateGameObjectCell = ({ gameObject, worldGrid, reason }) => {
   addItemToCell(worldGrid, cellIndex, gameObject)
   cellMates.forEach((cellMate) => {
     if (cellMate.onCellMateJoin) {
-      cellMate.onCellMateJoin(gameObject)
+      cellMate.onCellMateJoin(gameObject, { cellIndexPrevious })
     }
   })
 }
