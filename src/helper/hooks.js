@@ -9,14 +9,18 @@ export const useNodeSize = (nodeRef) => {
       return null
     }
 
-    //  sizeSetter(sizeGetter(node))
+    let frameId
     const resizeObserver = new ResizeObserver(() => {
-      sizeSetter(sizeGetter(node))
+      // avoid ResizeObserver loop limit exceeded error
+      frameId = window.requestAnimationFrame(() => {
+        sizeSetter(sizeGetter(node))
+      })
     })
     resizeObserver.observe(node)
 
     return () => {
       resizeObserver.disconnect()
+      window.cancelAnimationFrame(frameId)
     }
   }, [nodeRef.current])
 
