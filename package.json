@@ -15,6 +15,7 @@
     "access": "public"
   },
   "type": "module",
+  "importmap": "./project.importmap",
   "exports": {
     ".": {
       "import": "./main.js",
@@ -46,7 +47,7 @@
   },
   "dependencies": {
     "@jsenv/pwa": "3.0.6",
-    "@jsenv/server": "5.6.0",
+    "@jsenv/server": "6.0.0",
     "black-engine": "0.5.12",
     "page-lifecycle": "0.1.2",
     "phaser": "3.52.0",
@@ -63,11 +64,11 @@
     "@jsenv/file-size-impact": "6.0.6",
     "@jsenv/github-release-package": "1.2.2",
     "@jsenv/lighthouse-score-impact": "2.4.8",
-    "@jsenv/node-module-import-map": "12.4.0",
+    "@jsenv/node-module-import-map": "13.0.0-alpha.5",
     "@jsenv/package-publish": "1.5.2",
     "@jsenv/prettier-check-project": "5.6.1",
     "@jsenv/util": "4.0.6",
-    "eslint": "7.20.0",
+    "eslint": "7.21.0",
     "eslint-plugin-react": "7.22.0",
     "playwright-chromium": "1.7.1",
     "prettier": "2.2.1"
