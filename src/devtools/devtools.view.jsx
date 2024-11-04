@@ -1,7 +1,7 @@
 import React from "react";
-import { addDOMEventListener } from "src/helper/dom.js";
-import { GameEngineDevtools } from "./GameEngineDevtools.js";
-import { GameObjectInspection } from "./GameObjectInspection.js";
+import { addDOMEventListener } from "../helper/dom.js";
+import { GameEngineDevtools } from "./GameEngineDevtools.jsx";
+import { GameObjectInspection } from "./GameObjectInspection.jsx";
 
 export const DevtoolsView = ({
   world,

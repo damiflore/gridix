@@ -1,5 +1,5 @@
-import { rectangleToCorners } from "src/geometry/rectangle.js";
-import { getVectorLength } from "src/geometry/vector.js";
+import { rectangleToCorners } from "../geometry/rectangle.js";
+import { getVectorLength } from "../geometry/vector.js";
 
 export const testBoundingBoxContact = (a, b) => {
   const aBoundingBox = getBoundingBox(a);

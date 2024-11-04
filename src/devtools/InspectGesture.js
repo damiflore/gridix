@@ -1,5 +1,5 @@
 import React from "react";
-import { addDOMEventListener } from "src/helper/dom.js";
+import { addDOMEventListener } from "../helper/dom.js";
 
 export const InspectGesture = ({
   world,

@@ -1,8 +1,8 @@
-import { getScalarProduct } from "src/geometry/vector.js";
-import { testBoundingBoxContact } from "./boundingBox.js";
-import { getCollisionInfoForCircleToCircle } from "./circleToCircle.js";
-import { getCollisionInfoForRectangleToCircle } from "./rectangleToCircle.js";
-import { getCollisionInfoForRectangleToRectangle } from "./rectangleToRectangle.js";
+import { getScalarProduct } from "../geometry/vector.js";
+import { testBoundingBoxContact } from "./bounding_box.js";
+import { getCollisionInfoForCircleToCircle } from "./circle_to_circle.js";
+import { getCollisionInfoForRectangleToCircle } from "./rectangle_to_circle.js";
+import { getCollisionInfoForRectangleToRectangle } from "./rectangle_to_rectangle.js";
 
 export const getCollisionInfo = (rigidBody, otherRigidBody) => {
   if (
@@ -39,26 +39,6 @@ export const getCollisionInfo = (rigidBody, otherRigidBody) => {
   }
 
   return collisionInfo;
-};
-
-export const createCollisionInfo = ({
-  collisionDepth = 0,
-  collisionNormalX = 0,
-  collisionNormalY = 0,
-  collisionStartX = 0,
-  collisionStartY = 0,
-  collisionEndX = collisionStartX + collisionNormalX * collisionDepth,
-  collisionEndY = collisionStartY + collisionNormalY * collisionDepth,
-}) => {
-  return {
-    collisionDepth,
-    collisionNormalX,
-    collisionNormalY,
-    collisionStartX,
-    collisionStartY,
-    collisionEndX,
-    collisionEndY,
-  };
 };
 
 const reverseCollisionInfo = ({

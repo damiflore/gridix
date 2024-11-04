@@ -1,6 +1,6 @@
-import { trackKeyboardKeydown } from "src/interaction/keyboard.js";
-import { clampMagnitude, sameSign } from "src/math/math.js";
-import { addImpulse } from "src/physic/physic.motion.js";
+import { trackKeyboardKeydown } from "../interaction/keyboard.js";
+import { clampMagnitude, sameSign } from "../math/math.js";
+import { addImpulse } from "../physic/physic.motion.js";
 
 export const createKeyboardNavigation = ({
   // the accell/decel numbers below are dependent of the ambient friction

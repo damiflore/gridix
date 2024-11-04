@@ -1,13 +1,13 @@
-import { drawRectangle } from "src/draw/draw.js";
+import { drawRectangle } from "../draw/draw.js";
 import {
   centerXFromCellX,
   centerYFromCellY,
   closestCellCenterFromPoint,
-} from "src/geometry/grid.js";
-import { createRectangle } from "src/geometry/rectangle.js";
-import { sameSign } from "src/math/math.js";
-import { addImpulse } from "src/physic/physic.motion.js";
-import { createRigidBody } from "src/physic/rigid-body.js";
+} from "../geometry/grid.js";
+import { createRectangle } from "../geometry/rectangle.js";
+import { sameSign } from "../math/math.js";
+import { addImpulse } from "../physic/physic.motion.js";
+import { createRigidBody } from "../physic/rigid-body.js";
 
 export const createBaril = ({ cellX, cellY, worldGrid }) => {
   const rectangle = createRectangle({

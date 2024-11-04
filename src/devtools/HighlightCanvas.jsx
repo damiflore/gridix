@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { drawPath } from "src/draw/path.js";
+import { drawPath } from "../draw/path.js";
 
 export const HighlightCanvas = ({
   world,

@@ -1,14 +1,14 @@
 import {
   rectangleToCorners,
   rectangleToNormals,
-} from "src/geometry/rectangle.js";
+} from "../geometry/rectangle.js";
 import {
   getScalarProduct,
   getVectorLength,
   normalizeVector,
   scaleVector,
-} from "src/geometry/vector.js";
-import { createCollisionInfo } from "./collisionInfo.js";
+} from "../geometry/vector.js";
+import { createCollisionInfo } from "./collision_info_shared.js";
 
 export const getCollisionInfoForRectangleToCircle = (rectangle, circle) => {
   const corners = rectangleToCorners(rectangle);

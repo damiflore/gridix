@@ -1,11 +1,11 @@
-import { drawRectangle } from "src/draw/draw.js";
+import { drawRectangle } from "../draw/draw.js";
 import {
   cellXFromCellIndex,
   cellYFromCellIndex,
   centerXFromCellX,
   centerYFromCellY,
-} from "src/geometry/grid.js";
-import { createRectangle } from "src/geometry/rectangle.js";
+} from "../geometry/grid.js";
+import { createRectangle } from "../geometry/rectangle.js";
 
 export const createHole = ({ cellX, cellY, worldGrid }) => {
   const rectangle = createRectangle({

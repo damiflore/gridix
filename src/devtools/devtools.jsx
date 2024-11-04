@@ -1,10 +1,10 @@
 import React from "react";
-import { addDOMEventListener } from "src/helper/dom.js";
-import { useNodeSize } from "src/helper/hooks.js";
-import { clamp } from "src/math/math.js";
-import { DevtoolsView } from "./devtools.view.js";
-import { HighlightCanvas } from "./HighlightCanvas.js";
-import { InspectGesture } from "./InspectGesture.js";
+import { addDOMEventListener } from "../helper/dom.js";
+import { useNodeSize } from "../helper/hooks.js";
+import { clamp } from "../math/math.js";
+import { DevtoolsView } from "./devtools.view.jsx";
+import { HighlightCanvas } from "./HighlightCanvas.jsx";
+import { InspectGesture } from "./InspectGesture.jsx";
 
 export const Devtools = ({ world, worldNode }) => {
   const worldMinHeight = 150;

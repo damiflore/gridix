@@ -1,5 +1,5 @@
-import { createRectangle } from "src/geometry/rectangle.js";
-import { createRigidBody } from "src/physic/rigid-body.js";
+import { createRectangle } from "../geometry/rectangle.js";
+import { createRigidBody } from "../physic/rigid-body.js";
 
 export const createWorldBounds = ({
   worldWidth,

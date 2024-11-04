@@ -1,5 +1,5 @@
-import { circleToStartPoint } from "src/geometry/circle.js";
-import { rectangleToTopLeftCorner } from "src/geometry/rectangle.js";
+import { circleToStartPoint } from "../geometry/circle.js";
+import { rectangleToTopLeftCorner } from "../geometry/rectangle.js";
 
 export const drawRectangle = (
   {

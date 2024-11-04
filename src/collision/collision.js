@@ -1,5 +1,5 @@
-import { forEachPairs } from "src/helper/pairs.js";
-import { getCollisionInfo } from "./collisionInfo.js";
+import { forEachPairs } from "../helper/pairs.js";
+import { getCollisionInfo } from "./collision_info.js";
 
 export const forEachCollidingPairs = ({
   rigidBodies,

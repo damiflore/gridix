@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { injectStylesheetIntoDocument } from "src/helper/dom.js";
-import { Devtools } from "./devtools.js";
+import { injectStylesheetIntoDocument } from "../helper/dom.js";
+import { Devtools } from "./devtools.jsx";
 
 const devtoolsCssUrl = new URL("./devtools.css", import.meta.url);
 

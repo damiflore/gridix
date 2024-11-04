@@ -4,7 +4,7 @@ import {
   scaleVector,
   substractVector,
 } from "../geometry/vector.js";
-import { createCollisionInfo } from "./collisionInfo.js";
+import { createCollisionInfo } from "./collision_info_shared.js";
 
 export const getCollisionInfoForCircleToCircle = (circleA, circleB) => {
   const centerDiff = substractVector(

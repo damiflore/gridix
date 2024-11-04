@@ -1,6 +1,6 @@
-import { drawRectangle } from "src/draw/draw.js";
-import { centerXFromCellX, centerYFromCellY } from "src/geometry/grid.js";
-import { createRectangle } from "src/geometry/rectangle.js";
+import { drawRectangle } from "../draw/draw.js";
+import { centerXFromCellX, centerYFromCellY } from "../geometry/grid.js";
+import { createRectangle } from "../geometry/rectangle.js";
 
 export const createIce = ({ cellX, cellY, worldGrid }) => {
   const rectangle = createRectangle({

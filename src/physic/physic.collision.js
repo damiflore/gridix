@@ -1,10 +1,10 @@
-import { forEachCollidingPairs } from "src/collision/collision.js";
+import { forEachCollidingPairs } from "../collision/collision.js";
 import {
   getScalarProduct,
   getVectorialProduct,
   normalizeVector,
   scaleVector,
-} from "src/geometry/vector.js";
+} from "../geometry/vector.js";
 import { motionAllowedFromMass } from "./physic.motion.js";
 
 const relaxationCount = 5;

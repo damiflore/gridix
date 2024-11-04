@@ -1,7 +1,7 @@
-import { drawRectangle } from "src/draw/draw.js";
-import { centerXFromCellX, centerYFromCellY } from "src/geometry/grid.js";
-import { createRectangle } from "src/geometry/rectangle.js";
-import { createRigidBody } from "src/physic/rigid-body.js";
+import { drawRectangle } from "../draw/draw.js";
+import { centerXFromCellX, centerYFromCellY } from "../geometry/grid.js";
+import { createRectangle } from "../geometry/rectangle.js";
+import { createRigidBody } from "../physic/rigid-body.js";
 
 export const createWall = ({ cellX, cellY, worldGrid }) => {
   const rectangle = createRectangle({

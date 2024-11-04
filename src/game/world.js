@@ -1,8 +1,8 @@
-import { pointHitCircle } from "src/collision/pointHitCircle.js";
-import { pointHitRectangle } from "src/collision/pointHitRectangle.js";
-import { drawCollisionInfo } from "src/draw/draw.js";
-import { injectStylesheetIntoDocument } from "src/helper/dom.js";
-import { createSimulation } from "src/physic/physic.simulation.js";
+import { pointHitCircle } from "../collision/point_hit_circle.js";
+import { pointHitRectangle } from "../collision/point_hit_rectangle.js";
+import { drawCollisionInfo } from "../draw/draw.js";
+import { injectStylesheetIntoDocument } from "../helper/dom.js";
+import { createSimulation } from "../physic/physic.simulation.js";
 
 const worldCssUrl = new URL("./world.css", import.meta.url);
 
@@ -153,7 +153,7 @@ export const createWorld = ({
 };
 
 const loadAndInjectDevtools = async (params) => {
-  const { injectDevtools } = await import("src/devtools/devtools.inject.js");
+  const { injectDevtools } = await import("../devtools/devtools.inject.js");
   injectDevtools(params);
 };
 
