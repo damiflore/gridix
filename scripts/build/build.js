@@ -1,12 +1,7 @@
 import { buildProject, jsenvServiceWorkerFinalizer } from "@jsenv/core"
 import { copyFileSystemNode, resolveUrl } from "@jsenv/util"
-import * as jsenvConfig from "../../jsenv.config.js"
 
 await buildProject({
-  ...jsenvConfig,
-  format: "systemjs",
-  systemJsUrl: "/node_modules/systemjs/dist/s.js",
-  buildDirectoryClean: true,
   entryPointMap: {
     "./main.html": "./main.prod.html",
   },

@@ -34,4 +34,21 @@ export const serverPromise = startServer({
       compressionEnabled: true,
     })
   },
+  explorableConfig: {
+    "app": {
+      "./main.html": true,
+    },
+    "example": {
+      "src/**/*.html": true,
+      "example/**/*.html": true,
+    },
+    "unit tests": {
+      "test/**/*.test.html": true,
+    },
+  },
+  // "./node_modules/phaser/src/phaser.js": convertCommonJsWithRollup,
+  // "./node_modules/react/index.js": convertCommonJsWithRollup,
+  // "./node_modules/react-dom/index.js": async (options) => {
+  //   return convertCommonJsWithRollup({ ...options, external: ["react"] })
+  // },
 })
