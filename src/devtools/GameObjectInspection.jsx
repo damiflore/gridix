@@ -22,7 +22,7 @@ export const GameObjectInspection = ({ world, gameObjectInspected }) => {
 
   return (
     <>
-      <span>{gameObjectInspected.name}</span>
+      <span>name: {gameObjectInspected.name}</span>
       <button
         onClick={() => {
           console.log(gameObjectInspected);

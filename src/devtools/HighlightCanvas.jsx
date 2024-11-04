@@ -1,4 +1,4 @@
-import { render } from "preact";
+import { createPortal } from "preact/compat";
 import { useEffect, useRef } from "preact/hooks";
 import { drawPath } from "../draw/path.js";
 
@@ -25,7 +25,7 @@ export const HighlightCanvas = ({
     }
   }, [gameObjectToHighlight]);
 
-  return render(
+  return createPortal(
     <canvas
       ref={canvasNodeRef}
       width={world.worldWidth}
