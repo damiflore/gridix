@@ -1,5 +1,0 @@
-// import "src/pwa/add-to-home-screen.js"
-// import "src/pwa/service-worker-registration.js"
-// import "src/pwa/service-worker-update.js"
-import "src/pwa/splashscreen.js"
-import "src/gridix.js"

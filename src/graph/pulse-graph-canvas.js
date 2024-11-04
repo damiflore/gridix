@@ -1,12 +1,12 @@
-import { getDrawCommandsForQuadraticCurve } from "./draw-command-curve-quadratic.js"
-import { applyDrawCommandsToCanvasContext } from "./draw-command-canvas-context.js"
+import { applyDrawCommandsToCanvasContext } from "./draw-command-canvas-context.js";
+import { getDrawCommandsForQuadraticCurve } from "./draw-command-curve-quadratic.js";
 
-const pixelRatio = Math.round(window.devicePixelRatio || 1)
+const pixelRatio = Math.round(window.devicePixelRatio || 1);
 
 const maxPrecision = (value, max = 2) => {
-  const multiplier = Math.pow(10, max)
-  return Math.round(value * multiplier) / multiplier
-}
+  const multiplier = Math.pow(10, max);
+  return Math.round(value * multiplier) / multiplier;
+};
 
 export const createPulseGraph = ({
   fg = "#0f0",
@@ -27,99 +27,108 @@ export const createPulseGraph = ({
   legendFontSize = 14,
   valueFontSize = 30,
 } = {}) => {
-  const canvas = document.createElement("canvas")
-  const context = canvas.getContext("2d")
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
 
-  const widthPixels = width * pixelRatio
-  const heightPixels = height * pixelRatio
-  canvas.width = widthPixels
-  canvas.height = heightPixels
-  canvas.style.cssText = `width:${width}px;height:${height}px`
+  const widthPixels = width * pixelRatio;
+  const heightPixels = height * pixelRatio;
+  canvas.width = widthPixels;
+  canvas.height = heightPixels;
+  canvas.style.cssText = `width:${width}px;height:${height}px`;
 
-  const legendWidth = 70
+  const legendWidth = 70;
 
-  const graphPaddingPixels = graphPadding * pixelRatio
-  const graphX = graphPaddingPixels
-  const graphWidth = widthPixels - graphPaddingPixels * 2 - legendWidth
-  const graphY = graphPaddingPixels
-  const graphHeight = heightPixels - graphY - graphPaddingPixels
+  const graphPaddingPixels = graphPadding * pixelRatio;
+  const graphX = graphPaddingPixels;
+  const graphWidth = widthPixels - graphPaddingPixels * 2 - legendWidth;
+  const graphY = graphPaddingPixels;
+  const graphHeight = heightPixels - graphY - graphPaddingPixels;
 
-  context.textBaseline = "top"
-  context.fillStyle = bg
-  context.globalAlpha = 0.9
+  context.textBaseline = "top";
+  context.fillStyle = bg;
+  context.globalAlpha = 0.9;
 
-  const values = []
-  const widthPerPoint = graphWidth / maxPoints
+  const values = [];
+  const widthPerPoint = graphWidth / maxPoints;
 
   const update = (value) => {
     if (maxDynamic) {
       if (value < min) {
-        min = value
+        min = value;
       }
       if (value > max) {
-        max = value
+        max = value;
       }
     }
 
     if (values.length === maxPoints) {
-      values.shift()
+      values.shift();
     }
-    values.push(value)
+    values.push(value);
 
-    context.clearRect(0, 0, widthPixels, heightPixels)
+    context.clearRect(0, 0, widthPixels, heightPixels);
 
-    context.fillStyle = bg
-    context.fillRect(0, 0, widthPixels, heightPixels)
+    context.fillStyle = bg;
+    context.fillRect(0, 0, widthPixels, heightPixels);
 
-    const legendX = width - legendWidth
-    context.fillStyle = fg
+    const legendX = width - legendWidth;
+    context.fillStyle = fg;
 
-    context.font = `bold ${legendFontSize}px Helvetica,Arial,sans-serif`
-    context.fillText(maxPrecision(max), legendX + 5, 3, 40)
-    context.fillText(maxPrecision(min), legendX + 5, height - legendFontSize - 3, 40)
+    context.font = `bold ${legendFontSize}px Helvetica,Arial,sans-serif`;
+    context.fillText(maxPrecision(max), legendX + 5, 3, 40);
+    context.fillText(
+      maxPrecision(min),
+      legendX + 5,
+      height - legendFontSize - 3,
+      40,
+    );
 
-    context.font = `bold ${valueFontSize}px Helvetica,Arial,sans-serif`
-    const valueY = height / 2 - valueFontSize / 2
-    const valueDisplayed = maxPrecision(value, precision)
-    context.fillText(valueDisplayed, legendX + 5, valueY)
+    context.font = `bold ${valueFontSize}px Helvetica,Arial,sans-serif`;
+    const valueY = height / 2 - valueFontSize / 2;
+    const valueDisplayed = maxPrecision(value, precision);
+    context.fillText(valueDisplayed, legendX + 5, valueY);
     // https://developer.mozilla.org/en-US/docs/Web/API/TextMetrics
-    const valueWidth = context.measureText(valueDisplayed).width
+    const valueWidth = context.measureText(valueDisplayed).width;
 
-    context.font = `bold ${legendFontSize}px Helvetica,Arial,sans-serif`
-    context.fillText("fps", legendX + 5 + valueWidth + 3, valueY + valueFontSize - legendFontSize)
+    context.font = `bold ${legendFontSize}px Helvetica,Arial,sans-serif`;
+    context.fillText(
+      "fps",
+      legendX + 5 + valueWidth + 3,
+      valueY + valueFontSize - legendFontSize,
+    );
 
-    const circles = []
+    const circles = [];
 
-    const magnitude = Math.abs(min) + Math.abs(max)
+    const magnitude = Math.abs(min) + Math.abs(max);
 
-    let x = graphX
-    context.save()
+    let x = graphX;
+    context.save();
     values.forEach((value) => {
-      const diffWithMax = max - value
-      const ratio = diffWithMax / magnitude
-      const yRelativeToGraph = graphHeight * ratio
-      const y = graphY + yRelativeToGraph
+      const diffWithMax = max - value;
+      const ratio = diffWithMax / magnitude;
+      const yRelativeToGraph = graphHeight * ratio;
+      const y = graphY + yRelativeToGraph;
 
-      circles.push({ x, y, radius: circleRadius })
+      circles.push({ x, y, radius: circleRadius });
 
-      x += widthPerPoint
-    })
-    context.restore()
+      x += widthPerPoint;
+    });
+    context.restore();
 
-    context.beginPath()
+    context.beginPath();
 
-    const drawCommands = getDrawCommandsForQuadraticCurve(circles, { area })
-    applyDrawCommandsToCanvasContext(drawCommands, context)
+    const drawCommands = getDrawCommandsForQuadraticCurve(circles, { area });
+    applyDrawCommandsToCanvasContext(drawCommands, context);
 
-    context.save()
-    context.lineWidth = lineWidth
-    context.lineCap = "round"
-    context.strokeStyle = lineStyle
-    context.stroke()
+    context.save();
+    context.lineWidth = lineWidth;
+    context.lineCap = "round";
+    context.strokeStyle = lineStyle;
+    context.stroke();
     if (area) {
-      context.fill()
+      context.fill();
     }
-    context.restore()
+    context.restore();
 
     // circles.forEach((circle) => {
     //   context.beginPath()
@@ -130,10 +139,10 @@ export const createPulseGraph = ({
     //   context.fill()
     //   // context.restore()
     // })
-  }
+  };
 
   return {
     canvas,
     update,
-  }
-}
+  };
+};

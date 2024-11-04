@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <title>PWA Example</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="./icons/favicon.png" />
+    <link rel="manifest" href="./pwa.webmanifest" />
+    <link rel="stylesheet" href="./main.css" />
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <script>
+      // eslint-disable-next-line no-new
+      new URL("./robots.txt", window.origin);
+    </script>
+    <script>
+      // we have to register early to this event in case browser dispatch it quickly
+      // other scripts will have to check window.beforeinstallpromptEvent
+      // presence, otherwise listen the before install prompt event
+      window.addEventListener(
+        "beforeinstallprompt",
+        (beforeinstallpromptEvent) => {
+          console.info(
+            `Store beforeinstallpromptEvent on window to be used later`,
+          );
+          beforeinstallpromptEvent.preventDefault();
+          window.beforeinstallpromptEvent = beforeinstallpromptEvent;
+        },
+      );
+    </script>
+    <script id="main-script" type="module" src="./main.js"></script>
+  </body>
+</html>

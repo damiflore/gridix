@@ -1,13 +1,13 @@
-import { createWorld } from "src/game/world.js"
-import { closestCellIndexFromPoint, generateCells } from "src/geometry/grid.js"
-import { createWorldBounds } from "./world-bound.js"
-import { createKeyboardNavigation } from "./keyboard-navigation.js"
-import { createWall } from "./wall.js"
-import { createBaril } from "./baril.js"
-import { createSideWalk } from "./sidewalk.js"
-import { createIce } from "./ice.js"
-import { createHole } from "./hole.js"
-import { createHero } from "./hero.js"
+import { createWorld } from "../game/world.js";
+import { closestCellIndexFromPoint, generateCells } from "../geometry/grid.js";
+import { createBaril } from "./baril.js";
+import { createHero } from "./hero.js";
+import { createHole } from "./hole.js";
+import { createIce } from "./ice.js";
+import { createKeyboardNavigation } from "./keyboard-navigation.js";
+import { createSideWalk } from "./sidewalk.js";
+import { createWall } from "./wall.js";
+import { createWorldBounds } from "./world-bound.js";
 
 export const createGridixWorld = () => {
   const worldGrid = {
@@ -15,9 +15,9 @@ export const createGridixWorld = () => {
     cellYCount: 10,
     cellSize: 32,
     cells: [],
-  }
-  worldGrid.cells = generateCells(worldGrid)
-  window.worldGrid = worldGrid
+  };
+  worldGrid.cells = generateCells(worldGrid);
+  window.worldGrid = worldGrid;
 
   const world = createWorld({
     devtools: true,
@@ -30,56 +30,56 @@ export const createGridixWorld = () => {
           gameObject,
           worldGrid,
           reason: "add",
-        })
+        });
       }
     },
     onGameObjectMoved: (gameObject, move) => {
       if (move.from && gameObject.onMove) {
-        gameObject.onMove(move)
+        gameObject.onMove(move);
       }
       updateGameObjectCell({
         gameObject,
         worldGrid,
         reason: "move",
-      })
+      });
     },
-  })
+  });
 
   const addWall = ({ cellX, cellY }) => {
     const wall = createWall({
       cellX,
       cellY,
       worldGrid,
-    })
-    world.addGameObject(wall)
-  }
+    });
+    world.addGameObject(wall);
+  };
 
   const addBaril = ({ cellX, cellY }) => {
     const baril = createBaril({
       cellX,
       cellY,
       worldGrid,
-    })
-    world.addGameObject(baril)
-  }
+    });
+    world.addGameObject(baril);
+  };
 
   const addIce = ({ cellX, cellY }) => {
     const ice = createIce({
       cellX,
       cellY,
       worldGrid,
-    })
-    world.addGameObject(ice)
-  }
+    });
+    world.addGameObject(ice);
+  };
 
   const addHole = ({ cellX, cellY }) => {
     const hole = createHole({
       cellX,
       cellY,
       worldGrid,
-    })
-    world.addGameObject(hole)
-  }
+    });
+    world.addGameObject(hole);
+  };
 
   const addSideWalkTop = ({ cellX, cellY }) => {
     const sidewalk = createSideWalk({
@@ -87,82 +87,82 @@ export const createGridixWorld = () => {
       cellY,
       worldGrid,
       force: -6000,
-    })
-    world.addGameObject(sidewalk)
-  }
+    });
+    world.addGameObject(sidewalk);
+  };
 
   const addHero = ({ cellX, cellY }) => {
-    const hero = createHero({ cellX, cellY, worldGrid })
-    world.addGameObject(hero)
-    return hero
-  }
+    const hero = createHero({ cellX, cellY, worldGrid });
+    world.addGameObject(hero);
+    return hero;
+  };
 
   const worldBounds = createWorldBounds({
     worldWidth: world.worldWidth,
     worldHeight: world.worldHeight,
-  })
+  });
   Object.keys(worldBounds).forEach((key) => {
-    world.addGameObject(worldBounds[key])
-  })
+    world.addGameObject(worldBounds[key]);
+  });
 
-  const heroRef = { current: null }
+  const heroRef = { current: null };
   const keyboardNav = createKeyboardNavigation({
     heroRef,
-  })
+  });
   // put keyboard first so that sidewalk will be able to add/substract force from keyboard impulse
-  world.addGameObject(keyboardNav)
+  world.addGameObject(keyboardNav);
 
-  addSideWalkTop({ cellX: 5, cellY: 1 })
-  addSideWalkTop({ cellX: 5, cellY: 2 })
-  addSideWalkTop({ cellX: 5, cellY: 3 })
+  addSideWalkTop({ cellX: 5, cellY: 1 });
+  addSideWalkTop({ cellX: 5, cellY: 2 });
+  addSideWalkTop({ cellX: 5, cellY: 3 });
 
-  addHole({ cellX: 6, cellY: 5 })
+  addHole({ cellX: 6, cellY: 5 });
 
-  addWall({ cellX: 1, cellY: 0 })
-  addWall({ cellX: 1, cellY: 1 })
-  addBaril({ cellX: 1, cellY: 2 })
-  addBaril({ cellX: 2, cellY: 2 })
-  addBaril({ cellX: 5, cellY: 3 })
-  addWall({ cellX: 1, cellY: 3 })
+  addWall({ cellX: 1, cellY: 0 });
+  addWall({ cellX: 1, cellY: 1 });
+  addBaril({ cellX: 1, cellY: 2 });
+  addBaril({ cellX: 2, cellY: 2 });
+  addBaril({ cellX: 5, cellY: 3 });
+  addWall({ cellX: 1, cellY: 3 });
 
   // addIce({ cellX: 0, cellY: 0 })
-  addIce({ cellX: 3, cellY: 7 })
-  addIce({ cellX: 4, cellY: 7 })
-  addIce({ cellX: 5, cellY: 7 })
-  addIce({ cellX: 3, cellY: 8 })
-  addIce({ cellX: 4, cellY: 8 })
-  addIce({ cellX: 5, cellY: 8 })
-  addIce({ cellX: 6, cellY: 7 })
-  addIce({ cellX: 6, cellY: 8 })
+  addIce({ cellX: 3, cellY: 7 });
+  addIce({ cellX: 4, cellY: 7 });
+  addIce({ cellX: 5, cellY: 7 });
+  addIce({ cellX: 3, cellY: 8 });
+  addIce({ cellX: 4, cellY: 8 });
+  addIce({ cellX: 5, cellY: 8 });
+  addIce({ cellX: 6, cellY: 7 });
+  addIce({ cellX: 6, cellY: 8 });
 
-  heroRef.current = addHero({ cellX: 0, cellY: 0 })
+  heroRef.current = addHero({ cellX: 0, cellY: 0 });
 
-  return world
-}
+  return world;
+};
 
 const updateGameObjectCell = ({ gameObject, worldGrid, reason }) => {
   if (reason === "add") {
-    const cellIndexPrevious = -1
+    const cellIndexPrevious = -1;
     const cellIndex = closestCellIndexFromPoint(
       { x: gameObject.centerX, y: gameObject.centerY },
       worldGrid,
-    )
-    gameObject.cellIndex = cellIndex
+    );
+    gameObject.cellIndex = cellIndex;
 
     if (cellIndex === -1) {
-      return
+      return;
     }
 
-    const cellMates = worldGrid.cells[cellIndex] || []
-    addItemToCell(worldGrid, cellIndex, gameObject)
+    const cellMates = worldGrid.cells[cellIndex] || [];
+    addItemToCell(worldGrid, cellIndex, gameObject);
     cellMates.forEach((cellMate) => {
       if (cellMate.onCellMateJoin) {
-        cellMate.onCellMateJoin(gameObject, { cellIndexPrevious })
+        cellMate.onCellMateJoin(gameObject, { cellIndexPrevious });
       }
-    })
+    });
   }
 
-  const cellIndexPrevious = gameObject.cellIndex
+  const cellIndexPrevious = gameObject.cellIndex;
   const cellIndex = closestCellIndexFromPoint(
     {
       x: gameObject.centerX,
@@ -170,68 +170,72 @@ const updateGameObjectCell = ({ gameObject, worldGrid, reason }) => {
       angle: gameObject.angle,
     },
     worldGrid,
-  )
+  );
   if (cellIndexPrevious === cellIndex) {
-    return
+    return;
   }
 
-  gameObject.cellIndex = cellIndex
+  gameObject.cellIndex = cellIndex;
 
   if (cellIndexPrevious !== -1) {
-    const cellMatesPrevious = removeItemFromCell(worldGrid, cellIndexPrevious, gameObject)
+    const cellMatesPrevious = removeItemFromCell(
+      worldGrid,
+      cellIndexPrevious,
+      gameObject,
+    );
     cellMatesPrevious.forEach((cellMatePrevious) => {
       if (cellMatePrevious.onCellMateLeave) {
-        cellMatePrevious.onCellMateLeave(gameObject)
+        cellMatePrevious.onCellMateLeave(gameObject);
       }
-    })
+    });
   }
 
   if (cellIndex === -1) {
-    return
+    return;
   }
 
-  const cellMates = worldGrid.cells[cellIndex] || []
-  addItemToCell(worldGrid, cellIndex, gameObject)
+  const cellMates = worldGrid.cells[cellIndex] || [];
+  addItemToCell(worldGrid, cellIndex, gameObject);
   cellMates.forEach((cellMate) => {
     if (cellMate.onCellMateJoin) {
-      cellMate.onCellMateJoin(gameObject, { cellIndexPrevious })
+      cellMate.onCellMateJoin(gameObject, { cellIndexPrevious });
     }
-  })
-}
+  });
+};
 
 const removeItemFromCell = (grid, cellIndex, itemToRemove) => {
-  const cells = grid.cells
-  const cell = cells[cellIndex]
+  const cells = grid.cells;
+  const cell = cells[cellIndex];
 
   if (!cell) {
-    const cellWithoutItem = []
-    cells[cellIndex] = cellWithoutItem
-    return cellWithoutItem
+    const cellWithoutItem = [];
+    cells[cellIndex] = cellWithoutItem;
+    return cellWithoutItem;
   }
 
-  let i = cell.length
-  const cellWithoutItem = []
+  let i = cell.length;
+  const cellWithoutItem = [];
   while (i--) {
-    const itemCandidate = cell[i]
+    const itemCandidate = cell[i];
     if (itemCandidate !== itemToRemove) {
-      cellWithoutItem.push(itemCandidate)
+      cellWithoutItem.push(itemCandidate);
     }
   }
-  cells[cellIndex] = cellWithoutItem
+  cells[cellIndex] = cellWithoutItem;
 
-  return cellWithoutItem
-}
+  return cellWithoutItem;
+};
 
 const addItemToCell = (grid, cellIndex, item) => {
-  const cells = grid.cells
-  const cell = cells[cellIndex]
+  const cells = grid.cells;
+  const cell = cells[cellIndex];
   if (cell) {
-    const cellWithItem = [...cell, item]
-    cells[cellIndex] = cellWithItem
-    return cellWithItem
+    const cellWithItem = [...cell, item];
+    cells[cellIndex] = cellWithItem;
+    return cellWithItem;
   }
 
-  const cellWithItem = [item]
-  cells[cellIndex] = cellWithItem
-  return cellWithItem
-}
+  const cellWithItem = [item];
+  cells[cellIndex] = cellWithItem;
+  return cellWithItem;
+};

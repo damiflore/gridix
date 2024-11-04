@@ -1,6 +1,6 @@
-import React from "react"
-import { getDrawCommandsForQuadraticCurve } from "./draw-command-curve-quadratic.js"
-import { svgPathCommandFromDrawCommands } from "./draw-command-svg-path.js"
+import React from "react";
+import { getDrawCommandsForQuadraticCurve } from "./draw-command-curve-quadratic.js";
+import { svgPathCommandFromDrawCommands } from "./draw-command-svg-path.js";
 
 export const PulseGraphRAF = ({
   backgroundColor = "#020",
@@ -11,69 +11,69 @@ export const PulseGraphRAF = ({
   maxDynamic = true,
   legend,
 }) => {
-  const [values, valuesSetter] = React.useState([])
+  const [values, valuesSetter] = React.useState([]);
 
-  const [minValue, minValueSetter] = React.useState(min)
-  const [maxValue, maxValueSetter] = React.useState(max)
+  const [minValue, minValueSetter] = React.useState(min);
+  const [maxValue, maxValueSetter] = React.useState(max);
 
   React.useEffect(() => {
-    let previousMs
+    let previousMs;
     const loop = () => {
-      const nowMs = Date.now()
+      const nowMs = Date.now();
 
       if (previousMs) {
-        const msEllapsed = nowMs - previousMs
+        const msEllapsed = nowMs - previousMs;
         if (msEllapsed > 16) {
-          const fpsEstimation = 1000 / msEllapsed
+          const fpsEstimation = 1000 / msEllapsed;
           valuesSetter((values) => {
             if (values.length > maxValues) {
               // return values
-              return [...values.slice(1), fpsEstimation]
+              return [...values.slice(1), fpsEstimation];
             }
-            return [...values, fpsEstimation]
-          })
+            return [...values, fpsEstimation];
+          });
         }
       }
 
-      previousMs = nowMs
-      window.requestAnimationFrame(loop)
-    }
-    loop()
-  }, [])
+      previousMs = nowMs;
+      window.requestAnimationFrame(loop);
+    };
+    loop();
+  }, []);
 
   React.useEffect(() => {
     if (!minDynamic) {
-      minValueSetter(min)
-      return
+      minValueSetter(min);
+      return;
     }
 
-    let minValueFromValues = Infinity
+    let minValueFromValues = Infinity;
     values.forEach((value) => {
       if (value < minValue) {
-        minValueFromValues = value
+        minValueFromValues = value;
       }
-    })
+    });
     if (minValueFromValues < minValue) {
-      minValueSetter(minValueFromValues)
+      minValueSetter(minValueFromValues);
     }
-  }, [minDynamic, min, values, minValue])
+  }, [minDynamic, min, values, minValue]);
 
   React.useEffect(() => {
     if (!maxDynamic) {
-      maxValueSetter(max)
-      return
+      maxValueSetter(max);
+      return;
     }
 
-    let maxValueFromValues = -Infinity
+    let maxValueFromValues = -Infinity;
     values.forEach((value) => {
       if (value > maxValue) {
-        maxValueFromValues = value
+        maxValueFromValues = value;
       }
-    })
+    });
     if (maxValueFromValues > maxValue) {
-      maxValueSetter(maxValueFromValues)
+      maxValueSetter(maxValueFromValues);
     }
-  }, [maxDynamic, max, values, maxValue])
+  }, [maxDynamic, max, values, maxValue]);
 
   return (
     <PulseGraph
@@ -85,48 +85,75 @@ export const PulseGraphRAF = ({
       precision={0}
       legend={legend}
     />
-  )
-}
+  );
+};
 
-const PulseGraph = ({ backgroundColor, minValue, maxValue, values, maxValues } = {}) => {
-  const magnitude = Math.abs(minValue) + Math.abs(maxValue)
+const PulseGraph = ({
+  backgroundColor,
+  minValue,
+  maxValue,
+  values,
+  maxValues,
+} = {}) => {
+  const magnitude = Math.abs(minValue) + Math.abs(maxValue);
 
-  const widthPerPoint = 100 / maxValues
-  let graphY = 5
+  const widthPerPoint = 100 / maxValues;
+  let graphY = 5;
 
-  let x = 0
+  let x = 0;
   const points = values.map((value) => {
-    const diffWithMax = maxValue - value
-    const ratio = diffWithMax / magnitude
-    const yRelativeToGraph = 100 * ratio
-    const y = graphY + yRelativeToGraph
+    const diffWithMax = maxValue - value;
+    const ratio = diffWithMax / magnitude;
+    const yRelativeToGraph = 100 * ratio;
+    const y = graphY + yRelativeToGraph;
     const point = {
       x,
       y,
       value,
-    }
-    x += widthPerPoint
+    };
+    x += widthPerPoint;
 
-    return point
-  })
+    return point;
+  });
 
-  const drawCommands = getDrawCommandsForQuadraticCurve(points, { area: true })
+  const drawCommands = getDrawCommandsForQuadraticCurve(points, { area: true });
 
   return (
-    <svg viewBox="0 0 100 100" className="pulse-graph" preserveAspectRatio="none">
+    <svg
+      viewBox="0 0 100 100"
+      className="pulse-graph"
+      preserveAspectRatio="none"
+    >
       <g className="pulse-graph-background">
         {backgroundColor ? (
-          <rect x="0" y="0" width="100" height="100" fill={backgroundColor}></rect>
+          <rect
+            x="0"
+            y="0"
+            width="100"
+            height="100"
+            fill={backgroundColor}
+          ></rect>
         ) : null}
       </g>
 
-      <path d={svgPathCommandFromDrawCommands(drawCommands)} stroke="red" fill="black"></path>
+      <path
+        d={svgPathCommandFromDrawCommands(drawCommands)}
+        stroke="red"
+        fill="black"
+      ></path>
 
       <g className="pulse-graph-points">
         {points.map((point, index) => {
-          return <circle key={index} cx={point.x} cy={point.y} data-value={point.value}></circle>
+          return (
+            <circle
+              key={index}
+              cx={point.x}
+              cy={point.y}
+              data-value={point.value}
+            ></circle>
+          );
         })}
       </g>
     </svg>
-  )
-}
+  );
+};
