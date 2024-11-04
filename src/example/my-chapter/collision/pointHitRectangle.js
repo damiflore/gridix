@@ -1,50 +1,53 @@
-import { rotateVector } from "../geometry/vector.js"
+import { rotateVector } from "../geometry/vector.js";
 
 export const pointHitRectangle = (point, rectangle) => {
   if (rectangle.angle) {
-    return pointHitRotatedRectangle(point, rectangle)
+    return pointHitRotatedRectangle(point, rectangle);
   }
 
-  return pointHitRectangleWithoutRotation(point, rectangle)
-}
+  return pointHitRectangleWithoutRotation(point, rectangle);
+};
 
 const pointHitRectangleWithoutRotation = (point, rectangleWihoutRotation) => {
-  const pointX = point.x
-  const pointY = point.y
-  const { centerX, centerY, width, height } = rectangleWihoutRotation
+  const pointX = point.x;
+  const pointY = point.y;
+  const { centerX, centerY, width, height } = rectangleWihoutRotation;
 
-  const left = centerX - width / 2
+  const left = centerX - width / 2;
   if (pointX < left) {
-    return false
+    return false;
   }
 
-  const right = left + width
+  const right = left + width;
   if (pointX > right) {
-    return false
+    return false;
   }
 
-  const top = centerY - height / 2
+  const top = centerY - height / 2;
   if (pointY < top) {
-    return false
+    return false;
   }
 
-  const bottom = top + height
+  const bottom = top + height;
   if (pointY > bottom) {
-    return false
+    return false;
   }
 
-  return true
-}
+  return true;
+};
 
 const pointHitRotatedRectangle = (point, rectangleWithRotation) => {
-  const rectangleCenterX = rectangleWithRotation.centerX
-  const rectangleCenterY = rectangleWithRotation.centerY
-  const rectangleAngle = rectangleWithRotation.angle
+  const rectangleCenterX = rectangleWithRotation.centerX;
+  const rectangleCenterY = rectangleWithRotation.centerY;
+  const rectangleAngle = rectangleWithRotation.angle;
   const pointUnrotated = rotateVector(point, {
     centerX: rectangleCenterX,
     centerY: rectangleCenterY,
     angle: -rectangleAngle,
-  })
+  });
 
-  return pointHitRectangleWithoutRotation(pointUnrotated, rectangleWithRotation)
-}
+  return pointHitRectangleWithoutRotation(
+    pointUnrotated,
+    rectangleWithRotation,
+  );
+};

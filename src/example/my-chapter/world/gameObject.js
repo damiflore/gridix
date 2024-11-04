@@ -4,4 +4,4 @@ export const GameObject = {
   update: () => {},
 
   draw: () => {},
-}
+};

@@ -34,7 +34,7 @@ export const RIGID_BODY_PHYSIC_PROPS = {
   restitution: 0.2,
 
   rotationInertiaCoef: 0.2,
-}
+};
 
 export const RIGID_BODY_SLEEPING_PROPS = {
   sleeping: false,
@@ -48,7 +48,7 @@ export const RIGID_BODY_SLEEPING_PROPS = {
   velocityXWhenSleepStarted: 0,
   velocityYWhenSleepStarted: 0,
   velocityAngleWhenSleepStarted: 0,
-}
+};
 
 const RIGID_BODY_PROPS = {
   rigid: true,
@@ -58,12 +58,12 @@ const RIGID_BODY_PROPS = {
   debugCollisionResolution: false,
   debugCollisionDetection: false,
   debugSleep: false,
-}
+};
 
 export const createRigidBody = (props) => {
   return {
     ...RIGID_BODY_PROPS,
     forces: [],
     ...props,
-  }
-}
+  };
+};

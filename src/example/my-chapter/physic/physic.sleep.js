@@ -1,4 +1,4 @@
-import { motionAllowedFromMass } from "./physic.motion.js"
+import { motionAllowedFromMass } from "./physic.motion.js";
 
 export const handleSleep = ({
   world,
@@ -15,17 +15,17 @@ export const handleSleep = ({
   // sauf que sleep réutilise le concept de prev/next sur la position
 
   world.forEachGameObject((gameObject) => {
-    const { centerX, centerY, angle } = gameObject
-    const { centerXPrev, centerYPrev, anglePrev } = gameObject
+    const { centerX, centerY, angle } = gameObject;
+    const { centerXPrev, centerYPrev, anglePrev } = gameObject;
     // now we know the move for this object, store current position
     // for the next iteration
-    gameObject.centerXPrev = centerX
-    gameObject.centerYPrev = centerY
-    gameObject.anglePrev = angle
+    gameObject.centerXPrev = centerX;
+    gameObject.centerYPrev = centerY;
+    gameObject.anglePrev = angle;
 
     // this object is new, give up on detecting if it should sleep
     if (centerXPrev === undefined) {
-      return
+      return;
     }
 
     const move = {
@@ -34,7 +34,7 @@ export const handleSleep = ({
       x: centerX - centerXPrev,
       y: centerY - centerYPrev,
       angle: angle - anglePrev,
-    }
+    };
 
     updateSleepingState(gameObject, {
       stepInfo,
@@ -44,9 +44,9 @@ export const handleSleep = ({
       sleepVelocityThreshold,
       sleepStartDuration,
       moveCallback,
-    })
-  })
-}
+    });
+  });
+};
 
 const updateSleepingState = (
   gameObject,
@@ -61,23 +61,23 @@ const updateSleepingState = (
   },
 ) => {
   if (!gameObject.rigid) {
-    return
+    return;
   }
 
   if (!motionAllowedFromMass(gameObject.mass)) {
-    return
+    return;
   }
 
   if (gameObject.debugSleep) {
-    gameObject.debugSleep = false
+    gameObject.debugSleep = false;
     // eslint-disable-next-line no-debugger
-    debugger
+    debugger;
   }
 
   const moveIsNotable = !getMoveIsNegligible({
     move,
     sleepMoveThreshold,
-  })
+  });
 
   if (gameObject.sleeping) {
     if (
@@ -87,26 +87,26 @@ const updateSleepingState = (
         sleepVelocityThreshold,
       })
     ) {
-      gameObject.lastNotableMotionTime = stepInfo.time
-      gameObject.sleeping = false
-      moveCallback(gameObject, move)
+      gameObject.lastNotableMotionTime = stepInfo.time;
+      gameObject.sleeping = false;
+      moveCallback(gameObject, move);
     }
-    return
+    return;
   }
 
   // it's moving enough
   if (moveIsNotable) {
-    gameObject.lastNotableMotionTime = stepInfo.time
-    moveCallback(gameObject, move)
-    return
+    gameObject.lastNotableMotionTime = stepInfo.time;
+    moveCallback(gameObject, move);
+    return;
   }
 
   // not moving enough, since how long?
-  const lastNotableMotionTime = gameObject.lastNotableMotionTime
-  const timeSinceLastNotableMotion = stepInfo.time - lastNotableMotionTime
+  const lastNotableMotionTime = gameObject.lastNotableMotionTime;
+  const timeSinceLastNotableMotion = stepInfo.time - lastNotableMotionTime;
   if (timeSinceLastNotableMotion < sleepStartDuration) {
     // not since enough time
-    return
+    return;
   }
 
   // at this point object is not noving enough since at least sleepStartDuration
@@ -119,70 +119,81 @@ const updateSleepingState = (
     velocityXWhenSleepStarted: gameObject.velocityX,
     velocityYWhenSleepStarted: gameObject.velocityY,
     velocityAngleWhenSleepStarted: gameObject.velocityAngle,
-  })
-}
+  });
+};
 
 const getMoveIsNegligible = ({ move, sleepMoveThreshold }) => {
   if (Math.abs(move.x) > sleepMoveThreshold) {
-    return false
+    return false;
   }
 
   if (Math.abs(move.y) > sleepMoveThreshold) {
-    return false
+    return false;
   }
 
   if (Math.abs(move.angle) > sleepMoveThreshold) {
-    return false
+    return false;
   }
 
-  return true
-}
+  return true;
+};
 
-const shouldAwake = (gameObject, { sleepVelocityThreshold, sleepForceThreshold }) => {
-  const { velocityX, velocityXWhenSleepStarted } = gameObject
-  const velocityXSinceSleeping = Math.abs(velocityXWhenSleepStarted - velocityX)
+const shouldAwake = (
+  gameObject,
+  { sleepVelocityThreshold, sleepForceThreshold },
+) => {
+  const { velocityX, velocityXWhenSleepStarted } = gameObject;
+  const velocityXSinceSleeping = Math.abs(
+    velocityXWhenSleepStarted - velocityX,
+  );
   if (velocityXSinceSleeping > sleepVelocityThreshold) {
     // this object velocityX increased enough for some reason
-    return true
+    return true;
   }
 
-  const { velocityY, velocityYWhenSleepStarted } = gameObject
-  const velocityYSinceSleeping = Math.abs(velocityYWhenSleepStarted - velocityY)
+  const { velocityY, velocityYWhenSleepStarted } = gameObject;
+  const velocityYSinceSleeping = Math.abs(
+    velocityYWhenSleepStarted - velocityY,
+  );
   if (velocityYSinceSleeping > sleepVelocityThreshold) {
     // this object velocityY increased enough for some reason
-    return true
+    return true;
   }
 
-  const { velocityAngle, velocityAngleWhenSleepStarted } = gameObject
-  const velocityAngleSinceSleeping = Math.abs(velocityAngleWhenSleepStarted - velocityAngle)
+  const { velocityAngle, velocityAngleWhenSleepStarted } = gameObject;
+  const velocityAngleSinceSleeping = Math.abs(
+    velocityAngleWhenSleepStarted - velocityAngle,
+  );
   if (velocityAngleSinceSleeping > sleepVelocityThreshold) {
     // this object velocityAngle increased enough for some reason
     // -> awake it
-    return true
+    return true;
   }
 
-  const { forceX, forceXWhenSleepStarted } = gameObject
-  const forceXSinceSleeping = Math.abs(forceXWhenSleepStarted - forceX)
+  const { forceX, forceXWhenSleepStarted } = gameObject;
+  const forceXSinceSleeping = Math.abs(forceXWhenSleepStarted - forceX);
   if (forceXSinceSleeping > sleepForceThreshold) {
     // this object force x increased enough for some reason
     // -> awake it
-    return true
+    return true;
   }
 
-  const { forceY, forceYWhenSleepStarted } = gameObject
-  const forceYSinceSleeping = Math.abs(forceYWhenSleepStarted - forceY)
+  const { forceY, forceYWhenSleepStarted } = gameObject;
+  const forceYSinceSleeping = Math.abs(forceYWhenSleepStarted - forceY);
   if (forceYSinceSleeping > sleepForceThreshold) {
     // this object force y increased enough for some reason
     // -> awake it
-    return true
+    return true;
   }
 
-  const { forceAngle, forceAngleWhenSleepStarted } = gameObject
-  const forceAngleSinceSleeping = Math.abs(forceAngleWhenSleepStarted - forceAngle)
+  const { forceAngle, forceAngleWhenSleepStarted } = gameObject;
+  const forceAngleSinceSleeping = Math.abs(
+    forceAngleWhenSleepStarted - forceAngle,
+  );
   if (forceAngleSinceSleeping > sleepForceThreshold) {
     // this object force angle increased enough for some reason
-    return true
+    return true;
   }
 
-  return false
-}
+  return false;
+};

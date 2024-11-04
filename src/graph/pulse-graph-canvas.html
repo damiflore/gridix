@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <title>Graph</title>
@@ -10,7 +10,7 @@
   <body>
     <div id="app"></div>
     <script type="module">
-      import { createPulseGraph } from "./pulse-graph-canvas.js"
+      import { createPulseGraph } from "./pulse-graph-canvas.js";
 
       const pulseGraph = createPulseGraph({
         text: "fps",
@@ -18,26 +18,26 @@
         max: 60,
         precision: 0,
         // maxDynamic: false,
-      })
-      let previousMs
+      });
+      let previousMs;
 
-      document.querySelector("#app").appendChild(pulseGraph.canvas)
+      document.querySelector("#app").appendChild(pulseGraph.canvas);
 
       const loop = () => {
-        const nowMs = Date.now()
+        const nowMs = Date.now();
 
         if (previousMs) {
-          const msEllapsed = nowMs - previousMs
+          const msEllapsed = nowMs - previousMs;
           if (msEllapsed > 16.6) {
-            const fpsEstimation = 1000 / msEllapsed
-            pulseGraph.update(fpsEstimation)
+            const fpsEstimation = 1000 / msEllapsed;
+            pulseGraph.update(fpsEstimation);
           }
         }
 
-        previousMs = nowMs
-        window.requestAnimationFrame(loop)
-      }
-      loop()
+        previousMs = nowMs;
+        window.requestAnimationFrame(loop);
+      };
+      loop();
     </script>
   </body>
 </html>

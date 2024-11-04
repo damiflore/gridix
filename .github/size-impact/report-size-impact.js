@@ -1,4 +1,9 @@
-import { reportFileSizeImpact, readGithubWorkflowEnv, raw, gzip } from "@jsenv/file-size-impact"
+import {
+  gzip,
+  raw,
+  readGithubWorkflowEnv,
+  reportFileSizeImpact,
+} from "@jsenv/file-size-impact";
 
 reportFileSizeImpact({
   ...readGithubWorkflowEnv(),
@@ -37,4 +42,4 @@ reportFileSizeImpact({
   manifestConfig: {
     "./dist/**/asset-manifest.json": true,
   },
-})
+});

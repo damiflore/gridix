@@ -1,11 +1,11 @@
-import { getDistanceBetweenVectors } from "../geometry/vector.js"
+import { getDistanceBetweenVectors } from "../geometry/vector.js";
 
 export const pointHitCircle = (point, { centerX, centerY, radius }) => {
-  const distance = getDistanceBetweenVectors(point, { x: centerX, y: centerY })
+  const distance = getDistanceBetweenVectors(point, { x: centerX, y: centerY });
 
   if (distance <= radius) {
-    return true
+    return true;
   }
 
-  return false
-}
+  return false;
+};

@@ -7,41 +7,43 @@
 /* jslint node: true, vars: true, evil: true, bitwise: true */
 /* global  requestAnimationFrame: false */
 /* global document,gObjectNum */
-"use strict" // Operate in Strict mode such that variables must be declared before used!
+"use strict"; // Operate in Strict mode such that variables must be declared before used!
 
 /**
  * Static refrence to gEngine
  * @type gEngine
  */
-var gEngine = gEngine || {}
+var gEngine = gEngine || {};
 // initialize the variable while ensuring it is not redefined
 gEngine.Core = (function () {
-  var mCanvas
-  var mContext
-  var mWidth = 800
-  var mHeight = 450
-  mCanvas = document.getElementById("canvas")
-  mContext = mCanvas.getContext("2d")
-  mCanvas.height = mHeight
-  mCanvas.width = mWidth
+  var mCanvas;
+  var mContext;
+  var mWidth = 800;
+  var mHeight = 450;
+  mCanvas = document.getElementById("canvas");
+  mContext = mCanvas.getContext("2d");
+  mCanvas.height = mHeight;
+  mCanvas.width = mWidth;
 
-  var mGravity = new Vec2(0, 200)
-  var mMovement = true
+  var mGravity = new Vec2(0, 200);
+  var mMovement = true;
 
-  var mCurrentTime
-  var mElapsedTime
-  var mPreviousTime = Date.now()
-  var mLagTime = 0
-  var kFPS = 60 // Frames per second
-  var kFrameTime = 1 / kFPS
-  var mUpdateIntervalInSeconds = kFrameTime
-  var kMPF = 1000 * kFrameTime // Milliseconds per frame.
-  var mAllObjects = []
+  var mCurrentTime;
+  var mElapsedTime;
+  var mPreviousTime = Date.now();
+  var mLagTime = 0;
+  var kFPS = 60; // Frames per second
+  var kFrameTime = 1 / kFPS;
+  var mUpdateIntervalInSeconds = kFrameTime;
+  var kMPF = 1000 * kFrameTime; // Milliseconds per frame.
+  var mAllObjects = [];
 
   var updateUIEcho = function () {
     document.getElementById("uiEchoString").innerHTML =
       `${
-        "<p><b>Selected Object:</b>:</p>" + '<ul style="margin:-10px">' + "<li>Id: "
+        "<p><b>Selected Object:</b>:</p>" +
+        '<ul style="margin:-10px">' +
+        "<li>Id: "
       }${gObjectNum}</li>` +
       `<li>Center: ${mAllObjects[gObjectNum].mCenter.x.toPrecision(3)},${mAllObjects[
         gObjectNum
@@ -71,50 +73,50 @@ gEngine.Core = (function () {
       `<b>F/G</b>: Spawn [Rectangle/Circle] at selected object` +
       `<p><b>H</b>: Excite all objects</p>` +
       `<p><b>R</b>: Reset System</p>` +
-      `<hr>`
-  }
+      `<hr>`;
+  };
   var draw = function () {
-    mContext.clearRect(0, 0, mWidth, mHeight)
-    var i
+    mContext.clearRect(0, 0, mWidth, mHeight);
+    var i;
     for (i = 0; i < mAllObjects.length; i++) {
-      mContext.strokeStyle = "blue"
+      mContext.strokeStyle = "blue";
       if (i === gObjectNum) {
-        mContext.strokeStyle = "red"
+        mContext.strokeStyle = "red";
       }
-      mAllObjects[i].draw(mContext)
+      mAllObjects[i].draw(mContext);
     }
-  }
+  };
   var update = function () {
-    var i
+    var i;
     for (i = 0; i < mAllObjects.length; i++) {
-      mAllObjects[i].update(mContext)
+      mAllObjects[i].update(mContext);
     }
-  }
+  };
   var runGameLoop = function () {
     requestAnimationFrame(function () {
-      runGameLoop()
-    })
+      runGameLoop();
+    });
 
     //      compute how much time has elapsed since we last runGameLoop was executed
-    mCurrentTime = Date.now()
-    mElapsedTime = mCurrentTime - mPreviousTime
-    mPreviousTime = mCurrentTime
-    mLagTime += mElapsedTime
+    mCurrentTime = Date.now();
+    mElapsedTime = mCurrentTime - mPreviousTime;
+    mPreviousTime = mCurrentTime;
+    mLagTime += mElapsedTime;
 
-    updateUIEcho()
-    draw()
+    updateUIEcho();
+    draw();
     //      Make sure we update the game the appropriate number of times.
     //      Update only every Milliseconds per frame.
     //      If lag larger then update frames, update until caught up.
     while (mLagTime >= kMPF) {
-      mLagTime -= kMPF
-      gEngine.Physics.collision()
-      update()
+      mLagTime -= kMPF;
+      gEngine.Physics.collision();
+      update();
     }
-  }
+  };
   var initializeEngineCore = function () {
-    runGameLoop()
-  }
+    runGameLoop();
+  };
   var mPublic = {
     initializeEngineCore,
     mAllObjects,
@@ -124,6 +126,6 @@ gEngine.Core = (function () {
     mGravity,
     mUpdateIntervalInSeconds,
     mMovement,
-  }
-  return mPublic
-})()
+  };
+  return mPublic;
+})();

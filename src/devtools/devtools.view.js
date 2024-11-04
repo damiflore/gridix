@@ -1,7 +1,7 @@
-import React from "react"
-import { addDOMEventListener } from "src/helper/dom.js"
-import { GameEngineDevtools } from "./GameEngineDevtools.js"
-import { GameObjectInspection } from "./GameObjectInspection.js"
+import React from "react";
+import { addDOMEventListener } from "src/helper/dom.js";
+import { GameEngineDevtools } from "./GameEngineDevtools.js";
+import { GameObjectInspection } from "./GameObjectInspection.js";
 
 export const DevtoolsView = ({
   world,
@@ -31,7 +31,10 @@ export const DevtoolsView = ({
       <div className="devtools-body">
         <div className="devtools-left"></div>
         <div className="devtools-center">
-          <GameObjectInspection world={world} gameObjectInspected={gameObjectInspected} />
+          <GameObjectInspection
+            world={world}
+            gameObjectInspected={gameObjectInspected}
+          />
         </div>
         <div className="devtools-right"></div>
       </div>
@@ -41,102 +44,110 @@ export const DevtoolsView = ({
         <ButtonLayoutBottomBig onClick={onClickLayoutBottomBig} />
       </div>
     </>
-  )
-}
+  );
+};
 
 const useDragGesture = () => {
-  const nodeRef = React.useRef()
+  const nodeRef = React.useRef();
 
-  const [dragGesture, dragGestureSetter] = React.useState({ type: "end" })
+  const [dragGesture, dragGestureSetter] = React.useState({ type: "end" });
 
   React.useEffect(() => {
-    const node = nodeRef.current
+    const node = nodeRef.current;
 
-    let removeMousemoveListener = () => {}
-    let removeMouseupListener = () => {}
-    const removeMousedownListener = addDOMEventListener(node, "mousedown", (mousedownEvent) => {
-      dragGestureSetter({
-        type: "start",
-      })
-
-      removeMouseupListener = addDOMEventListener(document, "mouseup", () => {
-        removeMousemoveListener()
+    let removeMousemoveListener = () => {};
+    let removeMouseupListener = () => {};
+    const removeMousedownListener = addDOMEventListener(
+      node,
+      "mousedown",
+      (mousedownEvent) => {
         dragGestureSetter({
-          type: "end",
-        })
-      })
+          type: "start",
+        });
 
-      const startPageX = mousedownEvent.pageX
-      const startPageY = mousedownEvent.pageY
-      let previousPageX = startPageX
-      let previousPageY = startPageY
+        removeMouseupListener = addDOMEventListener(document, "mouseup", () => {
+          removeMousemoveListener();
+          dragGestureSetter({
+            type: "end",
+          });
+        });
 
-      removeMousemoveListener = addDOMEventListener(document, "mousemove", (mousemoveEvent) => {
-        const nowPageX = mousemoveEvent.pageX
-        const nowPageY = mousemoveEvent.pageY
-        const moveX = nowPageX - previousPageX
-        const moveY = nowPageY - previousPageY
-        previousPageX = nowPageX
-        previousPageY = nowPageY
-        dragGestureSetter({
-          type: "move",
-          data: {
-            moveX,
-            moveY,
+        const startPageX = mousedownEvent.pageX;
+        const startPageY = mousedownEvent.pageY;
+        let previousPageX = startPageX;
+        let previousPageY = startPageY;
+
+        removeMousemoveListener = addDOMEventListener(
+          document,
+          "mousemove",
+          (mousemoveEvent) => {
+            const nowPageX = mousemoveEvent.pageX;
+            const nowPageY = mousemoveEvent.pageY;
+            const moveX = nowPageX - previousPageX;
+            const moveY = nowPageY - previousPageY;
+            previousPageX = nowPageX;
+            previousPageY = nowPageY;
+            dragGestureSetter({
+              type: "move",
+              data: {
+                moveX,
+                moveY,
+              },
+            });
           },
-        })
-      })
-    })
+        );
+      },
+    );
 
     return () => {
-      removeMousedownListener()
-      removeMousemoveListener()
-      removeMouseupListener()
-    }
-  }, [])
+      removeMousedownListener();
+      removeMousemoveListener();
+      removeMouseupListener();
+    };
+  }, []);
 
-  return [nodeRef, dragGesture]
-}
+  return [nodeRef, dragGesture];
+};
 
 const DevtoolsResizeTop = ({
   // onResizeTopStart,
   onResizeTop,
   // onResizeTopEnd
 }) => {
-  const [nodeRefForDrag, dragGesture] = useDragGesture()
-  const dragGesturePreviousRef = React.useRef(dragGesture)
+  const [nodeRefForDrag, dragGesture] = useDragGesture();
+  const dragGesturePreviousRef = React.useRef(dragGesture);
 
   React.useEffect(() => {
     // const dragGesturePrevious = dragGesturePreviousRef.current
-    dragGesturePreviousRef.current = dragGesture
+    dragGesturePreviousRef.current = dragGesture;
 
     // if (dragGesturePrevious.type === "end" && dragGesture.type === "start") {
     //   onResizeTopStart()
     // }
     if (dragGesture.type === "move") {
-      onResizeTop(dragGesture.data)
+      onResizeTop(dragGesture.data);
     }
     // if (dragGesturePrevious.type !== "end" && dragGesture.type === "end") {
     //   onResizeTopEnd()
     // }
-  }, [dragGesture])
+  }, [dragGesture]);
 
-  return <div ref={nodeRefForDrag} className="devtools-resize-top"></div>
-}
+  return <div ref={nodeRefForDrag} className="devtools-resize-top"></div>;
+};
 
 const InputInspect = ({ inspecting, onInspectStart, onInspectStop }) => {
   React.useEffect(() => {
     if (!inspecting) {
-      return null
+      return null;
     }
 
     return addDOMEventListener(document, "keydown", (keydownEvent) => {
       if (keydownEvent.key === "Escape") {
-        keydownEvent.preventDefault()
-        onInspectStop()
+        keydownEvent.preventDefault();
+        onInspectStop();
       }
-    })
-  }, [inspecting])
+    });
+  }, [inspecting]);
 
   return (
     <label className="devtools-input">
@@ -145,9 +156,9 @@ const InputInspect = ({ inspecting, onInspectStart, onInspectStop }) => {
         checked={inspecting}
         onChange={(e) => {
           if (e.target.checked) {
-            onInspectStart()
+            onInspectStart();
           } else {
-            onInspectStop()
+            onInspectStop();
           }
         }}
       />
@@ -172,8 +183,8 @@ const InputInspect = ({ inspecting, onInspectStart, onInspectStop }) => {
         </g>
       </svg>
     </label>
-  )
-}
+  );
+};
 
 const ButtonLayoutBottomSmall = ({ onClick }) => {
   return (
@@ -184,8 +195,8 @@ const ButtonLayoutBottomSmall = ({ onClick }) => {
         </g>
       </svg>
     </button>
-  )
-}
+  );
+};
 
 const ButtonLayoutBottomMedium = ({ onClick }) => {
   return (
@@ -196,8 +207,8 @@ const ButtonLayoutBottomMedium = ({ onClick }) => {
         </g>
       </svg>
     </button>
-  )
-}
+  );
+};
 
 const ButtonLayoutBottomBig = ({ onClick }) => {
   return (
@@ -208,8 +219,8 @@ const ButtonLayoutBottomBig = ({ onClick }) => {
         </g>
       </svg>
     </button>
-  )
-}
+  );
+};
 
 const ButtonCloseDevtools = ({ onClick }) => {
   return (
@@ -221,5 +232,5 @@ const ButtonCloseDevtools = ({ onClick }) => {
         />
       </svg>
     </button>
-  )
-}
+  );
+};

@@ -24,7 +24,7 @@ const splashscreenHtml = `
       </details>
     </div>
   </div>
-</div>`
+</div>`;
 
 const splashScreenCss = `
 #splashscreen {
@@ -121,62 +121,67 @@ const splashScreenCss = `
   100% {
     transform: rotate(90deg) scale(1.3);
   }
-}`
+}`;
 
-const style = document.createElement("style")
-style.innerHTML = splashScreenCss
-document.body.appendChild(style)
+const style = document.createElement("style");
+style.innerHTML = splashScreenCss;
+document.body.appendChild(style);
 
-const div = document.createElement("div")
-div.innerHTML = splashscreenHtml
-const splashscreenNode = div.children[0]
-document.body.appendChild(splashscreenNode)
+const div = document.createElement("div");
+div.innerHTML = splashscreenHtml;
+const splashscreenNode = div.children[0];
+document.body.appendChild(splashscreenNode);
 
-const splashscreenElement = document.querySelector("#splashscreen")
-const mainScript = window.parent.document.querySelector("script#main-script")
+const splashscreenElement = document.querySelector("#splashscreen");
+const mainScript = window.parent.document.querySelector("script#main-script");
 
 const activateSplashscreenVariant = (variantId, data = {}) => {
-  const activeVariantContainer = document.querySelector("#splashscreen-text")
-  activeVariantContainer.innerHTML = ""
-  const variantModel = document.querySelector(`#${variantId}`)
-  const variantInstance = variantModel.cloneNode(true)
+  const activeVariantContainer = document.querySelector("#splashscreen-text");
+  activeVariantContainer.innerHTML = "";
+  const variantModel = document.querySelector(`#${variantId}`);
+  const variantInstance = variantModel.cloneNode(true);
 
   const visitNode = (node) => {
     if (node.nodeName === "#text") {
       node.textContent = node.textContent.replace(/\${(\w*)}/g, (_, key) => {
-        return data.hasOwnProperty(key) ? data[key] : ""
-      })
+        return data.hasOwnProperty(key) ? data[key] : "";
+      });
     } else {
       Array.from(node.childNodes).forEach((node) => {
-        visitNode(node)
-      })
+        visitNode(node);
+      });
     }
-  }
-  visitNode(variantInstance)
+  };
+  visitNode(variantInstance);
 
-  activeVariantContainer.appendChild(variantInstance)
-  return variantInstance
-}
+  activeVariantContainer.appendChild(variantInstance);
+  return variantInstance;
+};
 
 // montre un loader ou quelque chose parce que le site met un peu de temps a se load
 const showLoaderTimeout = setTimeout(() => {
-  activateSplashscreenVariant("loader")
-}, 2500)
+  activateSplashscreenVariant("loader");
+}, 2500);
 
 // detect main script load error
 mainScript.onerror = () => {
-  clearTimeout(showLoaderTimeout)
-  activateSplashscreenVariant("network-error-screen")
-}
+  clearTimeout(showLoaderTimeout);
+  activateSplashscreenVariant("network-error-screen");
+};
 // uncomment the line below to test the case of a network error
 // mainScript.onerror();
 
 // detect main script parse or execute error
 const errorEventCallback = (errorEvent) => {
-  window.parent.removeEventListener("error", errorEventCallback)
-  const { message, filename, lineno: lineNumber, colno: columnNumber } = errorEvent
+  window.parent.removeEventListener("error", errorEventCallback);
+  const {
+    message,
+    filename,
+    lineno: lineNumber,
+    colno: columnNumber,
+  } = errorEvent;
 
-  clearTimeout(showLoaderTimeout)
+  clearTimeout(showLoaderTimeout);
   activateSplashscreenVariant("runtime-error-screen", {
     runtimeErrorTitle: filename
       ? `${filename}:${lineNumber}:${columnNumber}`
@@ -185,9 +190,9 @@ const errorEventCallback = (errorEvent) => {
       message ||
       `<Aucun message associé a cette erreur>
       (Ouvrir les devtools pour en savoir plus)`,
-  })
-}
-window.addEventListener("error", errorEventCallback)
+  });
+};
+window.addEventListener("error", errorEventCallback);
 
 window.splashscreen = {
   remove: () => {
@@ -199,11 +204,11 @@ window.splashscreen = {
     // we should first display an other screen showing what the main script is doing
     // (likely loading assets)
     // we must create this component which does not exists yet
-    clearTimeout(showLoaderTimeout)
-    window.parent.removeEventListener("error", errorEventCallback)
-    splashscreenElement.setAttribute("data-step", "loaded")
+    clearTimeout(showLoaderTimeout);
+    window.parent.removeEventListener("error", errorEventCallback);
+    splashscreenElement.setAttribute("data-step", "loaded");
     setTimeout(() => {
-      splashscreenElement.style.display = "none"
-    }, 300)
+      splashscreenElement.style.display = "none";
+    }, 300);
   },
-}
+};

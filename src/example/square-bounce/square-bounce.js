@@ -1,12 +1,12 @@
 // Needs to be updated to latest behaviour
 /* eslint-disable import/no-unresolved */
-import { createGame } from "src/game/game.js"
-import { Bloc } from "src/game/bloc.js"
-import { blocUpdateVelocity } from "src/game/bloc.updates.js"
 import {
   blocEffectCollisionDetection,
   blocEffectCollisionResolutionBounce,
-} from "src/game/bloc.effects.js"
+} from "src/game/bloc.effects.js";
+import { Bloc } from "src/game/bloc.js";
+import { blocUpdateVelocity } from "src/game/bloc.updates.js";
+import { createGame } from "src/game/game.js";
 
 const createSquare = (props) => {
   return {
@@ -21,15 +21,15 @@ const createSquare = (props) => {
       "collision-color": ({ blocCollidingArray }) => {
         return {
           fillStyle: blocCollidingArray.length === 0 ? "green" : "red",
-        }
+        };
       },
     },
     width: 50,
     height: 50,
     fillStyle: "green",
     ...props,
-  }
-}
+  };
+};
 
 const blocs = [
   createSquare({
@@ -62,17 +62,17 @@ const blocs = [
     velocityX: 50,
     velocityY: -50,
   }),
-]
+];
 
 const game = createGame({
   worldContainer: true,
   worldWidth: 300,
   worldHeight: 400,
   blocs,
-})
+});
 
-document.body.appendChild(game.canvas)
-game.start()
+document.body.appendChild(game.canvas);
+game.start();
 
-window.game = game
-window.blocs = blocs
+window.game = game;
+window.blocs = blocs;

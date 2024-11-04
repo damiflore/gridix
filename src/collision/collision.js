@@ -1,5 +1,5 @@
-import { forEachPairs } from "src/helper/pairs.js"
-import { getCollisionInfo } from "./collisionInfo.js"
+import { forEachPairs } from "src/helper/pairs.js";
+import { getCollisionInfo } from "./collisionInfo.js";
 
 export const forEachCollidingPairs = ({
   rigidBodies,
@@ -8,10 +8,10 @@ export const forEachCollidingPairs = ({
 }) => {
   forEachPairs(rigidBodies, (a, b) => {
     if (canCollidePredicate(a, b)) {
-      const collisionInfo = getCollisionInfo(a, b)
+      const collisionInfo = getCollisionInfo(a, b);
       if (collisionInfo) {
-        pairCollisionCallback(a, b, collisionInfo)
+        pairCollisionCallback(a, b, collisionInfo);
       }
     }
-  })
-}
+  });
+};

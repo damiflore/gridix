@@ -57,5 +57,5 @@ export const createRigidBody = () => {
     velocityX: 0,
     velocityY: 0,
     velocityAngle: 0,
-  }
-}
+  };
+};

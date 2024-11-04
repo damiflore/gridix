@@ -1,4 +1,4 @@
-import { rotateVector } from "./vector.js"
+import { rotateVector } from "./vector.js";
 
 export const circleToStartPoint = ({ centerX, centerY, radius, angle }) => {
   return rotateVector(
@@ -7,5 +7,5 @@ export const circleToStartPoint = ({ centerX, centerY, radius, angle }) => {
       y: centerY - radius,
     },
     { centerX, centerY, angle },
-  )
-}
+  );
+};

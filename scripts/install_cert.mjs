@@ -7,17 +7,17 @@
  */
 
 import {
-    installCertificateAuthority,
-    verifyHostsFile,
-  } from "@jsenv/https-local"
-  
-  await installCertificateAuthority({
-    tryToTrust: !process.env.CI,
-    NSSDynamicInstall: true,
-  })
-  await verifyHostsFile({
-    ipMappings: {
-      "127.0.0.1": ["localhost"],
-    },
-    tryToUpdatesHostsFile: !process.env.CI,
-  })
+  installCertificateAuthority,
+  verifyHostsFile,
+} from "@jsenv/https-local";
+
+await installCertificateAuthority({
+  tryToTrust: !process.env.CI,
+  NSSDynamicInstall: true,
+});
+await verifyHostsFile({
+  ipMappings: {
+    "127.0.0.1": ["localhost"],
+  },
+  tryToUpdatesHostsFile: !process.env.CI,
+});

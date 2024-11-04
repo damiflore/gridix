@@ -4,7 +4,7 @@ https://developers.google.com/web/updates/2018/07/page-lifecycle-api
 https://github.com/GoogleChromeLabs/page-lifecycle
 
 */
-import pageLifecyle from "page-lifecycle"
+import pageLifecyle from "page-lifecycle";
 
 export const registerPageLifecyle = ({
   // user see and interacts with the page
@@ -20,27 +20,27 @@ export const registerPageLifecyle = ({
 
   notifyCurrent = true,
 }) => {
-  const callbacks = { active, passive, hidden, frozen, terminated }
+  const callbacks = { active, passive, hidden, frozen, terminated };
 
   const check = () => {
-    const pageState = getPageLifecycleState()
-    callbacks[pageState]()
-  }
+    const pageState = getPageLifecycleState();
+    callbacks[pageState]();
+  };
 
   if (notifyCurrent) {
-    check()
+    check();
   }
 
-  return listenPageLifecyleStateChange(check)
-}
+  return listenPageLifecyleStateChange(check);
+};
 
 const getPageLifecycleState = () => {
-  return pageLifecyle.state
-}
+  return pageLifecyle.state;
+};
 
 const listenPageLifecyleStateChange = (callback) => {
-  pageLifecyle.addEventListener("statechange", callback)
+  pageLifecyle.addEventListener("statechange", callback);
   return () => {
-    pageLifecyle.removeEventListener("statechange", callback)
-  }
-}
+    pageLifecyle.removeEventListener("statechange", callback);
+  };
+};

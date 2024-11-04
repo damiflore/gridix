@@ -45,5 +45,5 @@ export const devServer = await startDevServer({
 });
 
 if (process.argv.includes("--open")) {
-  open(`${devServer.origin}/main.html`);
+  open(`${devServer.origin}/index.html`);
 }

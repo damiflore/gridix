@@ -1,5 +1,5 @@
-import { getCollisionInfo } from "../collision/collisionInfo.js"
-import { forEachPairs } from "../helper/pairs.js"
+import { getCollisionInfo } from "../collision/collisionInfo.js";
+import { forEachPairs } from "../helper/pairs.js";
 
 export const forEachCollidingPairs = ({
   world,
@@ -8,16 +8,16 @@ export const forEachCollidingPairs = ({
 }) => {
   forEachPairs(world.getGameObjects(), (a, b) => {
     if (canCollidePredicate(a, b)) {
-      const collisionInfo = getCollisionInfo(a, b)
+      const collisionInfo = getCollisionInfo(a, b);
       if (collisionInfo) {
         if (a.debugCollisionDetection || b.debugCollisionDetection) {
-          a.debugCollisionDetection = false
-          b.debugCollisionDetection = false
+          a.debugCollisionDetection = false;
+          b.debugCollisionDetection = false;
           // eslint-disable-next-line no-debugger
-          debugger
+          debugger;
         }
-        pairCollisionCallback(a, b, collisionInfo)
+        pairCollisionCallback(a, b, collisionInfo);
       }
     }
-  })
-}
+  });
+};

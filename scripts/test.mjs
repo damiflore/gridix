@@ -3,20 +3,15 @@
  * See https://github.com/jsenv/jsenv-core/blob/master/docs/testing/readme.md#jsenv-test-runner
  */
 
-import {
-  executeTestPlan,
-  chromium,
+import { chromium, executeTestPlan } from "@jsenv/test";
 
-} from "@jsenv/test"
-
- await executeTestPlan({
+await executeTestPlan({
   rootDirectoryUrl: new URL("../", import.meta.url),
   testPlan: {
     "./src/**/*.test.html": {
       chromium: {
         runtime: chromium(),
       },
-     
     },
   },
   webServer: {
@@ -24,4 +19,4 @@ import {
     rootDirectoryUrl: new URL("../src/", import.meta.url),
     moduleUrl: new URL("./dev.mjs", import.meta.url),
   },
-})
+});

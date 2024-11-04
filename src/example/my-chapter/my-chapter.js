@@ -31,55 +31,55 @@ ou au moin de petit fichier html pour tester des cas concrets
 */
 
 // import { drawCollisionInfo } from "./draw/draw.js"
-import { motionAllowedFromMass } from "./physic/physic.motion.js"
-import { demoBloc } from "./demo-bloc.js"
-import { demoCool } from "./demo-cool.js"
+import { demoBloc } from "./demo-bloc.js";
+import { demoCool } from "./demo-cool.js";
+import { motionAllowedFromMass } from "./physic/physic.motion.js";
 // import { forEachCollidingPairs } from "./collision/collision.js"
-import { updateDevtool } from "./devtool.js"
-import { createGameEngine } from "./engine/engine.js"
-import { registerPageLifecyle } from "./page/page-lifecyle.js"
+import { updateDevtool } from "./devtool.js";
+import { createGameEngine } from "./engine/engine.js";
+import { registerPageLifecyle } from "./page/page-lifecyle.js";
 
-const demoPhysic = true
+const demoPhysic = true;
 
-let gameObjectSelected = null
-const world = demoPhysic ? demoCool() : demoBloc()
+let gameObjectSelected = null;
+const world = demoPhysic ? demoCool() : demoBloc();
 // const world = demoCool()
-const canvas = document.createElement("canvas")
-canvas.width = world.width
-canvas.height = world.height
-document.querySelector("#container").appendChild(canvas)
-const context = canvas.getContext("2d")
+const canvas = document.createElement("canvas");
+canvas.width = world.width;
+canvas.height = world.height;
+document.querySelector("#container").appendChild(canvas);
+const context = canvas.getContext("2d");
 
 const gameEngine = createGameEngine({
   framePerSecond: 60,
   update: (stepInfo) => {
-    world.update(stepInfo)
+    world.update(stepInfo);
   },
 
   draw: (stepInfo) => {
-    world.draw(stepInfo, context)
+    world.draw(stepInfo, context);
 
-    const { framePerSecondEstimation, memoryUsed, memoryLimit } = stepInfo
+    const { framePerSecondEstimation, memoryUsed, memoryLimit } = stepInfo;
 
-    context.clearRect(0, 0, world.width, world.height)
-    context.strokeStyle = "blue"
+    context.clearRect(0, 0, world.width, world.height);
+    context.strokeStyle = "blue";
     world.forEachGameObject((gameObject) => {
-      const { draw } = gameObject
+      const { draw } = gameObject;
       if (!draw) {
-        return
+        return;
       }
 
       if (gameObject === gameObjectSelected) {
-        gameObject.strokeStyle = "orange"
-        gameObject.lineWidth = 4
+        gameObject.strokeStyle = "orange";
+        gameObject.lineWidth = 4;
       } else {
-        gameObject.strokeStyle = "blue"
-        gameObject.lineWidth = 1
+        gameObject.strokeStyle = "blue";
+        gameObject.lineWidth = 1;
       }
-      gameObject.alpha = gameObject.sleeping ? 0.5 : 1
+      gameObject.alpha = gameObject.sleeping ? 0.5 : 1;
 
-      gameObject.draw(gameObject, context)
-    })
+      gameObject.draw(gameObject, context);
+    });
 
     updateDevtool({
       textContents: {
@@ -116,180 +116,184 @@ const gameEngine = createGameEngine({
         "game-object-selected-friction-ambient": gameObjectSelected
           ? gameObjectSelected.frictionAmbient
           : "",
-        "game-object-selected-mass": gameObjectSelected ? gameObjectSelected.mass : "",
+        "game-object-selected-mass": gameObjectSelected
+          ? gameObjectSelected.mass
+          : "",
         "game-object-selected-restitution": gameObjectSelected
           ? gameObjectSelected.restitution
           : "",
-        "game-object-selected-friction": gameObjectSelected ? gameObjectSelected.friction : "",
+        "game-object-selected-friction": gameObjectSelected
+          ? gameObjectSelected.friction
+          : "",
       },
 
       onClicks: {
         "play": () => {
-          gameEngine.startGameLoop()
+          gameEngine.startGameLoop();
         },
         "pause": () => {
-          gameEngine.pauseGameLoop()
+          gameEngine.pauseGameLoop();
         },
         "resume": () => {
-          gameEngine.resumeGameLoop()
+          gameEngine.resumeGameLoop();
         },
         "step": () => {
-          gameEngine.pauseGameLoop()
+          gameEngine.pauseGameLoop();
         },
 
         "debug-collision-detection": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.debugCollisionDetection = true
+            gameObjectSelected.debugCollisionDetection = true;
           }
         },
         "debug-collision-resolution": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.debugCollisionResolution = true
+            gameObjectSelected.debugCollisionResolution = true;
           }
         },
 
         "wakeup": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.sleeping = false
+            gameObjectSelected.sleeping = false;
           }
         },
         "sleep": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.sleeping = true
+            gameObjectSelected.sleeping = true;
           }
         },
         "debug-sleep": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.debugSleep = true
+            gameObjectSelected.debugSleep = true;
           }
         },
 
         "move-left": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.centerX -= 10
+            gameObjectSelected.centerX -= 10;
           }
         },
         "move-right": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.centerX += 10
+            gameObjectSelected.centerX += 10;
           }
         },
         "move-up": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.centerY -= 10
+            gameObjectSelected.centerY -= 10;
           }
         },
         "move-down": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.centerY += 10
+            gameObjectSelected.centerY += 10;
           }
         },
         "rotate-decrease": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.angle -= 0.1
+            gameObjectSelected.angle -= 0.1;
           }
         },
         "rotate-increase": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.angle += 0.1
+            gameObjectSelected.angle += 0.1;
           }
         },
         "velocity-x-decrease": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.velocityX -= 1
+            gameObjectSelected.velocityX -= 1;
           }
         },
         "velocity-x-increase": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.velocityX += 1
+            gameObjectSelected.velocityX += 1;
           }
         },
         "velocity-y-decrease": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.velocityY -= 1
+            gameObjectSelected.velocityY -= 1;
           }
         },
         "velocity-y-increase": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.velocityY += 1
+            gameObjectSelected.velocityY += 1;
           }
         },
         "velocity-angle-decrease": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.velocityAngle -= 0.1
+            gameObjectSelected.velocityAngle -= 0.1;
           }
         },
         "velocity-angle-increase": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.velocityAngle += 0.1
+            gameObjectSelected.velocityAngle += 0.1;
           }
         },
         "mass-negative": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.mass = -1
+            gameObjectSelected.mass = -1;
           }
         },
         "mass-positive": () => {
           if (gameObjectSelected) {
-            gameObjectSelected.mass = 1
+            gameObjectSelected.mass = 1;
           }
         },
         "gravity-enable": () => {
-          world.gravity = true
+          world.gravity = true;
         },
         "gravity-disable": () => {
-          world.gravity = false
+          world.gravity = false;
         },
         "excite": () => {
           world.forEachGameObject((gameObject) => {
             if (motionAllowedFromMass(gameObject.mass)) {
-              gameObject.velocityX = Math.random() * 500 - 250
-              gameObject.velocityY = Math.random() * 500 - 250
+              gameObject.velocityX = Math.random() * 500 - 250;
+              gameObject.velocityY = Math.random() * 500 - 250;
             }
-          })
+          });
         },
       },
-    })
+    });
   },
-})
+});
 window.addEventListener("error", () => {
-  gameEngine.stopGameLoop()
-})
+  gameEngine.stopGameLoop();
+});
 registerPageLifecyle({
   active: () => {
-    gameEngine.resumeGameLoop()
-    document.title = "active"
+    gameEngine.resumeGameLoop();
+    document.title = "active";
   },
   passive: () => {
-    gameEngine.resumeGameLoop()
-    document.title = "passive"
+    gameEngine.resumeGameLoop();
+    document.title = "passive";
   },
   hidden: () => {
-    gameEngine.pauseGameLoop()
-    document.title = "hidden"
+    gameEngine.pauseGameLoop();
+    document.title = "hidden";
   },
   frozen: () => {
-    gameEngine.pauseGameLoop()
+    gameEngine.pauseGameLoop();
   },
-})
+});
 // the first loop of the game engine is likely more expensive than the others
 // - internal logic might setup things
 // - browser might realize we will or just have created a lot of objects
 // so wait a bit for browser to be peaceful before starting the game engine
 window.requestIdleCallback(
   () => {
-    gameEngine.startGameLoop()
+    gameEngine.startGameLoop();
   },
   { timeout: 200 },
-)
+);
 
 canvas.addEventListener("click", (clickEvent) => {
   const clickPoint = {
     x: clickEvent.offsetX,
     y: clickEvent.offsetY,
-  }
-  const gameObjectUnderClick = world.gameObjectFromPoint(clickPoint)
+  };
+  const gameObjectUnderClick = world.gameObjectFromPoint(clickPoint);
   if (gameObjectUnderClick) {
-    gameObjectSelected = gameObjectUnderClick
+    gameObjectSelected = gameObjectUnderClick;
   }
-})
+});

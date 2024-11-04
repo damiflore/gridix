@@ -1,33 +1,33 @@
-import { createWorld, addBoundsToWorld } from "./world/world.js"
-import { motionAllowedFromMass } from "./physic/physic.motion.js"
-import { createRectangle, createCircle } from "./world/shape.js"
+import { motionAllowedFromMass } from "./physic/physic.motion.js";
+import { createCircle, createRectangle } from "./world/shape.js";
+import { addBoundsToWorld, createWorld } from "./world/world.js";
 
 export const demoCool = () => {
   const world = createWorld({
     width: 800,
     height: 450,
-  })
+  });
 
-  addBoundsToWorld(world)
+  addBoundsToWorld(world);
 
-  const gravity = 200
+  const gravity = 200;
 
-  world.gravity = true
+  world.gravity = true;
   world.addGameObject({
     name: "gravity",
     update: () => {
       if (!world.gravity) {
-        return
+        return;
       }
       world.forEachGameObject((gameObject) => {
         if (gameObject.rigid && motionAllowedFromMass(gameObject.mass)) {
           gameObject.forces.push({
             y: gravity * gameObject.mass,
-          })
+          });
         }
-      })
+      });
     },
-  })
+  });
 
   const rectangle = createRectangle({
     strokeStyle: "blue",
@@ -40,8 +40,8 @@ export const demoCool = () => {
     restitution: 0,
     angle: 2.8,
     rigid: true,
-  })
-  world.addGameObject(rectangle)
+  });
+  world.addGameObject(rectangle);
   world.addGameObject(
     createRectangle({
       strokeStyle: "blue",
@@ -54,7 +54,7 @@ export const demoCool = () => {
       restitution: 0.5,
       rigid: true,
     }),
-  )
+  );
   world.addGameObject(
     createRectangle({
       strokeStyle: "blue",
@@ -65,7 +65,7 @@ export const demoCool = () => {
       mass: 0,
       rigid: true,
     }),
-  )
+  );
   world.addGameObject(
     createRectangle({
       strokeStyle: "blue",
@@ -78,9 +78,9 @@ export const demoCool = () => {
       restitution: 1,
       rigid: true,
     }),
-  )
+  );
 
-  let i = 10
+  let i = 10;
   while (i--) {
     world.addGameObject(
       createRectangle({
@@ -97,7 +97,7 @@ export const demoCool = () => {
         velocityY: Math.random() * 60 - 30,
         rigid: true,
       }),
-    )
+    );
     world.addGameObject(
       createCircle({
         strokeStyle: "blue",
@@ -111,8 +111,8 @@ export const demoCool = () => {
         velocityY: Math.random() * 60 - 30,
         rigid: true,
       }),
-    )
+    );
   }
 
-  return world
-}
+  return world;
+};

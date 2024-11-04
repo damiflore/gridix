@@ -1,41 +1,50 @@
-import React from "react"
+import React from "react";
 
 export const GameObjectInspection = ({ world, gameObjectInspected }) => {
   if (!gameObjectInspected) {
-    return "no game object inspected"
+    return "no game object inspected";
   }
 
-  const [updateCount, updateCountSetter] = React.useState(0)
+  const [updateCount, updateCountSetter] = React.useState(0);
   React.useEffect(() => {
     const gameObject = {
       update: () => {
         updateCountSetter((updateCount) => {
-          return updateCount + 1
-        })
+          return updateCount + 1;
+        });
       },
-    }
-    world.addGameObject(gameObject)
+    };
+    world.addGameObject(gameObject);
     return () => {
-      world.removeGameObject(gameObject)
-    }
-  }, [])
+      world.removeGameObject(gameObject);
+    };
+  }, []);
 
   return (
     <>
       <span>{gameObjectInspected.name}</span>
       <button
         onClick={() => {
-          console.log(gameObjectInspected)
+          console.log(gameObjectInspected);
         }}
       >
         Log in console
       </button>
-      <ShapeDevtools updateCount={updateCount} gameObjectInspected={gameObjectInspected} />
-      <StyleDevtools updateCount={updateCount} gameObjectInspected={gameObjectInspected} />
-      <RigidBodyDevtools updateCount={updateCount} gameObjectInspected={gameObjectInspected} />
+      <ShapeDevtools
+        updateCount={updateCount}
+        gameObjectInspected={gameObjectInspected}
+      />
+      <StyleDevtools
+        updateCount={updateCount}
+        gameObjectInspected={gameObjectInspected}
+      />
+      <RigidBodyDevtools
+        updateCount={updateCount}
+        gameObjectInspected={gameObjectInspected}
+      />
     </>
-  )
-}
+  );
+};
 
 const ShapeDevtools = ({ updateCount, gameObjectInspected }) => {
   if (gameObjectInspected.shapeName === "rectangle") {
@@ -46,7 +55,7 @@ const ShapeDevtools = ({ updateCount, gameObjectInspected }) => {
         propertyGroupTitle={"rectangle"}
         propertyGroupNames={RECTANGLE_SHAPE_PROPS}
       />
-    )
+    );
   }
 
   if (gameObjectInspected.shapeName === "circle") {
@@ -56,17 +65,17 @@ const ShapeDevtools = ({ updateCount, gameObjectInspected }) => {
         propertyGroupTitle={"circle"}
         propertyGroupNames={CIRCLE_SHAPE_PROPS}
       />
-    )
+    );
   }
-  return null
-}
-const SHAPE_PROPS = ["centerX", "centerY", "angle"]
-const RECTANGLE_SHAPE_PROPS = [...SHAPE_PROPS, "width", "height"]
-const CIRCLE_SHAPE_PROPS = [...SHAPE_PROPS, "radius"]
+  return null;
+};
+const SHAPE_PROPS = ["centerX", "centerY", "angle"];
+const RECTANGLE_SHAPE_PROPS = [...SHAPE_PROPS, "width", "height"];
+const CIRCLE_SHAPE_PROPS = [...SHAPE_PROPS, "radius"];
 
 const StyleDevtools = ({ gameObjectInspected }) => {
   if (!gameObjectInspected.draw) {
-    return null
+    return null;
   }
 
   return (
@@ -75,13 +84,13 @@ const StyleDevtools = ({ gameObjectInspected }) => {
       propertyGroupTitle={"styles"}
       propertyGroupNames={STYLE_PROPS}
     />
-  )
-}
-const STYLE_PROPS = ["strokeStyle", "fillStyle", "alpha", "lineWidth"]
+  );
+};
+const STYLE_PROPS = ["strokeStyle", "fillStyle", "alpha", "lineWidth"];
 
 const RigidBodyDevtools = ({ gameObjectInspected }) => {
   if (!gameObjectInspected.rigid) {
-    return null
+    return null;
   }
 
   return (
@@ -90,8 +99,8 @@ const RigidBodyDevtools = ({ gameObjectInspected }) => {
       propertyGroupTitle={"physics"}
       propertyGroupNames={PHYSIC_PROPS}
     />
-  )
-}
+  );
+};
 
 const PHYSIC_PROPS = [
   "velocityX",
@@ -102,7 +111,7 @@ const PHYSIC_PROPS = [
   "frictionAmbient",
   "restitution",
   "rotationInertiaCoef",
-]
+];
 
 const PropertyGroup = ({ object, propertyGroupTitle, propertyGroupNames }) => {
   return (
@@ -110,17 +119,21 @@ const PropertyGroup = ({ object, propertyGroupTitle, propertyGroupNames }) => {
       <summary>{propertyGroupTitle}</summary>
       <ol>
         {propertyGroupNames.map((key) => {
-          const value = object[key]
+          const value = object[key];
           return (
             <li key={key}>
-              <EditableObjectProperty object={object} propertyName={key} propertyValue={value} />
+              <EditableObjectProperty
+                object={object}
+                propertyName={key}
+                propertyValue={value}
+              />
             </li>
-          )
+          );
         })}
       </ol>
     </details>
-  )
-}
+  );
+};
 
 // TODO: en faisant un double click on peut éditer une valeur
 // Nice to have: a dedicated way to update value for some properties
@@ -132,11 +145,11 @@ const EditableObjectProperty = ({ object, propertyName, propertyValue }) => {
         <EditableInputNumber
           value={propertyValue}
           onChange={(value) => {
-            object[propertyName] = value
+            object[propertyName] = value;
           }}
         />
       </span>
-    )
+    );
   }
 
   if (typeof propertyValue === "boolean") {
@@ -144,7 +157,7 @@ const EditableObjectProperty = ({ object, propertyName, propertyValue }) => {
       <span>
         {propertyName}: {propertyValue}
       </span>
-    )
+    );
   }
 
   if (typeof propertyValue === "string") {
@@ -152,22 +165,22 @@ const EditableObjectProperty = ({ object, propertyName, propertyValue }) => {
       <span>
         {propertyName}: {propertyValue}
       </span>
-    )
+    );
   }
 
-  return null
-}
+  return null;
+};
 
 const EditableInputNumber = ({ value, onChange }) => {
-  const inputNodeRef = React.useRef()
-  const [editable, editableSetter] = React.useState(false)
-  const [valueLocal, valueLocalSetter] = React.useState(value)
-  const charCount = String(valueLocal).length + 1
-  const fontSize = 12 // should be dynamic
+  const inputNodeRef = React.useRef();
+  const [editable, editableSetter] = React.useState(false);
+  const [valueLocal, valueLocalSetter] = React.useState(value);
+  const charCount = String(valueLocal).length + 1;
+  const fontSize = 12; // should be dynamic
 
   React.useEffect(() => {
-    valueLocalSetter(value)
-  }, [value])
+    valueLocalSetter(value);
+  }, [value]);
 
   return (
     <input
@@ -183,33 +196,33 @@ const EditableInputNumber = ({ value, onChange }) => {
       //   valueEditedSetter(valueFromInput)
       // }}
       onKeyDown={(keydownEvent) => {
-        const inputNode = inputNodeRef.current
+        const inputNode = inputNodeRef.current;
         if (keydownEvent.key === "Enter") {
-          inputNode.blur()
+          inputNode.blur();
         }
       }}
       onChange={() => {
-        valueLocalSetter(inputNodeRef.current.value)
+        valueLocalSetter(inputNodeRef.current.value);
       }}
       onBlur={() => {
-        const floatValue = floatValueFromInput(inputNodeRef.current)
-        valueLocalSetter(floatValue)
-        onChange(floatValue)
-        editableSetter(false)
+        const floatValue = floatValueFromInput(inputNodeRef.current);
+        valueLocalSetter(floatValue);
+        onChange(floatValue);
+        editableSetter(false);
       }}
       onDoubleClick={() => {
-        editableSetter(true)
+        editableSetter(true);
       }}
       value={valueLocal}
     />
-  )
-}
+  );
+};
 
 const floatValueFromInput = (input) => {
-  const { value } = input
+  const { value } = input;
   if (value === "") {
-    return 0
+    return 0;
   }
-  const floatValue = parseFloat(value)
-  return floatValue
-}
+  const floatValue = parseFloat(value);
+  return floatValue;
+};

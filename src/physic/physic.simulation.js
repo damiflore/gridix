@@ -1,8 +1,8 @@
-import { handleMotion } from "./physic.motion.js"
-import { handleCollision } from "./physic.collision.js"
-import { handleSleep } from "./physic.sleep.js"
+import { handleCollision } from "./physic.collision.js";
+import { handleMotion } from "./physic.motion.js";
+import { handleSleep } from "./physic.sleep.js";
 
-const PHYSIC_SIMULATION_MAX_DURATION = 15
+const PHYSIC_SIMULATION_MAX_DURATION = 15;
 
 // it's arcade 2d physic
 export const createSimulation = ({
@@ -37,36 +37,36 @@ export const createSimulation = ({
   onRigidBodyMoved = () => {},
   onRigidBodyRemoved = () => {},
 } = {}) => {
-  const simulation = {}
+  const simulation = {};
 
-  const rigidBodies = []
+  const rigidBodies = [];
 
   const addRigidBody = (rigidBody) => {
-    rigidBodies.push(rigidBody)
-    onRigidBodyAdded(rigidBody)
-  }
+    rigidBodies.push(rigidBody);
+    onRigidBodyAdded(rigidBody);
+  };
 
   const removeRigidBody = (rigidBody) => {
-    const index = rigidBodies.indexOf(rigidBody)
+    const index = rigidBodies.indexOf(rigidBody);
     if (index === -1) {
-      return
+      return;
     }
-    rigidBodies.splice(index, 1)
-    onRigidBodyRemoved(rigidBody)
-  }
+    rigidBodies.splice(index, 1);
+    onRigidBodyRemoved(rigidBody);
+  };
 
   let step = (stepInfo) => {
     handleMotion({
       rigidBodies,
       stepInfo,
-    })
+    });
     handleCollision({
       rigidBodies,
       bounceThreshold,
       collisionPositionResolution: true,
       collisionVelocityImpact: true,
       onRigidBodyCollision,
-    })
+    });
     handleSleep({
       rigidBodies,
       stepInfo,
@@ -75,29 +75,29 @@ export const createSimulation = ({
       sleepVelocityThreshold,
       sleepStartDuration,
       onRigidBodyMoved,
-    })
-  }
+    });
+  };
 
   if (import.meta.dev) {
-    const stepOriginal = step
+    const stepOriginal = step;
     step = (stepInfo) => {
-      const startMs = Date.now()
-      stepOriginal(stepInfo)
-      const endMs = Date.now()
-      const duration = endMs - startMs
+      const startMs = Date.now();
+      stepOriginal(stepInfo);
+      const endMs = Date.now();
+      const duration = endMs - startMs;
       if (duration > PHYSIC_SIMULATION_MAX_DURATION) {
         console.warn(
           `physic simulation is too slow, took ${duration}ms (should be less than ${PHYSIC_SIMULATION_MAX_DURATION})`,
-        )
+        );
       }
-    }
+    };
   }
 
   Object.assign(simulation, {
     step,
     addRigidBody,
     removeRigidBody,
-  })
+  });
 
-  return simulation
-}
+  return simulation;
+};

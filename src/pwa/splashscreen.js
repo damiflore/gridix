@@ -1,1 +1,1 @@
-window.splashscreen.remove()
+window.splashscreen.remove();

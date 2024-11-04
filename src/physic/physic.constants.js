@@ -6,4 +6,4 @@ export const PHYSIC_CONSTANTS = {
   // velocityXEffectFloor: 0.00001,
   // velocityYEffectFloor: 0.00001,
   // velocityAngleEffectFloor: 0.000001,
-}
+};

@@ -1,35 +1,35 @@
-import React from "react"
-import { addDOMEventListener } from "src/helper/dom.js"
-import { useNodeSize } from "src/helper/hooks.js"
-import { DevtoolsView } from "./devtools.view.js"
-import { InspectGesture } from "./InspectGesture.js"
-import { HighlightCanvas } from "./HighlightCanvas.js"
-import { clamp } from "src/math/math.js"
+import React from "react";
+import { addDOMEventListener } from "src/helper/dom.js";
+import { useNodeSize } from "src/helper/hooks.js";
+import { clamp } from "src/math/math.js";
+import { DevtoolsView } from "./devtools.view.js";
+import { HighlightCanvas } from "./HighlightCanvas.js";
+import { InspectGesture } from "./InspectGesture.js";
 
 export const Devtools = ({ world, worldNode }) => {
-  const worldMinHeight = 150
-  const devtoolsMinHeight = 100
-  const stateFromStorage = fromStorage() || { opened: false, height: 0 }
+  const worldMinHeight = 150;
+  const devtoolsMinHeight = 100;
+  const stateFromStorage = fromStorage() || { opened: false, height: 0 };
 
-  const [opened, openedSetter] = React.useState(stateFromStorage.opened)
-  const [worldHeight, worldHeightSetter] = React.useState(0)
-  const [devtoolsHeight, devtoolsHeightSetter] = React.useState(0)
-  const [height, heightSetter] = React.useState(stateFromStorage.height)
-  const [inspecting, inspectingSetter] = React.useState(false)
+  const [opened, openedSetter] = React.useState(stateFromStorage.opened);
+  const [worldHeight, worldHeightSetter] = React.useState(0);
+  const [devtoolsHeight, devtoolsHeightSetter] = React.useState(0);
+  const [height, heightSetter] = React.useState(stateFromStorage.height);
+  const [inspecting, inspectingSetter] = React.useState(false);
 
-  const worldSize = useNodeSize({ current: worldNode })
-  const heightAvailable = worldSize.height
+  const worldSize = useNodeSize({ current: worldNode });
+  const heightAvailable = worldSize.height;
 
   const open = () => {
-    openedSetter(true)
-  }
+    openedSetter(true);
+  };
   const close = () => {
-    openedSetter(false)
-  }
+    openedSetter(false);
+  };
 
   React.useEffect(() => {
-    world.devtools.opened = opened
-  }, [opened])
+    world.devtools.opened = opened;
+  }, [opened]);
 
   React.useEffect(() => {
     localStorage.setItem(
@@ -38,59 +38,68 @@ export const Devtools = ({ world, worldNode }) => {
         opened,
         height,
       }),
-    )
-  }, [opened, height])
+    );
+  }, [opened, height]);
 
   React.useEffect(() => {
     // https://stackoverflow.com/questions/11941180/available-keyboard-shortcuts-for-web-applications
     // pour etre safe, le focus ne devrait pas etre dans un input etc
     // pour le moment osef
-    const removeKeydownListener = addDOMEventListener(document, "keydown", (keydownEvent) => {
-      if (keydownEvent.metaKey && keydownEvent.code === "KeyI") {
-        keydownEvent.preventDefault()
-        if (opened) {
-          close()
-        } else {
-          inspectingSetter(true)
-          open()
+    const removeKeydownListener = addDOMEventListener(
+      document,
+      "keydown",
+      (keydownEvent) => {
+        if (keydownEvent.metaKey && keydownEvent.code === "KeyI") {
+          keydownEvent.preventDefault();
+          if (opened) {
+            close();
+          } else {
+            inspectingSetter(true);
+            open();
+          }
         }
-      }
-    })
+      },
+    );
     return () => {
-      removeKeydownListener()
-    }
-  }, [opened])
+      removeKeydownListener();
+    };
+  }, [opened]);
 
   React.useEffect(() => {
-    const remainingHeight = heightAvailable - worldMinHeight
-    devtoolsHeightSetter(clamp(height, devtoolsMinHeight, remainingHeight))
-  }, [heightAvailable, height])
+    const remainingHeight = heightAvailable - worldMinHeight;
+    devtoolsHeightSetter(clamp(height, devtoolsMinHeight, remainingHeight));
+  }, [heightAvailable, height]);
 
   React.useEffect(() => {
     if (opened) {
-      worldHeightSetter(clamp(heightAvailable - devtoolsHeight, worldMinHeight))
+      worldHeightSetter(
+        clamp(heightAvailable - devtoolsHeight, worldMinHeight),
+      );
     } else {
-      worldHeightSetter(heightAvailable)
+      worldHeightSetter(heightAvailable);
     }
-  }, [heightAvailable, devtoolsHeight, opened])
+  }, [heightAvailable, devtoolsHeight, opened]);
 
   React.useEffect(() => {
-    const worldViewNode = worldNode.children[0]
-    worldViewNode.style.height = `${worldHeight}px`
-  }, [worldHeight])
+    const worldViewNode = worldNode.children[0];
+    worldViewNode.style.height = `${worldHeight}px`;
+  }, [worldHeight]);
 
   React.useEffect(() => {
-    const worldDevtoolsNode = worldNode.children[1]
-    worldDevtoolsNode.style.height = `${devtoolsHeight}px`
-  }, [devtoolsHeight])
+    const worldDevtoolsNode = worldNode.children[1];
+    worldDevtoolsNode.style.height = `${devtoolsHeight}px`;
+  }, [devtoolsHeight]);
 
   React.useEffect(() => {
-    const worldDevtoolsNode = worldNode.children[1]
-    worldDevtoolsNode.style.display = opened ? "" : "none"
-  }, [opened])
+    const worldDevtoolsNode = worldNode.children[1];
+    worldDevtoolsNode.style.display = opened ? "" : "none";
+  }, [opened]);
 
-  const [gameObjectInspected, gameObjectInspectedSetter] = React.useState(world.hero)
-  const [gameObjectToHighlight, gameObjectToHighlightSetter] = React.useState(null)
+  const [gameObjectInspected, gameObjectInspectedSetter] = React.useState(
+    world.hero,
+  );
+  const [gameObjectToHighlight, gameObjectToHighlightSetter] =
+    React.useState(null);
 
   return (
     <>
@@ -99,14 +108,14 @@ export const Devtools = ({ world, worldNode }) => {
           world={world}
           worldNode={worldNode}
           onInspectHover={(gameObjectOrNull) => {
-            gameObjectToHighlightSetter(gameObjectOrNull)
+            gameObjectToHighlightSetter(gameObjectOrNull);
           }}
           onInspectSelect={(gameObjectOrNull) => {
-            gameObjectInspectedSetter(gameObjectOrNull)
-            gameObjectToHighlightSetter(null)
+            gameObjectInspectedSetter(gameObjectOrNull);
+            gameObjectToHighlightSetter(null);
 
             // stop inspection
-            inspectingSetter(false)
+            inspectingSetter(false);
           }}
         />
       ) : null}
@@ -123,41 +132,41 @@ export const Devtools = ({ world, worldNode }) => {
           inspecting={inspecting}
           gameObjectInspected={gameObjectInspected}
           onInspectStart={() => {
-            inspectingSetter(true)
+            inspectingSetter(true);
           }}
           onInspectStop={() => {
-            inspectingSetter(false)
+            inspectingSetter(false);
           }}
           onResizeTop={(data) => {
-            const { moveY } = data
+            const { moveY } = data;
             heightSetter((height) => {
-              return height + moveY * -1
-            })
+              return height + moveY * -1;
+            });
           }}
           onClickLayoutBottomSmall={() => {
-            heightSetter(heightAvailable * 0.2)
+            heightSetter(heightAvailable * 0.2);
           }}
           onClickLayoutBottomMedium={() => {
-            heightSetter(heightAvailable * 0.5)
+            heightSetter(heightAvailable * 0.5);
           }}
           onClickLayoutBottomBig={() => {
-            heightSetter(heightAvailable * 0.8)
+            heightSetter(heightAvailable * 0.8);
           }}
           onClickCloseDevtools={() => {
-            close()
+            close();
           }}
         />
       ) : null}
     </>
-  )
-}
+  );
+};
 
 const fromStorage = () => {
-  const localStorageSource = localStorage.getItem("game-devtool")
+  const localStorageSource = localStorage.getItem("game-devtool");
   try {
-    return JSON.parse(localStorageSource)
+    return JSON.parse(localStorageSource);
   } catch (e) {
-    console.warn(e)
-    return null
+    console.warn(e);
+    return null;
   }
-}
+};

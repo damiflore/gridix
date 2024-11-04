@@ -1,12 +1,12 @@
 export const memoize = (fn) => {
-  let called = false
-  let value
+  let called = false;
+  let value;
   return (...args) => {
     if (called) {
-      return value
+      return value;
     }
-    value = fn(...args)
-    called = true
-    return value
-  }
-}
+    value = fn(...args);
+    called = true;
+    return value;
+  };
+};

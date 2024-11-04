@@ -1,4 +1,4 @@
-import { build } from "@jsenv/core"
+import { build } from "@jsenv/core";
 import { jsenvPluginReact } from "@jsenv/plugin-react";
 
 await build({
@@ -24,5 +24,4 @@ await build({
   minification: true,
   assetManifestFile: true,
   assetManifestFileRelativeUrl: "asset-manifest.json",
-})
-
+});
