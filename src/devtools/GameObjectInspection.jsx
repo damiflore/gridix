@@ -1,12 +1,12 @@
-import React from "react";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 export const GameObjectInspection = ({ world, gameObjectInspected }) => {
   if (!gameObjectInspected) {
     return "no game object inspected";
   }
 
-  const [updateCount, updateCountSetter] = React.useState(0);
-  React.useEffect(() => {
+  const [updateCount, updateCountSetter] = useState(0);
+  useEffect(() => {
     const gameObject = {
       update: () => {
         updateCountSetter((updateCount) => {
@@ -172,13 +172,13 @@ const EditableObjectProperty = ({ object, propertyName, propertyValue }) => {
 };
 
 const EditableInputNumber = ({ value, onChange }) => {
-  const inputNodeRef = React.useRef();
-  const [editable, editableSetter] = React.useState(false);
-  const [valueLocal, valueLocalSetter] = React.useState(value);
+  const inputNodeRef = useRef();
+  const [editable, editableSetter] = useState(false);
+  const [valueLocal, valueLocalSetter] = useState(value);
   const charCount = String(valueLocal).length + 1;
   const fontSize = 12; // should be dynamic
 
-  React.useEffect(() => {
+  useEffect(() => {
     valueLocalSetter(value);
   }, [value]);
 

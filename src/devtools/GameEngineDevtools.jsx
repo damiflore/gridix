@@ -1,23 +1,23 @@
-import React from "react";
+import { useEffect, useState } from "preact/hooks";
 
 export const GameEngineDevtools = ({ gameEngine }) => {
-  const [stopped, stoppedSetter] = React.useState(false);
-  React.useEffect(() => {
+  const [stopped, stoppedSetter] = useState(false);
+  useEffect(() => {
     stoppedSetter(gameEngine.isStopped());
     gameEngine.onStoppedStateChange = (stopped) => {
       stoppedSetter(stopped);
     };
   }, []);
 
-  const [paused, pausedSetter] = React.useState(false);
-  React.useEffect(() => {
+  const [paused, pausedSetter] = useState(false);
+  useEffect(() => {
     pausedSetter(gameEngine.isPaused());
     gameEngine.onPausedStateChange = (paused) => {
       pausedSetter(paused);
     };
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     gameEngine.pauseGameLoop();
     return () => {
       gameEngine.resumeGameLoop();

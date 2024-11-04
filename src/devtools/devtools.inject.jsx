@@ -1,5 +1,4 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import { render } from "preact";
 import { injectStylesheetIntoDocument } from "../helper/dom.js";
 import { Devtools } from "./devtools.jsx";
 
@@ -12,7 +11,7 @@ export const injectDevtools = ({ world, worldNode }) => {
   worldDevtoolsNode.className = "world-devtools";
   worldNode.appendChild(worldDevtoolsNode);
 
-  ReactDOM.render(
+  render(
     <Devtools world={world} worldNode={worldNode}></Devtools>,
     worldDevtoolsNode,
   );

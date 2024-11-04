@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect } from "preact/hooks";
 import { addDOMEventListener } from "../helper/dom.js";
 
 export const InspectGesture = ({
@@ -9,7 +9,7 @@ export const InspectGesture = ({
 }) => {
   const worldViewWrapperNode = worldNode.querySelector(".world-view-wrapper");
 
-  React.useEffect(() => {
+  useEffect(() => {
     return addDOMEventListener(
       worldViewWrapperNode,
       "mousemove",
@@ -26,7 +26,7 @@ export const InspectGesture = ({
     );
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     return addDOMEventListener(worldViewWrapperNode, "click", (clickEvent) => {
       const x = clickEvent.layerX;
       const y = clickEvent.layerY;

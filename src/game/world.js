@@ -153,7 +153,7 @@ export const createWorld = ({
 };
 
 const loadAndInjectDevtools = async (params) => {
-  const { injectDevtools } = await import("../devtools/devtools.inject.js");
+  const { injectDevtools } = await import("../devtools/devtools.inject.jsx");
   injectDevtools(params);
 };
 

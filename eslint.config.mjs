@@ -3,7 +3,7 @@ import { eslintConfigRelax } from "@jsenv/eslint-config-relax";
 export default [
   ...eslintConfigRelax({
     rootDirectoryUrl: new URL("./", import.meta.url),
-    browserFiles: ["src/**/*.js"],
+    browserDirectoryUrl: new URL("./src/", import.meta.url),
     jsxPragmaAuto: true,
   }),
   {

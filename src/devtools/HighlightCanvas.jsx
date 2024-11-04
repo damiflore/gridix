@@ -1,5 +1,5 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import { render } from "preact";
+import { useEffect, useRef } from "preact/hooks";
 import { drawPath } from "../draw/path.js";
 
 export const HighlightCanvas = ({
@@ -8,9 +8,9 @@ export const HighlightCanvas = ({
   gameObjectToHighlight,
 }) => {
   const worldViewWrapperNode = worldNode.querySelector(".world-view-wrapper");
-  const canvasNodeRef = React.useRef();
+  const canvasNodeRef = useRef();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const canvasNode = canvasNodeRef.current;
     const context = canvasNode.getContext("2d");
 
@@ -25,7 +25,7 @@ export const HighlightCanvas = ({
     }
   }, [gameObjectToHighlight]);
 
-  return ReactDOM.createPortal(
+  return render(
     <canvas
       ref={canvasNodeRef}
       width={world.worldWidth}
