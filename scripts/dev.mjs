@@ -20,7 +20,7 @@ export const devServer = await startDevServer({
     jsenvPluginExplorer({
       groups: {
         "app": {
-          "./main.html": true,
+          "./index.html": true,
         },
         "example": {
           "src/**/*.html": true,

@@ -1,8 +1,5 @@
-import {
-  listenAddToHomescreenAvailable,
-  promptAddToHomescreen,
-} from "@jsenv/pwa";
-import { createDOM } from "src/helper/dom.js";
+import { addToHomescreen } from "@jsenv/pwa";
+import { createDOM } from "../helper/dom.js";
 
 // on fera une sorte de notif, ou alors de bouton flotant quelque part
 const addToHomeScreenDocument = createDOM(
@@ -12,8 +9,8 @@ const buttonAddToHomescreen = addToHomeScreenDocument.querySelector("button");
 document.body.appendChild(buttonAddToHomescreen);
 
 buttonAddToHomescreen.onclick = () => {
-  promptAddToHomescreen();
+  addToHomescreen.prompt();
 };
-listenAddToHomescreenAvailable((available) => {
+addToHomescreen.listenAvailabilityChange((available) => {
   buttonAddToHomescreen.disabled = !available;
 });
