@@ -2,7 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import { addDOMEventListener } from "../helper/dom.js";
 import { useNodeSize } from "../helper/hooks.js";
 import { clamp } from "../math/math.js";
-import { DevtoolsView } from "./devtools.view.jsx";
+import { DevtoolsContent } from "./devtools_content.jsx";
 import { HighlightCanvas } from "./HighlightCanvas.jsx";
 import { InspectGesture } from "./InspectGesture.jsx";
 
@@ -124,7 +124,7 @@ export const Devtools = ({ world, worldNode }) => {
         />
       ) : null}
       {opened ? (
-        <DevtoolsView
+        <DevtoolsContent
           world={world}
           inspecting={inspecting}
           gameObjectInspected={gameObjectInspected}

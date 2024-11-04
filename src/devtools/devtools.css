@@ -1,6 +1,6 @@
-@import "./devtools.layout.css";
-@import "./engine-devtools.css";
-@import "./input.editable.css";
+@import "./devtools_layout.css";
+@import "./devtools_engine.css";
+@import "./input_editable.css";
 
 /* details.devtools-details-category {
 } */

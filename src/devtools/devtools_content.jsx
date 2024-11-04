@@ -1,9 +1,9 @@
-import React from "react";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { addDOMEventListener } from "../helper/dom.js";
 import { GameEngineDevtools } from "./GameEngineDevtools.jsx";
 import { GameObjectInspection } from "./GameObjectInspection.jsx";
 
-export const DevtoolsView = ({
+export const DevtoolsContent = ({
   world,
   inspecting,
   gameObjectInspected,
@@ -48,11 +48,11 @@ export const DevtoolsView = ({
 };
 
 const useDragGesture = () => {
-  const nodeRef = React.useRef();
+  const nodeRef = useRef();
 
-  const [dragGesture, dragGestureSetter] = React.useState({ type: "end" });
+  const [dragGesture, dragGestureSetter] = useState({ type: "end" });
 
-  React.useEffect(() => {
+  useEffect(() => {
     const node = nodeRef.current;
 
     let removeMousemoveListener = () => {};
@@ -115,9 +115,9 @@ const DevtoolsResizeTop = ({
   // onResizeTopEnd
 }) => {
   const [nodeRefForDrag, dragGesture] = useDragGesture();
-  const dragGesturePreviousRef = React.useRef(dragGesture);
+  const dragGesturePreviousRef = useRef(dragGesture);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // const dragGesturePrevious = dragGesturePreviousRef.current
     dragGesturePreviousRef.current = dragGesture;
 
@@ -136,7 +136,7 @@ const DevtoolsResizeTop = ({
 };
 
 const InputInspect = ({ inspecting, onInspectStart, onInspectStop }) => {
-  React.useEffect(() => {
+  useEffect(() => {
     if (!inspecting) {
       return null;
     }

@@ -7,7 +7,7 @@ import { startDevServer } from "@jsenv/core";
 import { requestCertificate } from "@jsenv/https-local";
 import { jsenvPluginCommonJs } from "@jsenv/plugin-commonjs";
 import { jsenvPluginExplorer } from "@jsenv/plugin-explorer";
-import { jsenvPluginReact } from "@jsenv/plugin-react";
+import { jsenvPluginPreact } from "@jsenv/plugin-preact";
 import open from "open";
 
 const { certificate, privateKey } = requestCertificate();
@@ -31,7 +31,7 @@ export const devServer = await startDevServer({
         },
       },
     }),
-    jsenvPluginReact(),
+    jsenvPluginPreact(),
     jsenvPluginCommonJs({
       include: {
         "./node_modules/phaser/src/phaser.js": true,

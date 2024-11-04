@@ -1,5 +1,5 @@
 import { build } from "@jsenv/core";
-import { jsenvPluginReact } from "@jsenv/plugin-react";
+import { jsenvPluginPreact } from "@jsenv/plugin-preact";
 
 await build({
   sourceDirectoryUrl: new URL("../src/", import.meta.url),
@@ -7,7 +7,7 @@ await build({
   entryPoints: {
     "./index.html": "index.html",
   },
-  plugins: [jsenvPluginReact()],
+  plugins: [jsenvPluginPreact()],
   serviceWorkers: {
     "./service-worker.js": "./service-worker.js",
   },
