@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { trackKeyboardKeydown } from "../../src/interaction/keyboard.js";
+import { trackKeyboardKeydown } from "../../interaction/keyboard.js";
 import {
   centerXFromCellX,
   centerYFromCellY,
