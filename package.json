@@ -34,9 +34,10 @@
     "build:local": "node ./scripts/build.mjs",
     "build:prod": "node ./scripts/build.mjs --prod",
     "build:serve": "node ./scripts/build_serve.mjs --open",
-    "test": "node ./script/test.mjs",
+    "test": "node ./scripts/test.mjs",
     "eslint": "npx eslint .",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+    "https:setup": "npx @jsenv/https-local setup"
   },
   "dependencies": {
     "@jsenv/pwa": "6.1.3",

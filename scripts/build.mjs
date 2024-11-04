@@ -8,9 +8,6 @@ await build({
     "./index.html": "index.html",
   },
   plugins: [jsenvPluginPreact()],
-  serviceWorkers: {
-    "./service-worker.js": "./service-worker.js",
-  },
   bundling: {
     js_module: {
       chunks: {
@@ -20,8 +17,6 @@ await build({
   },
   // disable preserveEntrySignatures otherwise an empty (and useless) file is generated
   // as main js entry point
-  preserveEntrySignatures: false,
   minification: true,
-  assetManifestFile: true,
   assetManifestFileRelativeUrl: "asset-manifest.json",
 });
