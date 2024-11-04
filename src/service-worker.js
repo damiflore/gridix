@@ -1,8 +1,12 @@
-/* globals self, config */
+// https://github.com/jsenv/core/tree/main/packages/independent/service-worker
 
-self.importScripts("./node_modules/@jsenv/pwa/src/service-worker.setup.js");
+self.importScripts("@jsenv/service-worker/src/jsenv_service_worker.js");
 
-config.cachePrefix = "pwa-template";
-// config.logLevel = "debug"
-
-self.importScripts("./node_modules/@jsenv/pwa/src/service-worker.main.js");
+self.__sw__.init({
+  name: "product-name",
+  // logLevel: "debug",
+  resources: {
+    "/": true,
+    ...(self.resourcesFromJsenvBuild || {}),
+  },
+});
